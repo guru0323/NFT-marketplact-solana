@@ -1,18 +1,18 @@
-import { useWallet } from '@solana/wallet-adapter-react';
-import { Col, Layout, Row, Tabs } from 'antd';
-import React, { useState } from 'react';
+import {useWallet} from '@solana/wallet-adapter-react';
+import {Col, Layout, Row, Tabs} from 'antd';
+import React, {useState} from 'react';
 import Masonry from 'react-masonry-css';
 
-import { useMeta } from '../../../../contexts';
-import { CardLoader } from '../../../../components/MyLoader';
-import { Banner } from '../../../../components/Banner';
-import { HowToBuyModal } from '../../../../components/HowToBuyModal';
+import {useMeta} from '../../../../contexts';
+import {CardLoader} from '../../../../components/MyLoader';
+import {Banner} from '../../../../components/Banner';
+import {HowToBuyModal} from '../../../../components/HowToBuyModal';
 
-import { useSales } from './hooks/useSales';
+import {useSales} from './hooks/useSales';
 import SaleCard from './components/SaleCard';
 
-const { TabPane } = Tabs;
-const { Content } = Layout;
+const {TabPane} = Tabs;
+const {Content} = Layout;
 
 export enum LiveAuctionViewState {
   All = '0',
@@ -36,21 +36,15 @@ export const SalesListView = () => {
 
   return (
     <>
-      {/* <Banner
-        src="/main-banner.svg"
-        headingText="Welcome to Akkoro's NFTs"
-        subHeadingText="Community-Built Marketplace"
-        actionComponent={}
-        useBannerBg
-      /> */}
+      <style jsx>{``}</style>
       <Layout>
         <Content style={{display: 'flex', flexWrap: 'wrap'}}>
           <Col style={{width: '100%'}}>
             <Row></Row>
           </Col>
           <Col style={{width: '100%'}}>
-            <div style={{margin: '1rem 0'}}>
-              <h3>Experimental Build</h3>
+            <div className={`mx-2 my-5  d-flex flex-column `}>
+              <h3 className={`text-white`}>Experimental Build</h3>
               This is a community-built marketplace for NFTs.
               <HowToBuyModal buttonClassName='secondary-btn' />
             </div>

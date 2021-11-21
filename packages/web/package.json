@@ -55,7 +55,7 @@
     "test": "jest --passWithNoTests",
     "deploy:ar": "yarn export && arweave deploy-dir  ../../build/web --key-file ",
     "deploy:gh": "yarn export",
-    "deploy:app": "cross-env ASSET_PREFIX=/metaplex/ yarn build && yarn deploy:gh",
+    "deploy:app": "cross-env ASSET_PREFIX=/metaplex/ yarn build",
     "format:fix": "prettier --write \"**/*.+(js|jsx|ts|tsx|json|css|md)\""
   },
   "browserslist": {

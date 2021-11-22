@@ -11,7 +11,6 @@ export const HEADER_CONTENT: Record<CreatePackSteps, HeaderContentRecord> = {
   [CreatePackSteps.AdjustQuantities]: {
     title: 'Adjust Quantities',
   },
-
   [CreatePackSteps.ReviewAndMint]: {
     title: 'Review and mint your pack',
   },

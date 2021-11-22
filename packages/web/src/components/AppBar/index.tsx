@@ -109,7 +109,7 @@ const MetaplexMenu = () => {
 export const LogoLink = () => {
   return (
     <Link to={`/`}>
-      <p className={`m-0`}>AKKORO's</p>
+      <img src={'/metaplex-logo.svg'} />
     </Link>
   );
 };

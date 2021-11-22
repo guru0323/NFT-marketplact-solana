@@ -1,18 +1,18 @@
-import {useWallet} from '@solana/wallet-adapter-react';
-import {Col, Layout, Row, Tabs} from 'antd';
-import React, {useState} from 'react';
+import { useWallet } from '@solana/wallet-adapter-react';
+import { Col, Layout, Row, Tabs } from 'antd';
+import React, { useState } from 'react';
 import Masonry from 'react-masonry-css';
 
-import {useMeta} from '../../../../contexts';
-import {CardLoader} from '../../../../components/MyLoader';
-import {Banner} from '../../../../components/Banner';
-import {HowToBuyModal} from '../../../../components/HowToBuyModal';
+import { useMeta } from '../../../../contexts';
+import { CardLoader } from '../../../../components/MyLoader';
+import { Banner } from '../../../../components/Banner';
+import { HowToBuyModal } from '../../../../components/HowToBuyModal';
 
-import {useSales} from './hooks/useSales';
+import { useSales } from './hooks/useSales';
 import SaleCard from './components/SaleCard';
 
-const {TabPane} = Tabs;
-const {Content} = Layout;
+const { TabPane } = Tabs;
+const { Content } = Layout;
 
 export enum LiveAuctionViewState {
   All = '0',

@@ -109,7 +109,7 @@ const MetaplexMenu = () => {
 export const LogoLink = () => {
   return (
     <Link to={`/`}>
-      AKKOROS
+      <p className='m-0'>AKKOROS</p>
     </Link>
   );
 };

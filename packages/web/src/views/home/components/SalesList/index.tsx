@@ -5,7 +5,6 @@ import Masonry from 'react-masonry-css';
 
 import { useMeta } from '../../../../contexts';
 import { CardLoader } from '../../../../components/MyLoader';
-import { Banner } from '../../../../components/Banner';
 import { HowToBuyModal } from '../../../../components/HowToBuyModal';
 
 import { useSales } from './hooks/useSales';
@@ -45,7 +44,7 @@ export const SalesListView = () => {
           <Col style={{width: '100%'}}>
             <div className={`mx-2 my-5  d-flex flex-column `}>
               <h3 className={`text-white`}>Experimental Build</h3>
-              This is a community-built marketplace for NFTs.
+              <p className='text-white'>This is a community-built marketplace for NFTs.</p>
               <HowToBuyModal buttonClassName='secondary-btn' />
             </div>
             <Row>

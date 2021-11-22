@@ -1,2 +1,8 @@
 
 node_modules/
+
+packages/common/dist/lib/models/metaplex/setStoreIndex.d.ts.map
+
+packages/common/dist/lib/models/metaplex/setStoreIndex.js.map
+
+packages/common/dist/tsconfig.tsbuildinfo

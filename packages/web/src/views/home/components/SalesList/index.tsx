@@ -35,19 +35,32 @@ export const SalesListView = () => {
 
   return (
     <>
-      <style jsx>{``}</style>
+      <style global jsx>{`
+        .btn-w {
+          width: 150px !important;
+        }
+      `}</style>
       <Layout>
         <Content style={{display: 'flex', flexWrap: 'wrap'}}>
           <Col style={{width: '100%'}}>
             <Row></Row>
           </Col>
           <Col style={{width: '100%'}}>
-            <div className={`mx-2 my-5  d-flex flex-column `}>
-              <h3 className={`text-white`}>Experimental Build</h3>
-              <p className='text-white'>
-                This is a community-built marketplace for NFTs.
+            <div
+              style={{width: '100%', maxWidth: '800px'}}
+              className={`mx-auto my-5 d-flex flex-column justify-content-center align-items-center text-center`}>
+              <h3 className={`text-white`} style={{fontSize: '2.75rem'}}>
+                Welcome to Akkoros.io!
+              </h3>
+              <p className='text-white' style={{fontSize: '1.5rem'}}>
+                We are a community working to decentralize NFTs and provide a
+                greater future for artists and creatives alike.
               </p>
-              <HowToBuyModal buttonClassName='secondary-btn' />
+              <div className='d-flex flex-column flex-md-row justify-content-around w-100 text-white py-2 my-5'>
+                <button className='btn btn-outline-light btn-w py-4'>Discord</button>
+                <button className='btn btn-outline-light btn-w py-4'>Twitter</button>
+              </div>
+              <HowToBuyModal buttonClassName='secondary-btn btn-w my-5' />
             </div>
             <Row>
               <Tabs

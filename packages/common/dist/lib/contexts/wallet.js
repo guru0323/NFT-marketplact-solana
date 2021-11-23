@@ -46,7 +46,7 @@ const WalletModal = () => {
                 color: 'rgba(255, 255, 255, 0.75)',
                 fontSize: '14px',
                 lineHeight: '14px',
-                fontFamily: 'GraphikWeb',
+                fontFamily: 'Graphikweb',
                 letterSpacing: '0.02em',
                 marginBottom: 14,
             } }, "RECOMMENDED"),

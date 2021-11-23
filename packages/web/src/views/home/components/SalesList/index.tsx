@@ -9,6 +9,7 @@ import {HowToBuyModal} from '../../../../components/HowToBuyModal';
 
 import {useSales} from './hooks/useSales';
 import SaleCard from './components/SaleCard';
+import {useRouter} from 'next/router';
 
 const {TabPane} = Tabs;
 const {Content} = Layout;
@@ -32,12 +33,20 @@ export const SalesListView = () => {
   const {isLoading} = useMeta();
   const {connected} = useWallet();
   const {sales, hasResaleAuctions} = useSales(activeKey);
-
+  const router = useRouter();
   return (
     <>
       <style global jsx>{`
         .btn-w {
           width: 150px !important;
+        }
+        a {
+          color: #fff; /* blue colors for links too */
+          text-decoration: inherit; /* no underline */
+        }
+        a:visited {
+          color: #fff; /* blue colors for links too */
+          text-decoration: inherit; /* no underline */
         }
       `}</style>
       <Layout>
@@ -57,8 +66,24 @@ export const SalesListView = () => {
                 greater future for artists and creatives alike.
               </p>
               <div className='d-flex flex-column flex-md-row justify-content-around w-100 text-white py-2 my-5'>
-                <button className='btn btn-outline-light btn-w py-4'>Discord</button>
-                <button className='btn btn-outline-light btn-w py-4'>Twitter</button>
+                <a
+                  className='btn btn-outline-light btn-w py-4'
+                  href='https://discord.gg/DnbkrC8'
+                  target={'_blank'}>
+                  Discord
+                </a>
+                <a
+                  className='btn btn-outline-light btn-w py-4'
+                  href='https://github.com/AKKOROWEB/akkoro-client'
+                  target={'_blank'}>
+                  Github
+                </a>
+                <a
+                  className='btn btn-outline-light btn-w py-4'
+                  href='https://twitter.com/akkoros'
+                  target={'_blank'}>
+                  Twitter
+                </a>
               </div>
               <HowToBuyModal buttonClassName='secondary-btn btn-w my-5' />
             </div>

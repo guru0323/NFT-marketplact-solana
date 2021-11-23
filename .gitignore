@@ -6,3 +6,9 @@ packages/common/dist/lib/models/metaplex/setStoreIndex.d.ts.map
 packages/common/dist/lib/models/metaplex/setStoreIndex.js.map
 
 packages/common/dist/tsconfig.tsbuildinfo
+
+packages/common/dist/lib/contexts/meta/meta.d.ts.map
+
+packages/common/dist/lib/contexts/meta/meta.js.map
+
+packages/common/dist/lib/components/ConnectButton/index.js.map

@@ -1,17 +1,17 @@
-import { useWallet } from '@solana/wallet-adapter-react';
-import { Col, Layout, Row, Tabs } from 'antd';
-import React, { useState } from 'react';
+import {useWallet} from '@solana/wallet-adapter-react';
+import {Col, Layout, Row, Tabs} from 'antd';
+import React, {useState} from 'react';
 import Masonry from 'react-masonry-css';
 
-import { useMeta } from '../../../../contexts';
-import { CardLoader } from '../../../../components/MyLoader';
-import { HowToBuyModal } from '../../../../components/HowToBuyModal';
+import {useMeta} from '../../../../contexts';
+import {CardLoader} from '../../../../components/MyLoader';
+import {HowToBuyModal} from '../../../../components/HowToBuyModal';
 
-import { useSales } from './hooks/useSales';
+import {useSales} from './hooks/useSales';
 import SaleCard from './components/SaleCard';
 
-const { TabPane } = Tabs;
-const { Content } = Layout;
+const {TabPane} = Tabs;
+const {Content} = Layout;
 
 export enum LiveAuctionViewState {
   All = '0',
@@ -44,7 +44,9 @@ export const SalesListView = () => {
           <Col style={{width: '100%'}}>
             <div className={`mx-2 my-5  d-flex flex-column `}>
               <h3 className={`text-white`}>Experimental Build</h3>
-              <p className='text-white'>This is a community-built marketplace for NFTs.</p>
+              <p className='text-white'>
+                This is a community-built marketplace for NFTs.
+              </p>
               <HowToBuyModal buttonClassName='secondary-btn' />
             </div>
             <Row>
@@ -54,21 +56,23 @@ export const SalesListView = () => {
                 <TabPane
                   tab={
                     <>
-                      <span className='live'></span> Live
+                      <span className='live'></span> Live Auction
                     </>
                   }
-                  key={LiveAuctionViewState.All}></TabPane>
-                {hasResaleAuctions && (
-                  <TabPane
-                    tab='Secondary Marketplace'
-                    key={LiveAuctionViewState.Resale}></TabPane>
-                )}
-                <TabPane tab='Ended' key={LiveAuctionViewState.Ended}></TabPane>
-                {connected && (
+                  key={LiveAuctionViewState.All}
+                />
+
+                <TabPane
+                  tab='The Marketplace'
+                  key={LiveAuctionViewState.Resale}
+                />
+
+                {/* <TabPane tab='Ended' key={LiveAuctionViewState.Ended}></TabPane> */}
+                {/* {connected && (
                   <TabPane
                     tab='Participated'
                     key={LiveAuctionViewState.Participated}></TabPane>
-                )}
+                )} */}
               </Tabs>
             </Row>
             <Row>
@@ -76,8 +80,6 @@ export const SalesListView = () => {
                 breakpointCols={breakpointColumnsObj}
                 className='masonry-grid'
                 columnClassName='masonry-grid_column'>
-                {isLoading &&
-                  [...Array(10)].map((_, idx) => <CardLoader key={idx} />)}
                 {!isLoading &&
                   sales.map((sale, idx) => <SaleCard sale={sale} key={idx} />)}
               </Masonry>

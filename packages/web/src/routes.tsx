@@ -22,6 +22,11 @@ export function Routes() {
   const shouldEnableNftPacks = process.env.NEXT_ENABLE_NFT_PACKS;
   return (
     <>
+    <style global jsx>{`
+      body {
+      color:#fff !important;
+      }
+    `}</style>
       <HashRouter basename={'/'}>
         <Providers>
           <Switch>

@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { ArtCard } from '../../components/ArtCard';
-import { Layout, Row, Col, Tabs, Button } from 'antd';
+import React, {useEffect, useState} from 'react';
+import {ArtCard} from '../../components/ArtCard';
+import {Layout, Row, Col, Tabs, Button} from 'antd';
 import Masonry from 'react-masonry-css';
-import { Link } from 'react-router-dom';
-import { useCreatorArts, useUserArts } from '../../hooks';
-import { useMeta } from '../../contexts';
-import { CardLoader } from '../../components/MyLoader';
-import { useWallet } from '@solana/wallet-adapter-react';
+import {Link} from 'react-router-dom';
+import {useCreatorArts, useUserArts} from '../../hooks';
+import {useMeta} from '../../contexts';
+import {CardLoader} from '../../components/MyLoader';
+import {useWallet} from '@solana/wallet-adapter-react';
 
-const { TabPane } = Tabs;
+const {TabPane} = Tabs;
 
-const { Content } = Layout;
+const {Content} = Layout;
 
 export enum ArtworkViewState {
   Metaplex = '0',
@@ -19,10 +19,10 @@ export enum ArtworkViewState {
 }
 
 export const ArtworksView = () => {
-  const { connected, publicKey } = useWallet();
+  const {connected, publicKey} = useWallet();
   const ownedMetadata = useUserArts();
   const createdMetadata = useCreatorArts(publicKey?.toBase58() || '');
-  const { metadata, isLoading, pullAllMetadata, storeIndexer } = useMeta();
+  const {metadata, isLoading, pullAllMetadata, storeIndexer} = useMeta();
   const [activeKey, setActiveKey] = useState(ArtworkViewState.Metaplex);
   const breakpointColumnsObj = {
     default: 4,
@@ -33,7 +33,7 @@ export const ArtworksView = () => {
 
   const items =
     activeKey === ArtworkViewState.Owned
-      ? ownedMetadata.map(m => m.metadata)
+      ? ownedMetadata.map((m) => m.metadata)
       : activeKey === ArtworkViewState.Created
       ? createdMetadata
       : metadata;
@@ -49,9 +49,8 @@ export const ArtworksView = () => {
   const artworkGrid = (
     <Masonry
       breakpointCols={breakpointColumnsObj}
-      className="my-masonry-grid"
-      columnClassName="my-masonry-grid_column"
-    >
+      className='my-masonry-grid'
+      columnClassName='my-masonry-grid_column'>
       {!isLoading
         ? items.map((m, idx) => {
             const id = m.pubkey;
@@ -71,38 +70,39 @@ export const ArtworksView = () => {
     </Masonry>
   );
 
-  const refreshButton = connected && storeIndexer.length !== 0 &&
-  <Button className="refresh-button" onClick={() => pullAllMetadata()}>Refresh</Button>
+  const refreshButton = connected && storeIndexer.length !== 0 && (
+    <Button className='refresh-button' onClick={() => pullAllMetadata()}>
+      Refresh
+    </Button>
+  );
 
   return (
-    <Layout style={{ margin: 0, marginTop: 30 }}>
-      <Content style={{ display: 'flex', flexWrap: 'wrap' }}>
-        <Col style={{ width: '100%', marginTop: 10 }}>
+    <Layout style={{margin: 0, marginTop: 30}}>
+      <Content style={{display: 'flex', flexWrap: 'wrap'}}>
+        <Col style={{width: '100%', marginTop: 10}}>
           <Row>
             <Tabs
               activeKey={activeKey}
-              onTabClick={key => setActiveKey(key as ArtworkViewState)}
-              tabBarExtraContent={refreshButton}
-            >
-              <TabPane
-                tab={<span className="tab-title">All</span>}
-                key={ArtworkViewState.Metaplex}
-              >
-                {artworkGrid}
-              </TabPane>
-              {connected && (
+              onTabClick={(key) => setActiveKey(key as ArtworkViewState)}
+              tabBarExtraContent={refreshButton}>
+              {!connected && (
                 <TabPane
-                  tab={<span className="tab-title">Owned</span>}
-                  key={ArtworkViewState.Owned}
-                >
+                  tab={<span className='tab-title'>All</span>}
+                  key={ArtworkViewState.Metaplex}>
                   {artworkGrid}
                 </TabPane>
               )}
               {connected && (
                 <TabPane
-                  tab={<span className="tab-title">Created</span>}
-                  key={ArtworkViewState.Created}
-                >
+                  tab={<span className='tab-title'>Owned</span>}
+                  key={ArtworkViewState.Owned}>
+                  {artworkGrid}
+                </TabPane>
+              )}
+              {connected && (
+                <TabPane
+                  tab={<span className='tab-title'>Created</span>}
+                  key={ArtworkViewState.Created}>
                   {artworkGrid}
                 </TabPane>
               )}

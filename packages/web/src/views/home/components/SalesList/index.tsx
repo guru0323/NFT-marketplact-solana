@@ -59,7 +59,7 @@ export const SalesListView = () => {
               style={{width: '100%', maxWidth: '800px'}}
               className={`mx-auto my-5 d-flex flex-column justify-content-center align-items-center text-center`}>
               <h3 className={`text-white`} style={{fontSize: '2.75rem'}}>
-                Welcome to Akkoros.io!
+                Welcome to Akkoros.xyz!
               </h3>
               <p className='text-white' style={{fontSize: '1.5rem'}}>
                 We are a community working to decentralize NFTs and provide a

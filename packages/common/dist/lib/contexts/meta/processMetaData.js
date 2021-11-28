@@ -10,8 +10,7 @@ const processMetaData = async ({ account, pubkey }, setter) => {
     try {
         if (isMetadataV1Account(account)) {
             const metadata = actions_1.decodeMetadata(account.data);
-            if (isValidHttpUrl_1.isValidHttpUrl(metadata.data.uri) &&
-                metadata.data.uri.indexOf('arweave') >= 0) {
+            if (isValidHttpUrl_1.isValidHttpUrl(metadata.data.uri)) {
                 const parsedAccount = {
                     pubkey,
                     account,

@@ -735,7 +735,7 @@ const CategoryStep = (props: {
               </div>
             </Button>
           </Row>
-          <Row>
+          {/* <Row>
             <Button
               className="type-btn"
               size="large"
@@ -748,8 +748,8 @@ const CategoryStep = (props: {
                 </div>
               </div>
             </Button>
-          </Row>
-          <Row>
+          </Row> */}
+          {/* <Row>
             <Button
               className="type-btn"
               size="large"
@@ -762,8 +762,8 @@ const CategoryStep = (props: {
                 </div>
               </div>
             </Button>
-          </Row>
-          <Row>
+          </Row> */}
+          {/* <Row>
             <Button
               className="type-btn"
               size="large"
@@ -777,7 +777,7 @@ const CategoryStep = (props: {
                 </div>
               </div>
             </Button>
-          </Row>
+          </Row> */}
           <Row>
             <Button
               className="type-btn"

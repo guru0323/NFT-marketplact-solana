@@ -4,10 +4,7 @@ p {
   font-style: normal;
   font-size: 0.9rem;
 }
-.ant-collapse-ghost
-  > .ant-collapse-item
-  > .ant-collapse-content
-  > .ant-collapse-content-box {
+.ant-collapse-ghost > .ant-collapse-item > .ant-collapse-content > .ant-collapse-content-box {
   padding: 0 8px;
 }
 .ant-collapse > .ant-collapse-item > .ant-collapse-header .ant-collapse-arrow {
@@ -92,7 +89,7 @@ p {
 }
 .ant-modal-content {
   border-radius: 12px;
-  background: #2a2a2a;
+  background: #2A2A2A;
 }
 .ant-modal-header {
   border-radius: 12px 12px 0 0;

@@ -125,7 +125,7 @@ export const AppBar = (props: P) => {
       <Row wrap={false} align="middle">
         <Col flex="0 0 auto">
           <Link to="/" id="metaplex-header-logo">
-            <img src={props.logo} />
+            AKKOROS
           </Link>
         </Col>
         <Col flex="1 0 0" style={{ overflow: 'hidden' }}>

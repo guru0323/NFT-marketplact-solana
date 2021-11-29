@@ -1,17 +1,17 @@
-import { LoadingOutlined } from '@ant-design/icons';
-import { useStore } from '@oyster/common';
-import { useWallet } from '@solana/wallet-adapter-react';
-import { Alert, Button, Spin } from 'antd';
+import {LoadingOutlined} from '@ant-design/icons';
+import {useStore} from '@oyster/common';
+import {useWallet} from '@solana/wallet-adapter-react';
+import {Alert, Button, Spin} from 'antd';
 import React from 'react';
 import useInfiniteScroll from 'react-infinite-scroll-hook';
-import { Link } from 'react-router-dom';
-import { AuctionRenderCard } from '../../components/AuctionRenderCard';
-import { MetaplexMasonry } from '../../components/MetaplexMasonry';
+import {Link} from 'react-router-dom';
+import {AuctionRenderCard} from '../../components/AuctionRenderCard';
+import {MetaplexMasonry} from '../../components/MetaplexMasonry';
 import {
   useAuctionManagersToCache,
   useInfiniteScrollAuctions,
 } from '../../hooks';
-import { Banner } from '../../components/Banner';
+import {Banner} from '../../components/Banner';
 
 export enum LiveAuctionViewState {
   All = '0',
@@ -21,8 +21,13 @@ export enum LiveAuctionViewState {
 }
 
 export const AuctionListView = () => {
-  const { auctions, loading, initLoading, hasNextPage, loadMore } =
-    useInfiniteScrollAuctions();
+  const {
+    auctions,
+    loading,
+    initLoading,
+    hasNextPage,
+    loadMore,
+  } = useInfiniteScrollAuctions();
 
   const [sentryRef] = useInfiniteScroll({
     loading,
@@ -31,34 +36,32 @@ export const AuctionListView = () => {
     rootMargin: '0px 0px 200px 0px',
   });
 
-  const { ownerAddress, storefront } = useStore();
+  const {ownerAddress, storefront} = useStore();
   const wallet = useWallet();
-  const { auctionManagerTotal, auctionCacheTotal } =
-    useAuctionManagersToCache();
+  const {auctionManagerTotal, auctionCacheTotal} = useAuctionManagersToCache();
   const isStoreOwner = ownerAddress === wallet.publicKey?.toBase58();
   const notAllAuctionsCached = auctionManagerTotal !== auctionCacheTotal;
   const showCacheAuctionsAlert = isStoreOwner && notAllAuctionsCached;
 
   return initLoading ? (
-    <div className="app-section--loading">
+    <div className='app-section--loading'>
       <Spin indicator={<LoadingOutlined />} />
     </div>
   ) : (
     <>
       {showCacheAuctionsAlert && (
         <Alert
-          message="Attention Store Owner"
-          className="app-alert-banner metaplex-spacing-bottom-lg"
+          message='Attention Store Owner'
+          className='app-alert-banner metaplex-spacing-bottom-lg'
           description={
             <p>
               Make your storefront faster by enabling listing caches.{' '}
               {auctionCacheTotal}/{auctionManagerTotal} of your listing have a
               cache account. Watch this{' '}
               <a
-                rel="noopener noreferrer"
-                target="_blank"
-                href="https://youtu.be/02V7F07DFbk"
-              >
+                rel='noopener noreferrer'
+                target='_blank'
+                href='https://youtu.be/02V7F07DFbk'>
                 video
               </a>{' '}
               for more details and a walkthrough. On November 17rd storefronts
@@ -75,77 +78,20 @@ export const AuctionListView = () => {
           }
         />
       )}
-      {storefront.theme.banner && (
+      {
         <Banner
-          src={storefront.theme.banner}
-          headingText={''}
-          subHeadingText={''}
+          src={''}
+          headingText={'AKKOROS.xyz'}
+          subHeadingText={'PRE-PRE-ALPHA: Use w/ Caution'}
         />
-      )}
+      }
       <MetaplexMasonry>
         {auctions.map((m, idx) => {
-          type AuctionStatus =
-            | {
-                isInstantSale: false;
-                isLive: boolean;
-                hasBids: boolean;
-              }
-            | {
-                isInstantSale: true;
-                isLive: boolean;
-                soldOut: boolean;
-              };
-
-          interface AuctionStatusLabels {
-            status: AuctionStatus;
-            amount: string | number;
-          }
-
-          const useAuctionStatus = (
-            auctionView: any
-          ): AuctionStatusLabels => {
-
-            const countdown = auctionView.auction.info.timeToEnd();
-
-            let isLive = auctionView.state !== false;
-
-            if (auctionView.isInstantSale) {
-
-              return {
-                status: {isInstantSale: true, isLive, soldOut:false},
-                amount:0,
-              };
-            }
-
-            isLive =
-              isLive &&
-              !(
-                countdown?.days === 0 &&
-                countdown?.hours === 0 &&
-                countdown?.minutes === 0 &&
-                countdown?.seconds === 0
-              );
-
-            return {
-              status: {
-                isInstantSale: false,
-                isLive,
-                hasBids: false,
-              },
-              amount: 0,
-            };
-          };
-
           const id = m.auction.pubkey;
-
-          const {status} = useAuctionStatus(m);
           return (
-            // status.isInstantSale &&
-            status.isLive && (
-              <Link to={`/auction/${id}`} key={idx}>
-                <AuctionRenderCard key={id} auctionView={m} />
-              </Link>
-            )
+            <Link to={`/auction/${id}`} key={idx}>
+              <AuctionRenderCard key={id} auctionView={m} />
+            </Link>
           );
         })}
       </MetaplexMasonry>

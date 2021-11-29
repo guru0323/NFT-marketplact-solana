@@ -90,11 +90,11 @@ function AppWrapper({ storefront }: AppProps) {
   const appBody = (
     <>
       <Head>
-        {storefront.meta.favicon && (
+        {/* {storefront.meta.favicon && (
           <>
             <link rel="icon" type="image/png" href={storefront.meta.favicon} />
           </>
-        )}
+        )} */}
         <title>AKKOROS.xyz</title>
         <meta
           name="description"
@@ -103,7 +103,7 @@ function AppWrapper({ storefront }: AppProps) {
         />
         <meta
           property="og:title"
-          content={storefront.meta.title}
+          content={'AKKOROS.xyz'}
           key="og:title"
         />
         <meta

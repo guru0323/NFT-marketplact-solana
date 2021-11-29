@@ -18,7 +18,6 @@ export const InstantSaleStep = ({
   confirm: () => void;
 }) => {
   const [editionError, setEditionError] = useState<string>();
-  const [type, setType] = useState<any>(InstantSaleType.Single);
   const nft = attributes?.items[0];
   const isEdition = useMemo(() => !!nft?.edition, [nft]);
   const masterEdition = useMemo(() => nft?.masterEdition, [nft]);
@@ -63,11 +62,10 @@ export const InstantSaleStep = ({
                 ...attributes,
                 instantSaleType: value,
               });
-              setType(value);
             }}
           >
             <Option value={InstantSaleType.Single}>Sell unique token</Option>
-            { (
+            {availableSupply > 0 && (
               <Option value={InstantSaleType.Limited}>
                 Sell limited number of copies
               </Option>
@@ -78,7 +76,7 @@ export const InstantSaleStep = ({
               </Option>
             )}
           </Select>
-          {type == InstantSaleType.Limited && (
+          {availableSupply > 0 && (
             <>
               <span>
                 Each copy will be given unique edition number e.g. 1 of 30
@@ -87,17 +85,16 @@ export const InstantSaleStep = ({
                 autoFocus
                 placeholder="Enter number of copies sold"
                 allowClear
-                max={100}
                 onChange={info => {
                   setEditionError(undefined);
                   const editions = parseInt(info.target.value);
 
-                  // if (editions > availableSupply) {
-                  //   setEditionError(
-                  //     `The NFT can only generate ${availableSupply} more editions. Please lower the copy count.`,
-                  //   );
-                  //   return;
-                  // }
+                  if (editions > availableSupply) {
+                    setEditionError(
+                      `The NFT can only generate ${availableSupply} more editions. Please lower the copy count.`,
+                    );
+                    return;
+                  }
 
                   setAttributes({
                     ...attributes,

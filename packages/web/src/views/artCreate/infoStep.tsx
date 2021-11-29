@@ -1,9 +1,9 @@
-import {MinusCircleOutlined, PlusOutlined} from '@ant-design/icons';
-import {IMetadataExtension} from '@oyster/common';
-import {Button, Col, Form, Input, InputNumber, Row, Space} from 'antd';
+import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import { IMetadataExtension } from '@oyster/common';
+import { Button, Col, Form, Input, InputNumber, Row, Space } from 'antd';
 import React from 'react';
-import {useArtworkFiles} from '.';
-import {ArtCard} from '../../components/ArtCard';
+import { useArtworkFiles } from '.';
+import { ArtCard } from '../../components/ArtCard';
 
 export const InfoStep = (props: {
   attributes: IMetadataExtension;
@@ -11,11 +11,14 @@ export const InfoStep = (props: {
   setAttributes: (attr: IMetadataExtension) => void;
   confirm: () => void;
 }) => {
-  const {image, animation_url} = useArtworkFiles(props.files, props.attributes);
+  const { image, animation_url } = useArtworkFiles(
+    props.files,
+    props.attributes,
+  );
   const [form] = Form.useForm();
 
   return (
-    <Space className='metaplex-fullwidth' direction='vertical'>
+    <Space className="metaplex-fullwidth" direction="vertical">
       <>
         <h2>Describe your item</h2>
         <p>
@@ -24,7 +27,7 @@ export const InfoStep = (props: {
         </p>
       </>
 
-      <Row justify='space-between' align='middle' wrap={false}>
+      <Row justify="space-between" align="middle" wrap={false}>
         <Col span={6}>
           {props.attributes.image && (
             <ArtCard
@@ -38,15 +41,15 @@ export const InfoStep = (props: {
           )}
         </Col>
         <Col span={16}>
-          <Space className='metaplex-fullwidth' direction='vertical'>
+          <Space className="metaplex-fullwidth" direction="vertical">
             <label>
               <h3>Title</h3>
               <Input
                 autoFocus
-                placeholder='Max 50 characters'
+                placeholder="Max 50 characters"
                 allowClear
                 value={props.attributes.name}
-                onChange={(info) =>
+                onChange={info =>
                   props.setAttributes({
                     ...props.attributes,
                     name: info.target.value,
@@ -73,10 +76,10 @@ export const InfoStep = (props: {
             <label>
               <h3>Description</h3>
               <Input.TextArea
-                size='large'
-                placeholder='Max 500 characters'
+                size="large"
+                placeholder="Max 500 characters"
                 value={props.attributes.description}
-                onChange={(info) =>
+                onChange={info =>
                   props.setAttributes({
                     ...props.attributes,
                     description: info.target.value,
@@ -156,11 +159,11 @@ export const InfoStep = (props: {
       </Row>
 
       <Button
-        className='metaplex-fullwidth'
-        type='primary'
-        size='large'
+        className="metaplex-fullwidth"
+        type="primary"
+        size="large"
         onClick={() => {
-          form.validateFields().then((values) => {
+          form.validateFields().then(values => {
             const nftAttributes = values.attributes;
             // value is number if possible
             for (const nftAttribute of nftAttributes || []) {
@@ -177,7 +180,8 @@ export const InfoStep = (props: {
 
             props.confirm();
           });
-        }}>
+        }}
+      >
         Continue to royalties
       </Button>
     </Space>

@@ -12,6 +12,7 @@ import {
   useInfiniteScrollAuctions,
 } from '../../hooks';
 import {Banner} from '../../components/Banner';
+// import {useAuctionStatus} from '../../components/AuctionRenderCard/hooks/useAuctionStatus';
 
 export enum LiveAuctionViewState {
   All = '0',
@@ -87,11 +88,64 @@ export const AuctionListView = () => {
       )}
       <MetaplexMasonry>
         {auctions.map((m, idx) => {
-          const id = m.auction.pubkey;
-          console.log(m.auction.info.endedAt);
+          type AuctionStatus =
+            | {
+                isInstantSale: false;
+                isLive: boolean;
+                hasBids: boolean;
+              }
+            | {
+                isInstantSale: true;
+                isLive: boolean;
+                soldOut: boolean;
+              };
 
+          interface AuctionStatusLabels {
+            status: AuctionStatus;
+            amount: string | number;
+          }
+
+          const useAuctionStatus = (
+            auctionView: any
+          ): AuctionStatusLabels => {
+
+            const countdown = auctionView.auction.info.timeToEnd();
+
+            let isLive = auctionView.state !== false;
+
+            if (auctionView.isInstantSale) {
+
+              return {
+                status: {isInstantSale: true, isLive, soldOut:0},
+                amount:0,
+              };
+            }
+
+            isLive =
+              isLive &&
+              !(
+                countdown?.days === 0 &&
+                countdown?.hours === 0 &&
+                countdown?.minutes === 0 &&
+                countdown?.seconds === 0
+              );
+
+            return {
+              status: {
+                isInstantSale: false,
+                isLive,
+                hasBids: false,
+              },
+              amount: 0,
+            };
+          };
+
+          const id = m.auction.pubkey;
+
+          const {status} = useAuctionStatus(m);
           return (
-            m.auction.info.endedAt == undefined && (
+            // status.isInstantSale &&
+            status.isLive && (
               <Link to={`/auction/${id}`} key={idx}>
                 <AuctionRenderCard key={id} auctionView={m} />
               </Link>

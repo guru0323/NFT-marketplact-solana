@@ -40,28 +40,24 @@ export const ArtistView = () => {
       <Col span={24}>
         <h2>Artists</h2>
         <MetaplexMasonry>
-          {creators
-            .filter((m) => {
-              m.info.address !== '5WAb9rDN61iuq3Qh5LAvc68qrwg4rdgEQzpP4vwkwHHa';
-            })
-            .map((m, idx) => {
-              const address = m.info.address;
-              console.log(typeof address);
-              return (
-                <Link to={`/artists/${address}`} key={idx}>
-                  <ArtistCard
-                    key={address}
-                    active={address === id}
-                    artist={{
-                      address,
-                      name: m.info.name || '',
-                      image: m.info.image || '',
-                      link: m.info.twitter || '',
-                    }}
-                  />
-                </Link>
-              );
-            })}
+          {creators.map((m, idx) => {
+            const address = m.info.address;
+            console.log(typeof address);
+            return (
+              <Link to={`/artists/${address}`} key={idx}>
+                <ArtistCard
+                  key={address}
+                  active={address === id}
+                  artist={{
+                    address,
+                    name: m.info.name || '',
+                    image: m.info.image || '',
+                    link: m.info.twitter || '',
+                  }}
+                />
+              </Link>
+            );
+          })}
         </MetaplexMasonry>
       </Col>
       <Col span={24}>

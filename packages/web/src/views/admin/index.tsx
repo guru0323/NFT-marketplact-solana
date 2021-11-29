@@ -64,7 +64,6 @@ export const AdminView = () => {
   const { storeAddress, setStoreForOwner, isConfigured } = useStore();
 
   useEffect(() => {
-    // console.log(process.env.NEXT_PUBLIC_STORE_OWNER_ADDRES,wallet.publicKey)
     if (
       !store &&
       !storeAddress &&

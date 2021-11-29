@@ -1,13 +1,11 @@
+import { Card, CardProps, Divider, Space } from 'antd';
 import React from 'react';
-import { Card, CardProps } from 'antd';
-import { ArtContent } from '../ArtContent';
 import { AuctionView, useArt, useCreators } from '../../hooks';
 import { AmountLabel } from '../AmountLabel';
-import { MetaAvatar } from '../MetaAvatar';
+import { ArtContent } from '../ArtContent';
 import { AuctionCountdown } from '../AuctionNumbers';
-
-import { useAuctionStatus } from './hooks/useAuctionStatus';
-import { useTokenList } from '../../contexts/tokenList';
+import { MetaAvatar } from '../MetaAvatar';
+import { getHumanStatus, useAuctionStatus } from './hooks/useAuctionStatus';
 
 export interface AuctionCard extends CardProps {
   auctionView: AuctionView;
@@ -20,45 +18,31 @@ export const AuctionRenderCard = (props: AuctionCard) => {
   const creators = useCreators(auctionView);
   const name = art?.title || ' ';
 
-  const tokenInfo = useTokenList().mainnetTokens.filter(m=>m.address == auctionView.auction.info.tokenMint)[0]
   const { status, amount } = useAuctionStatus(auctionView);
+  const humanStatus = getHumanStatus(status);
 
   const card = (
-    <Card hoverable={true} className={`auction-render-card`} bordered={false}>
-      <div className={'card-art-info'}>
-        <div className={'card-artist-info'}>
-          <MetaAvatar creators={creators.length ? [creators[0]] : undefined} />
-          <span className={'artist-name'}>
-            {creators[0]?.name ||
-              creators[0]?.address?.substr(0, 6) ||
-              'Go to auction'}
-            ...
+    <Card hoverable bordered={false}>
+      <Space direction="vertical" className="metaplex-fullwidth">
+        <Space direction="horizontal">
+          <MetaAvatar creators={[creators[0]]} />
+          <span>
+            {creators[0]?.name || creators[0]?.address?.substr(0, 6)}...
           </span>
-        </div>
-        <div className={'art-content-wrapper'}>
-          <ArtContent
-            className="auction-image no-events"
-            preview={false}
-            pubkey={id}
-            allowMeshRender={false}
-          />
-        </div>
-        <div className={'art-name'}>{name}</div>
-        <div className={'art-auction-info'}>
-          <span className={'info-message'}>ENDING IN</span>
-          <AuctionCountdown auctionView={auctionView} labels={false} />
-        </div>
-      </div>
-      <div className="card-bid-info">
-        <span className={'text-uppercase info-message'}>{status}</span>
-        <AmountLabel
-          containerStyle={{ flexDirection: 'row' }}
-          title={status}
-          amount={amount}
-          iconSize={24}
-          tokenInfo={tokenInfo}
-        />
-      </div>
+        </Space>
+
+        <ArtContent preview={false} pubkey={id} allowMeshRender={false} card />
+        <h3>{name}</h3>
+
+        {!status.isInstantSale && status.isLive && (
+          <div>
+            <h5>ENDING IN</h5>
+            <AuctionCountdown auctionView={auctionView} labels={false} />
+          </div>
+        )}
+      </Space>
+      <Divider />
+      <AmountLabel title={humanStatus} amount={amount} />
     </Card>
   );
 

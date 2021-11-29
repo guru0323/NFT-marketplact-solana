@@ -27,7 +27,7 @@ const getEmptyMetaState = () => ({
     bidRedemptionV2sByAuctionManagerAndWinningIndex: {},
     auctionCaches: {},
     storeIndexer: [],
-    packs: {},
+    auctionCachesByAuctionManager: {},
 });
 exports.getEmptyMetaState = getEmptyMetaState;
 //# sourceMappingURL=getEmptyMetaState.js.map

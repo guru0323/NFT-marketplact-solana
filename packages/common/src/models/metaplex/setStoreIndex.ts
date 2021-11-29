@@ -1,7 +1,4 @@
-import {
-  SYSVAR_RENT_PUBKEY,
-  TransactionInstruction,
-} from '@solana/web3.js';
+import { SYSVAR_RENT_PUBKEY, TransactionInstruction } from '@solana/web3.js';
 import BN from 'bn.js';
 import { serialize } from 'borsh';
 
@@ -76,6 +73,7 @@ export async function setStoreIndex(
       isWritable: false,
     });
   }
+
   instructions.push(
     new TransactionInstruction({
       keys,

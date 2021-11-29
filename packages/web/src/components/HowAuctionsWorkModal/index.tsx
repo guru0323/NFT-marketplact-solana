@@ -1,17 +1,16 @@
-import { InstructionsModal } from '../InstructionsModal';
+import { ButtonProps } from 'antd';
 import React from 'react';
 import { LABELS } from '../../constants';
+import { InstructionsModal } from '../InstructionsModal';
 
-interface HowAuctionsWorkModalProps {
-  buttonClassName: string;
-}
-
-export const HowAuctionsWorkModal: React.FC<HowAuctionsWorkModalProps> = ({
-  buttonClassName,
+export const HowAuctionsWorkModal = (props: {
+  buttonSize?: ButtonProps['size'];
+  buttonType?: ButtonProps['type'];
+  buttonBlock?: boolean;
 }) => {
   return (
     <InstructionsModal
-      buttonClassName={buttonClassName}
+      {...props}
       buttonText="How Auctions Work"
       modalTitle="How Auctions Work"
       cardProps={[

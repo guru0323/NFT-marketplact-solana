@@ -1,17 +1,13 @@
-import React from 'react';
+/// <reference types="react" />
 import { PublicKey } from '@solana/web3.js';
 import { KnownTokenMap } from '../../utils';
-export declare const TokenIcon: (props: {
-    mintAddress?: string | PublicKey;
-    style?: React.CSSProperties;
-    size?: number;
-    className?: string;
-    tokenMap?: KnownTokenMap;
+export declare const TokenIcon: ({ mintAddress, size, tokenMap, }: {
+    mintAddress?: string | PublicKey | undefined;
+    size?: number | undefined;
+    tokenMap?: KnownTokenMap | undefined;
 }) => JSX.Element;
 export declare const PoolIcon: (props: {
     mintA: string;
     mintB: string;
-    style?: React.CSSProperties;
-    className?: string;
 }) => JSX.Element;
 //# sourceMappingURL=index.d.ts.map

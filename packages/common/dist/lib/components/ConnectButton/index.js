@@ -20,25 +20,25 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ConnectButton = void 0;
+const wallet_adapter_react_1 = require("@solana/wallet-adapter-react");
 const antd_1 = require("antd");
 const react_1 = __importStar(require("react"));
-const wallet_adapter_react_1 = require("@solana/wallet-adapter-react");
 const contexts_1 = require("../../contexts");
-const ConnectButton = (props) => {
-    const { children, disabled, allowWalletChange, className, ...rest } = props;
+const ConnectButton = ({ onClick, children, disabled, allowWalletChange, popoverPlacement, ...rest }) => {
     const { wallet, connect, connected } = wallet_adapter_react_1.useWallet();
     const { setVisible } = contexts_1.useWalletModal();
     const open = react_1.useCallback(() => setVisible(true), [setVisible]);
     const handleClick = react_1.useCallback(() => (wallet ? connect().catch(() => { }) : open()), [wallet, connect, open]);
     // only show if wallet selected or user connected
     if (!wallet || !allowWalletChange) {
-        return (react_1.default.createElement(antd_1.Button, { className: className || 'connector', ...rest, onClick: e => {
-                props.onClick ? props.onClick(e) : null;
+        return (react_1.default.createElement(antd_1.Button, { ...rest, onClick: e => {
+                onClick && onClick(e);
                 handleClick();
             }, disabled: connected && disabled }, connected ? children : 'Connect Wallet'));
     }
-    return (react_1.default.createElement(antd_1.Dropdown.Button, { className: className || (connected ? 'connector' : ''), onClick: handleClick, disabled: connected && disabled, overlay: react_1.default.createElement(antd_1.Menu, { className: 'black-dropdown' },
-            react_1.default.createElement(antd_1.Menu.Item, { onClick: open }, "Change Wallet")) }, "Connect"));
+    return (react_1.default.createElement(antd_1.Popover, { trigger: "click", placement: popoverPlacement, content: react_1.default.createElement(antd_1.Space, { direction: "vertical" },
+            react_1.default.createElement(antd_1.Button, { onClick: open }, "Change wallet")) },
+        react_1.default.createElement(antd_1.Button, { ...rest, onClick: handleClick, disabled: connected && disabled }, "Connect")));
 };
 exports.ConnectButton = ConnectButton;
 //# sourceMappingURL=index.js.map

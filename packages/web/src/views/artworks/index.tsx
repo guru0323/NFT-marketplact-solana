@@ -1,114 +1,74 @@
-import React, {useEffect, useState} from 'react';
-import {ArtCard} from '../../components/ArtCard';
-import {Layout, Row, Col, Tabs, Button} from 'antd';
-import Masonry from 'react-masonry-css';
-import {Link} from 'react-router-dom';
-import {useCreatorArts, useUserArts} from '../../hooks';
-import {useMeta} from '../../contexts';
-import {CardLoader} from '../../components/MyLoader';
-import {useWallet} from '@solana/wallet-adapter-react';
-
-const {TabPane} = Tabs;
-
-const {Content} = Layout;
-
-export enum ArtworkViewState {
-  Metaplex = '0',
-  Owned = '1',
-  Created = '2',
-}
+import { LoadingOutlined } from '@ant-design/icons';
+import {
+  loadMetadataForUsers,
+  useConnection,
+  useUserAccounts,
+} from '@oyster/common';
+import { useWallet } from '@solana/wallet-adapter-react';
+import { Button, Col, Row, Spin } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { ArtCard } from '../../components/ArtCard';
+import { MetaplexMasonry } from '../../components/MetaplexMasonry';
+import { useMeta } from '../../contexts';
+import { useUserArts } from '../../hooks';
 
 export const ArtworksView = () => {
-  const {connected, publicKey} = useWallet();
   const ownedMetadata = useUserArts();
-  const createdMetadata = useCreatorArts(publicKey?.toBase58() || '');
-  const {metadata, isLoading, pullAllMetadata, storeIndexer} = useMeta();
-  const [activeKey, setActiveKey] = useState(ArtworkViewState.Metaplex);
-  const breakpointColumnsObj = {
-    default: 4,
-    1100: 3,
-    700: 2,
-    500: 1,
-  };
-
-  const items =
-    activeKey === ArtworkViewState.Owned
-      ? ownedMetadata.map((m) => m.metadata)
-      : activeKey === ArtworkViewState.Created
-      ? createdMetadata
-      : metadata;
+  const [loadingArt, setLoadingArt] = useState(true);
+  const { whitelistedCreatorsByCreator, patchState } = useMeta();
+  const connection = useConnection();
+  const wallet = useWallet();
+  const { userAccounts } = useUserAccounts();
 
   useEffect(() => {
-    if (connected) {
-      setActiveKey(ArtworkViewState.Owned);
-    } else {
-      setActiveKey(ArtworkViewState.Metaplex);
-    }
-  }, [connected, setActiveKey]);
+    (async () => {
+      setLoadingArt(true);
+      const metadataState = await loadMetadataForUsers(
+        connection,
+        userAccounts,
+        whitelistedCreatorsByCreator,
+      );
 
-  const artworkGrid = (
-    <Masonry
-      breakpointCols={breakpointColumnsObj}
-      className='my-masonry-grid'
-      columnClassName='my-masonry-grid_column'>
-      {!isLoading &&
-        items.map((m, idx) => {
-          const id = m.pubkey;
-          return (
-            <Link to={`/art/${id}`} key={idx}>
-              <ArtCard
-                key={id}
-                pubkey={m.pubkey}
-                preview={false}
-                height={250}
-                width={250}
-              />
-            </Link>
-          );
-        })}
-    </Masonry>
-  );
+      patchState(metadataState);
+      setLoadingArt(false);
+    })();
+  }, [connection, wallet.connected, userAccounts]);
 
-  const refreshButton = connected && storeIndexer.length !== 0 && (
-    <Button className='refresh-button' onClick={() => pullAllMetadata()}>
-      Refresh
-    </Button>
-  );
+  if (loadingArt) {
+    return (
+      <div className="app-section--loading">
+        <Spin indicator={<LoadingOutlined />} />
+      </div>
+    );
+  }
 
   return (
-    <Layout style={{margin: 0, marginTop: 30}}>
-      <Content style={{display: 'flex', flexWrap: 'wrap'}}>
-        <Col style={{width: '100%', marginTop: 10}}>
-          <Row>
-            <Tabs
-              activeKey={activeKey}
-              onTabClick={(key) => setActiveKey(key as ArtworkViewState)}
-              tabBarExtraContent={refreshButton}>
-              {!connected && (
-                <TabPane
-                  tab={<span className='tab-title'>All</span>}
-                  key={ArtworkViewState.Metaplex}>
-                  {artworkGrid}
-                </TabPane>
-              )}
-              {connected && (
-                <TabPane
-                  tab={<span className='tab-title'>Owned</span>}
-                  key={ArtworkViewState.Owned}>
-                  {artworkGrid}
-                </TabPane>
-              )}
-              {connected && (
-                <TabPane
-                  tab={<span className='tab-title'>Created</span>}
-                  key={ArtworkViewState.Created}>
-                  {artworkGrid}
-                </TabPane>
-              )}
-            </Tabs>
-          </Row>
+    <>
+      <Row justify="space-between" align="middle">
+        <h2>Owned Artwork</h2>
+        <Link to="/auction/create/0">
+          <Button size="large" type="primary">Sell NFT</Button>
+        </Link>
+      </Row>
+      <Row>
+        <Col span={24}>
+          <MetaplexMasonry>
+            {ownedMetadata.map(m => {
+              const id = m.metadata.pubkey;
+              return (
+                <Link to={`/artworks/${id}`} key={id}>
+                  <ArtCard
+                    key={id}
+                    pubkey={m.metadata.pubkey}
+                    preview={false}
+                  />
+                </Link>
+              );
+            })}
+          </MetaplexMasonry>
         </Col>
-      </Content>
-    </Layout>
+      </Row>
+    </>
   );
 };

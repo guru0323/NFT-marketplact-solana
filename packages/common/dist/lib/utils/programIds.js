@@ -33,7 +33,6 @@ const programIds = () => {
         vault: ids_1.VAULT_ID,
         auction: ids_1.AUCTION_ID,
         metaplex: ids_1.METAPLEX_ID,
-        pack_create: ids_1.PACK_CREATE_ID,
         store: STORE,
     };
 };

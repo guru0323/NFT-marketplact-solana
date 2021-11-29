@@ -1,106 +1,87 @@
 import { Connection } from '@solana/web3.js';
+import { findIndex } from 'lodash';
 import {
+  AuctionManagerV1,
+  AuctionManagerV2,
   getAuctionCache,
-  loadAccounts,
   MetaplexKey,
-  MetaState,
   ParsedAccount,
-  programIds,
-  pullPages,
   SafetyDepositBox,
   sendTransactions,
   SequenceType,
+  StoreIndexer,
   WalletSigner,
+  AuctionCache,
+  loadSafeteyDepositBoxesForVaults,
+  loadStoreIndexers,
 } from '@oyster/common';
-import { cacheAuctionIndexer } from './cacheAuctionInIndexer';
+import { cacheAuctionIndexer } from './cacheAuctionIndexer';
 import { buildListWhileNonZero } from '../hooks';
-import { BN } from 'bn.js';
 
 // This command caches an auction at position 0, page 0, and moves everything up
 export async function cacheAllAuctions(
   wallet: WalletSigner,
   connection: Connection,
-  tempCache: MetaState,
-) {
-  if (!programIds().store) {
-    return false;
-  }
-  const store = programIds().store?.toBase58();
-
-  if (tempCache.storeIndexer.length) {
-    console.log('----> Previously indexed. Pulling all.');
-    // well now we need to pull first.
-    tempCache = await loadAccounts(connection);
-  }
-
-  let auctionManagersToCache = Object.values(tempCache.auctionManagersByAuction)
-    .filter(a => a.info.store == store)
-    .sort((a, b) =>
-      (
-        tempCache.auctions[b.info.auction].info.endedAt ||
-        new BN(Date.now() / 1000)
-      )
-        .sub(
-          tempCache.auctions[a.info.auction].info.endedAt ||
-            new BN(Date.now() / 1000),
-        )
-        .toNumber(),
-    );
-
-  const indexedInStoreIndexer = {};
-
-  tempCache.storeIndexer.forEach(s => {
-    s.info.auctionCaches.forEach(a => (indexedInStoreIndexer[a] = true));
-  });
-
-  const alreadyIndexed = Object.values(tempCache.auctionCaches).reduce(
-    (hash, val) => {
-      hash[val.info.auctionManager] = indexedInStoreIndexer[val.pubkey];
-
-      return hash;
-    },
-    {},
+  auctionManagers: ParsedAccount<AuctionManagerV1 | AuctionManagerV2>[],
+  auctionCaches: Record<string, ParsedAccount<AuctionCache>>,
+  storeIndexer: ParsedAccount<StoreIndexer>[],
+): Promise<void> {
+  const vaultPubKeys = auctionManagers.map(
+    auctionManager => auctionManager.info.vault,
   );
-  auctionManagersToCache = auctionManagersToCache.filter(
-    a => !alreadyIndexed[a.pubkey],
-  );
-
-  console.log(
-    '----> Found ',
-    auctionManagersToCache.length,
-    'auctions to cache.',
-  );
-
-  let storeIndex = tempCache.storeIndexer;
-  for (let i = 0; i < auctionManagersToCache.length; i++) {
-    const auctionManager = auctionManagersToCache[i];
+  const { safetyDepositBoxesByVaultAndIndex } =
+    await loadSafeteyDepositBoxesForVaults(connection, vaultPubKeys);
+  let storeIndex = [...storeIndexer];
+  for (const auctionManager of auctionManagers) {
+    if (auctionManager.info.key !== MetaplexKey.AuctionManagerV2) {
+      return;
+    }
     const boxes: ParsedAccount<SafetyDepositBox>[] = buildListWhileNonZero(
-      tempCache.safetyDepositBoxesByVaultAndIndex,
+      safetyDepositBoxesByVaultAndIndex,
       auctionManager.info.vault,
     );
-    if (auctionManager.info.key === MetaplexKey.AuctionManagerV2) {
-      const { instructions, signers } = await cacheAuctionIndexer(
-        wallet,
-        auctionManager.info.vault,
-        auctionManager.info.auction,
-        auctionManager.pubkey,
-        boxes.map(a => a.info.tokenMint),
-        storeIndex,
-        !!tempCache.auctionCaches[
-          await getAuctionCache(auctionManager.info.auction)
-        ],
-      );
 
-      await sendTransactions(
-        connection,
-        wallet,
-        instructions,
-        signers,
-        SequenceType.StopOnFailure,
-        'max',
-      );
+    const auctionCachePubkey = await getAuctionCache(
+      auctionManager.info.auction,
+    );
+    const auctionCache = auctionCaches[auctionCachePubkey];
+    const cacheExists = !!auctionCache;
+    const activeIndex = storeIndex[0];
+    let offset = 0;
 
-      storeIndex = await pullPages(connection);
+    if (activeIndex && cacheExists) {
+      offset = findIndex(activeIndex.info.auctionCaches, pubkey => {
+        const cache = auctionCaches[pubkey];
+
+        return (
+          auctionCache.info.timestamp.toNumber() >
+          cache.info.timestamp.toNumber()
+        );
+      });
     }
+
+    const { instructions, signers } = await cacheAuctionIndexer(
+      wallet,
+      auctionManager.info.vault,
+      auctionManager.info.auction,
+      auctionManager.pubkey,
+      boxes.map(a => a.info.tokenMint),
+      storeIndex,
+      offset,
+      cacheExists,
+    );
+
+    await sendTransactions(
+      connection,
+      wallet,
+      instructions,
+      signers,
+      SequenceType.StopOnFailure,
+      'max',
+    );
+
+    const { storeIndexer } = await loadStoreIndexers(connection);
+
+    storeIndex = storeIndexer;
   }
 }

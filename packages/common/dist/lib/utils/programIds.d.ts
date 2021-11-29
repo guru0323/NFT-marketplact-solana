@@ -11,7 +11,6 @@ export declare const programIds: () => {
     vault: string;
     auction: string;
     metaplex: string;
-    pack_create: PublicKey;
     store: PublicKey | undefined;
 };
 //# sourceMappingURL=programIds.d.ts.map

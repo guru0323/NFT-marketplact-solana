@@ -17,9 +17,8 @@ exports.formatPriceNumber = new Intl.NumberFormat('en-US', {
 function useLocalStorageState(key, defaultState) {
     const localStorage = useLocalStorage_1.useLocalStorage();
     const [state, setState] = react_1.useState(() => {
-        console.debug('Querying local storage', key);
+        // NOTE: Not sure if this is ok
         const storedState = localStorage.getItem(key);
-        console.debug('Retrieved local storage', storedState);
         if (storedState) {
             return JSON.parse(storedState);
         }
@@ -174,14 +173,11 @@ const abbreviateNumber = (number, precision) => {
         const scale = Math.pow(10, tier * 3);
         scaled = number / scale;
     }
-    // Added this to remove unneeded decimals when abbreviating number
-    precision = Number.isInteger(scaled) ? 0 : precision;
-    //console.log("Number", scaled, precision)
     return scaled.toFixed(precision) + suffix;
 };
 const formatAmount = (val, precision = 2, abbr = true) => (abbr ? abbreviateNumber(val, precision) : val.toFixed(precision));
 exports.formatAmount = formatAmount;
-function formatTokenAmount(account, mint, rate = 1.0, prefix = '', suffix = '', precision = 3, abbr = false) {
+function formatTokenAmount(account, mint, rate = 1.0, prefix = '', suffix = '', precision = 2, abbr = false) {
     if (!account) {
         return '';
     }

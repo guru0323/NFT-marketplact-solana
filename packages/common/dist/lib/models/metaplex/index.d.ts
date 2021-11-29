@@ -38,8 +38,7 @@ export declare enum MetaplexKey {
     BidRedemptionTicketV2 = 11,
     AuctionWinnerTokenTypeTrackerV1 = 12,
     StoreIndexerV1 = 13,
-    AuctionCacheV1 = 14,
-    PackSet = 15
+    AuctionCacheV1 = 14
 }
 export declare class PrizeTrackingTicket {
     key: MetaplexKey;
@@ -223,13 +222,6 @@ export declare class RedeemPrintingV2BidArgs {
 export declare class WithdrawMasterEditionArgs {
     instruction: number;
 }
-export declare class RedeemParticipationBidV3Args {
-    instruction: number;
-    winIndex: BN | null;
-    constructor(args: {
-        winIndex: BN | null;
-    });
-}
 export declare class SetStoreIndexArgs {
     instruction: number;
     page: BN;
@@ -241,6 +233,13 @@ export declare class SetStoreIndexArgs {
 }
 export declare class SetAuctionCacheArgs {
     instruction: number;
+}
+export declare class RedeemParticipationBidV3Args {
+    instruction: number;
+    winIndex: BN | null;
+    constructor(args: {
+        winIndex: BN | null;
+    });
 }
 export declare enum WinningConstraint {
     NoParticipationPrize = 0,

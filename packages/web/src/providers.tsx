@@ -10,31 +10,37 @@ import { ConfettiProvider } from './components/Confetti';
 import { AppLayout } from './components/Layout';
 import { LoaderProvider } from './components/Loader';
 import { CoingeckoProvider } from './contexts/coingecko';
-import { SPLTokenListProvider } from './contexts/tokenList';
+import { Storefront } from '@oyster/common';
+import { AnalyticsProvider } from './components/Analytics';
 
-export const Providers: FC = ({ children }) => {
+interface ProvidersProps {
+  storefront: Storefront;
+  children: React.ReactNode;
+}
+
+export const Providers: FC<ProvidersProps> = ({ children, storefront }) => {
   return (
     <ConnectionProvider>
-      <WalletProvider>
-        <AccountsProvider>
-          <SPLTokenListProvider>
+      <StoreProvider
+        storefront={storefront}
+        storeAddress={process.env.NEXT_PUBLIC_STORE_ADDRESS}
+      >
+        <WalletProvider>
+          <AccountsProvider>
             <CoingeckoProvider>
-              <StoreProvider
-                ownerAddress={process.env.NEXT_PUBLIC_STORE_OWNER_ADDRESS}
-                storeAddress={process.env.NEXT_PUBLIC_STORE_ADDRESS}
-              >
-                <MetaProvider>
-                  <LoaderProvider>
-                    <ConfettiProvider>
-                      <AppLayout>{children}</AppLayout>
-                    </ConfettiProvider>
-                  </LoaderProvider>
-                </MetaProvider>
-              </StoreProvider>
+              <MetaProvider>
+                <LoaderProvider>
+                  <ConfettiProvider>
+                    <AnalyticsProvider>
+                      <AppLayout storefront={storefront}>{children}</AppLayout>
+                    </AnalyticsProvider>
+                  </ConfettiProvider>
+                </LoaderProvider>
+              </MetaProvider>
             </CoingeckoProvider>
-          </SPLTokenListProvider>
-        </AccountsProvider>
-      </WalletProvider>
+          </AccountsProvider>
+        </WalletProvider>
+      </StoreProvider>
     </ConnectionProvider>
   );
 };

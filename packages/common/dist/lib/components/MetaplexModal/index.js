@@ -7,14 +7,8 @@ exports.MetaplexModal = void 0;
 const react_1 = __importDefault(require("react"));
 const antd_1 = require("antd");
 const MetaplexModal = (props) => {
-    const { children, bodyStyle, ...rest } = props;
-    return (react_1.default.createElement(antd_1.Modal, { bodyStyle: {
-            background: '#2F2F2F',
-            boxShadow: '0px 20px 12px 8px rgba(0, 0, 0, 0.3)',
-            display: 'flex',
-            flexDirection: 'column',
-            ...bodyStyle,
-        }, className: 'modal-box small-modal', footer: null, width: 500, ...rest }, children));
+    const { children, ...rest } = props;
+    return (react_1.default.createElement(antd_1.Modal, { footer: null, width: 500, ...rest }, children));
 };
 exports.MetaplexModal = MetaplexModal;
 //# sourceMappingURL=index.js.map

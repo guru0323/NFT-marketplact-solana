@@ -59,7 +59,10 @@ const processMetaplexAccounts = async ({ account, pubkey }, setter) => {
                 account,
                 info: cache,
             };
-            setter('auctionCaches', pubkey, parsedAccount);
+            if (parsedAccount.info.store === (STORE_ID === null || STORE_ID === void 0 ? void 0 : STORE_ID.toBase58())) {
+                setter('auctionCaches', pubkey, parsedAccount);
+                setter('auctionCachesByAuctionManager', parsedAccount.info.auctionManager, parsedAccount);
+            }
         }
         if (isStoreIndexerV1Account(account)) {
             const indexer = models_1.decodeStoreIndexer(account.data);
@@ -123,7 +126,7 @@ const processMetaplexAccounts = async ({ account, pubkey }, setter) => {
     }
 };
 exports.processMetaplexAccounts = processMetaplexAccounts;
-const isMetaplexAccount = (account) => account && utils_1.pubkeyToString(account.owner) === utils_1.METAPLEX_ID;
+const isMetaplexAccount = (account) => utils_1.pubkeyToString(account === null || account === void 0 ? void 0 : account.owner) === utils_1.METAPLEX_ID;
 const isAuctionManagerV1Account = (account) => account.data[0] === models_1.MetaplexKey.AuctionManagerV1;
 const isAuctionManagerV2Account = (account) => account.data[0] === models_1.MetaplexKey.AuctionManagerV2;
 const isBidRedemptionTicketV1Account = (account) => account.data[0] === models_1.MetaplexKey.BidRedemptionTicketV1;

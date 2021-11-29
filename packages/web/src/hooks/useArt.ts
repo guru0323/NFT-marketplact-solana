@@ -15,9 +15,9 @@ import {
 import { WhitelistedCreator } from '@oyster/common/dist/lib/models/metaplex/index';
 import { Cache } from 'three';
 import { useInView } from 'react-intersection-observer';
-import useWindowDimensions from '../utils/layout';
+import { maybeCDN } from '../utils/cdn';
 
-export const metadataToArt = (
+const metadataToArt = (
   info: Metadata | undefined,
   editions: Record<string, ParsedAccount<Edition>>,
   masterEditions: Record<
@@ -109,7 +109,7 @@ export const useCachedImage = (uri: string, cacheMesh?: boolean) => {
 
         blob = await response.blob();
 
-        if (blob.size === 0) {
+        if (blob.size === 0 || !response.ok) {
           throw new Error('No content');
         }
       } catch {
@@ -147,13 +147,14 @@ export const useCachedImage = (uri: string, cacheMesh?: boolean) => {
 };
 
 export const useArt = (key?: StringPublicKey) => {
-  const { metadata, editions, masterEditions, whitelistedCreatorsByCreator } =
-    useMeta();
+  const {
+    metadataByMetadata,
+    editions,
+    masterEditions,
+    whitelistedCreatorsByCreator,
+  } = useMeta();
 
-  const account = useMemo(
-    () => metadata.find(a => a.pubkey === key),
-    [key, metadata],
-  );
+  const account = metadataByMetadata[key as string];
 
   const art = useMemo(
     () =>
@@ -173,8 +174,7 @@ export const useExtendedArt = (id?: StringPublicKey) => {
   const { metadata } = useMeta();
 
   const [data, setData] = useState<IMetadataExtension>();
-  const { width } = useWindowDimensions();
-  const { ref, inView } = useInView({ root: null, rootMargin: '-100px 0px' });
+  const { ref, inView } = useInView({ root: null, rootMargin: '-50px 0px' });
   const localStorage = useLocalStorage();
 
   const key = pubkeyToString(id);
@@ -185,22 +185,9 @@ export const useExtendedArt = (id?: StringPublicKey) => {
   );
 
   useEffect(() => {
-    if ((inView || width < 768) && id && !data) {
-      const USE_CDN = false;
-      const routeCDN = (uri: string) => {
-        let result = uri;
-        if (USE_CDN) {
-          result = uri.replace(
-            'https://arweave.net/',
-            'https://coldcdn.com/api/cdn/bronil/',
-          );
-        }
-
-        return result;
-      };
-
+    if (inView && id && !data) {
       if (account && account.info.data.uri) {
-        const uri = routeCDN(account.info.data.uri);
+        const uri = maybeCDN(account.info.data.uri);
 
         const processJson = (extended: any) => {
           if (!extended || extended?.properties?.files?.length === 0) {
@@ -211,7 +198,7 @@ export const useExtendedArt = (id?: StringPublicKey) => {
             const file = extended.image.startsWith('http')
               ? extended.image
               : `${account.info.data.uri}/${extended.image}`;
-            extended.image = routeCDN(file);
+            extended.image = maybeCDN(file);
           }
 
           return extended;
@@ -224,17 +211,12 @@ export const useExtendedArt = (id?: StringPublicKey) => {
           } else {
             // TODO: BL handle concurrent calls to avoid double query
             fetch(uri)
-              .then(async _ => {
+              .then(response => response.json())
+              .then(json => {
                 try {
-                  const data = await _.json();
-                  try {
-                    localStorage.setItem(uri, JSON.stringify(data));
-                  } catch {
-                    // ignore
-                  }
-                  setData(processJson(data));
-                } catch {
-                  return undefined;
+                  localStorage.setItem(uri, JSON.stringify(json));
+                } finally {
+                  setData(processJson(json));
                 }
               })
               .catch(() => {
@@ -246,7 +228,7 @@ export const useExtendedArt = (id?: StringPublicKey) => {
         }
       }
     }
-  }, [inView, id, data, setData, account]);
+  }, [inView, id, account]);
 
   return { ref, data };
 };

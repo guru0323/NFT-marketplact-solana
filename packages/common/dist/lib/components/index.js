@@ -1,6 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MetaplexOverlay = exports.MetaplexModal = exports.EtherscanLink = exports.TokenDisplay = exports.TokenIcon = exports.BackButton = exports.ActionConfirmation = exports.Settings = exports.NumericInput = exports.Info = exports.Identicon = exports.ConnectButton = exports.ExplorerLink = void 0;
+exports.MetaplexOverlay = exports.MetaplexModal = exports.EtherscanLink = exports.TokenDisplay = exports.TokenIcon = exports.BackButton = exports.ActionConfirmation = exports.Settings = exports.NumericInput = exports.Info = exports.Identicon = exports.ConnectButton = exports.ExplorerLink = exports.ArrowButton = void 0;
+var ArrowButton_1 = require("./ArrowButton");
+Object.defineProperty(exports, "ArrowButton", { enumerable: true, get: function () { return ArrowButton_1.ArrowButton; } });
 var index_1 = require("./ExplorerLink/index");
 Object.defineProperty(exports, "ExplorerLink", { enumerable: true, get: function () { return index_1.ExplorerLink; } });
 var index_2 = require("./ConnectButton/index");

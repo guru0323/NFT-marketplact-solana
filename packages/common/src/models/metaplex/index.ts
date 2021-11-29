@@ -64,7 +64,6 @@ export enum MetaplexKey {
   AuctionWinnerTokenTypeTrackerV1 = 12,
   StoreIndexerV1 = 13,
   AuctionCacheV1 = 14,
-  PackSet = 15,
 }
 export class PrizeTrackingTicket {
   key: MetaplexKey = MetaplexKey.PrizeTrackingTicketV1;
@@ -460,14 +459,6 @@ export class RedeemPrintingV2BidArgs {
 export class WithdrawMasterEditionArgs {
   instruction = 15;
 }
-export class RedeemParticipationBidV3Args {
-  instruction = 19;
-  winIndex: BN | null;
-  constructor(args: { winIndex: BN | null }) {
-    this.winIndex = args.winIndex;
-  }
-}
-
 export class SetStoreIndexArgs {
   instruction = 21;
   page: BN;
@@ -480,6 +471,14 @@ export class SetStoreIndexArgs {
 
 export class SetAuctionCacheArgs {
   instruction = 22;
+}
+
+export class RedeemParticipationBidV3Args {
+  instruction = 19;
+  winIndex: BN | null;
+  constructor(args: { winIndex: BN | null }) {
+    this.winIndex = args.winIndex;
+  }
 }
 
 export enum WinningConstraint {
@@ -497,7 +496,7 @@ export enum WinningConfigType {
   /// You may be selling your one-of-a-kind NFT for the first time, but not it's accompanying Metadata,
   /// of which you would like to retain ownership. You get 100% of the payment the first sale, then
   /// royalties forever after.
-  ///
+  ///WinningConstraint
   /// You may be re-selling something like a Limited/Open Edition print from another auction,
   /// a master edition record token by itself (Without accompanying metadata/printing ownership), etc.
   /// This means artists will get royalty fees according to the top level royalty % on the metadata

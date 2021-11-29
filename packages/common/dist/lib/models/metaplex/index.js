@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Store = exports.WhitelistedCreator = exports.decodePayoutTicket = exports.decodeSafetyDepositConfig = exports.decodeBidRedemptionTicket = exports.decodeAuctionManager = exports.decodeStore = exports.WhitelistedCreatorParser = exports.decodeWhitelistedCreator = exports.decodePrizeTrackingTicket = exports.decodeAuctionCache = exports.decodeStoreIndexer = exports.WinningConfigType = exports.NonWinningConstraint = exports.WinningConstraint = exports.SetAuctionCacheArgs = exports.SetStoreIndexArgs = exports.RedeemParticipationBidV3Args = exports.WithdrawMasterEditionArgs = exports.RedeemPrintingV2BidArgs = exports.DecommissionAuctionManagerArgs = exports.SetWhitelistedCreatorArgs = exports.SetStoreArgs = exports.EmptyPaymentAccountArgs = exports.RedeemUnusedWinningConfigItemsAsAuctioneerArgs = exports.ProxyCallAddress = exports.ClaimBidArgs = exports.EndAuctionArgs = exports.StartAuctionArgs = exports.RedeemFullRightsTransferBidArgs = exports.RedeemBidArgs = exports.ParticipationConfigV2 = exports.ParticipationStateV2 = exports.AuctionManagerStateV2 = exports.AuctionManagerV2 = exports.AuctionManager = exports.AuctionCache = exports.StoreIndexer = exports.PayoutTicket = exports.PrizeTrackingTicket = exports.MetaplexKey = exports.MAX_PAYOUT_TICKET_SIZE = exports.MAX_WHITELISTED_CREATOR_SIZE = exports.MAX_PRIZE_TRACKING_TICKET_SIZE = exports.ORIGINAL_AUTHORITY_LOOKUP_SIZE = exports.MAX_INDEXED_ELEMENTS = exports.TOTALS = exports.CACHE = exports.INDEX = exports.METAPLEX_PREFIX = void 0;
+exports.Store = exports.WhitelistedCreator = exports.decodePayoutTicket = exports.decodeSafetyDepositConfig = exports.decodeBidRedemptionTicket = exports.decodeAuctionManager = exports.decodeStore = exports.WhitelistedCreatorParser = exports.decodeWhitelistedCreator = exports.decodePrizeTrackingTicket = exports.decodeAuctionCache = exports.decodeStoreIndexer = exports.WinningConfigType = exports.NonWinningConstraint = exports.WinningConstraint = exports.RedeemParticipationBidV3Args = exports.SetAuctionCacheArgs = exports.SetStoreIndexArgs = exports.WithdrawMasterEditionArgs = exports.RedeemPrintingV2BidArgs = exports.DecommissionAuctionManagerArgs = exports.SetWhitelistedCreatorArgs = exports.SetStoreArgs = exports.EmptyPaymentAccountArgs = exports.RedeemUnusedWinningConfigItemsAsAuctioneerArgs = exports.ProxyCallAddress = exports.ClaimBidArgs = exports.EndAuctionArgs = exports.StartAuctionArgs = exports.RedeemFullRightsTransferBidArgs = exports.RedeemBidArgs = exports.ParticipationConfigV2 = exports.ParticipationStateV2 = exports.AuctionManagerStateV2 = exports.AuctionManagerV2 = exports.AuctionManager = exports.AuctionCache = exports.StoreIndexer = exports.PayoutTicket = exports.PrizeTrackingTicket = exports.MetaplexKey = exports.MAX_PAYOUT_TICKET_SIZE = exports.MAX_WHITELISTED_CREATOR_SIZE = exports.MAX_PRIZE_TRACKING_TICKET_SIZE = exports.ORIGINAL_AUTHORITY_LOOKUP_SIZE = exports.MAX_INDEXED_ELEMENTS = exports.TOTALS = exports.CACHE = exports.INDEX = exports.METAPLEX_PREFIX = void 0;
 exports.getPayoutTicket = exports.getAuctionCache = exports.getStoreIndexer = exports.getSafetyDepositConfig = exports.getAuctionWinnerTokenTypeTracker = exports.getPrizeTrackingTicket = exports.getWhitelistedCreator = exports.isCreatorPartOfTheStore = exports.getOriginalAuthority = exports.getBidderKeys = exports.getBidRedemption = exports.getAuctionKeys = exports.getAuctionManagerKey = exports.SCHEMA = exports.ValidateSafetyDepositBoxV2Args = exports.SafetyDepositConfig = exports.InitAuctionManagerV2Args = exports.AmountRange = exports.TupleNumericType = exports.AuctionManagerStatus = exports.BidRedemptionTicketV2 = void 0;
 const web3_js_1 = require("@solana/web3.js");
 const bn_js_1 = __importDefault(require("bn.js"));
@@ -58,7 +58,6 @@ var MetaplexKey;
     MetaplexKey[MetaplexKey["AuctionWinnerTokenTypeTrackerV1"] = 12] = "AuctionWinnerTokenTypeTrackerV1";
     MetaplexKey[MetaplexKey["StoreIndexerV1"] = 13] = "StoreIndexerV1";
     MetaplexKey[MetaplexKey["AuctionCacheV1"] = 14] = "AuctionCacheV1";
-    MetaplexKey[MetaplexKey["PackSet"] = 15] = "PackSet";
 })(MetaplexKey = exports.MetaplexKey || (exports.MetaplexKey = {}));
 class PrizeTrackingTicket {
     constructor(args) {
@@ -348,13 +347,6 @@ class WithdrawMasterEditionArgs {
     }
 }
 exports.WithdrawMasterEditionArgs = WithdrawMasterEditionArgs;
-class RedeemParticipationBidV3Args {
-    constructor(args) {
-        this.instruction = 19;
-        this.winIndex = args.winIndex;
-    }
-}
-exports.RedeemParticipationBidV3Args = RedeemParticipationBidV3Args;
 class SetStoreIndexArgs {
     constructor(args) {
         this.instruction = 21;
@@ -369,6 +361,13 @@ class SetAuctionCacheArgs {
     }
 }
 exports.SetAuctionCacheArgs = SetAuctionCacheArgs;
+class RedeemParticipationBidV3Args {
+    constructor(args) {
+        this.instruction = 19;
+        this.winIndex = args.winIndex;
+    }
+}
+exports.RedeemParticipationBidV3Args = RedeemParticipationBidV3Args;
 var WinningConstraint;
 (function (WinningConstraint) {
     WinningConstraint[WinningConstraint["NoParticipationPrize"] = 0] = "NoParticipationPrize";
@@ -385,7 +384,7 @@ var WinningConfigType;
     /// You may be selling your one-of-a-kind NFT for the first time, but not it's accompanying Metadata,
     /// of which you would like to retain ownership. You get 100% of the payment the first sale, then
     /// royalties forever after.
-    ///
+    ///WinningConstraint
     /// You may be re-selling something like a Limited/Open Edition print from another auction,
     /// a master edition record token by itself (Without accompanying metadata/printing ownership), etc.
     /// This means artists will get royalty fees according to the top level royalty % on the metadata

@@ -1,49 +1,26 @@
-import React, { useCallback } from 'react';
-import { Button, Select } from 'antd';
-import { Tooltip } from 'antd';
-import { useWallet } from '@solana/wallet-adapter-react';
-import { ENDPOINTS, useConnectionConfig } from '../../contexts/connection';
-import { useWalletModal } from '../../contexts';
-import { notify, shortenAddress } from '../../utils';
 import { CopyOutlined } from '@ant-design/icons';
-import { Identicon } from '../Identicon';
+import { useWallet } from '@solana/wallet-adapter-react';
+import { Divider, Space, Tooltip } from 'antd';
+import React from 'react';
 import { Link } from 'react-router-dom';
+import { shortenAddress } from '../../utils';
+import { Identicon } from '../Identicon';
 
 export const Settings = ({
   additionalSettings,
 }: {
   additionalSettings?: JSX.Element;
 }) => {
-  const { connected, disconnect, publicKey } = useWallet();
-  const { endpoint } = useConnectionConfig();
-  const { setVisible } = useWalletModal();
-  const open = useCallback(() => setVisible(true), [setVisible]);
+  const { publicKey } = useWallet();
 
   return (
-    <>
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          padding: '15px 0',
-        }}
-      >
-        <Identicon
-          address={publicKey?.toBase58()}
-          style={{
-            width: 48,
-          }}
-        />
+    <div className="metaplex-settings">
+      <Space direction="vertical" align="center">
+        <Identicon address={publicKey?.toBase58()} size={48} />
         {publicKey && (
           <>
             <Tooltip title="Address copied">
               <div
-                style={{
-                  fontWeight: 600,
-                  letterSpacing: '-0.02em',
-                  color: '#FFFFFF',
-                }}
                 onClick={() =>
                   navigator.clipboard.writeText(publicKey?.toBase58() || '')
                 }
@@ -53,26 +30,16 @@ export const Settings = ({
               </div>
             </Tooltip>
 
-            <Link
-              to={`/profile/${publicKey?.toBase58()}`}
-              style={{
-                color: 'rgba(255, 255, 255, 0.7)',
-              }}
-            >
-              View Art
-            </Link>
+            <Link to={`/owned`}>View Owned</Link>
           </>
         )}
-        <br />
-        <span
-          style={{
-            borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-            width: 'calc(100% + 32px)',
-            marginBottom: 10,
-          }}
-        ></span>
-        {additionalSettings}
-      </div>
-    </>
+      </Space>
+      {additionalSettings && (
+        <>
+          <Divider />
+          {additionalSettings}
+        </>
+      )}
+    </div>
   );
 };

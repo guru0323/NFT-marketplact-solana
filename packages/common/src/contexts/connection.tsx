@@ -1,28 +1,35 @@
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  ENV as ChainId,
   TokenInfo,
   TokenListProvider,
-  ENV as ChainId,
 } from '@solana/spl-token-registry';
 import { WalletNotConnectedError } from '@solana/wallet-adapter-base';
 import {
-  Keypair,
+  Blockhash,
   clusterApiUrl,
   Commitment,
   Connection,
+  FeeCalculator,
+  Keypair,
   RpcResponseAndContext,
   SignatureStatus,
   SimulatedTransactionResponse,
   Transaction,
   TransactionInstruction,
   TransactionSignature,
-  Blockhash,
-  FeeCalculator,
+  sendAndConfirmRawTransaction,
 } from '@solana/web3.js';
-import { sleep, useLocalStorageState } from '../utils/utils';
-import { notify } from '../utils/notifications';
+import React, {
+  ReactNode,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { ExplorerLink } from '../components/ExplorerLink';
 import { useQuerySearch } from '../hooks';
+import { notify } from '../utils/notifications';
+import { sleep, useLocalStorageState } from '../utils/utils';
 import { WalletSigner } from './wallet';
 
 interface BlockhashAndFeeCalculator {
@@ -30,168 +37,165 @@ interface BlockhashAndFeeCalculator {
   feeCalculator: FeeCalculator;
 }
 
-export type ENDPOINT_NAME =
-  | 'mainnet-beta'
-  | 'mainnet-beta-solana'
-  | 'mainnet-beta-serum'
+export type ENV =
+  | 'mainnet-beta (Triton)'
+  | 'mainnet-beta (Triton Staging)'
+  | 'mainnet-beta (Solana)'
+  | 'mainnet-beta (Serum)'
   | 'testnet'
   | 'devnet'
   | 'localnet'
   | 'lending';
 
-type Endpoint = {
-  name: ENDPOINT_NAME;
-  label: string;
-  url: string;
-  chainId: ChainId;
-};
-
-export const ENDPOINTS: Array<Endpoint> = [
+export const ENDPOINTS: { name: ENV; endpoint: string; ChainId: ChainId }[] = [
   {
-    name: 'mainnet-beta',
-    label: 'mainnet-beta',
-    url: 'https://api.metaplex.solana.com/',
-    chainId: ChainId.MainnetBeta,
+    name: 'mainnet-beta (Triton)',
+    endpoint: 'https://holaplex.rpcpool.com',
+    ChainId: ChainId.MainnetBeta,
   },
   {
-    name: 'mainnet-beta-solana',
-    label: 'mainnet-beta (Solana)',
-    url: 'https://api.mainnet-beta.solana.com',
-    chainId: ChainId.MainnetBeta,
+    name: 'mainnet-beta (Triton Staging)',
+    endpoint: 'https://stage.mainnet.rpcpool.com/4715f6087c8269548f2edb003a5e',
+    ChainId: ChainId.MainnetBeta,
   },
   {
-    name: 'mainnet-beta-serum',
-    label: 'mainnet-beta (Serum)',
-    url: 'https://solana-api.projectserum.com/',
-    chainId: ChainId.MainnetBeta,
+    name: 'mainnet-beta (Solana)',
+    endpoint: 'https://api.mainnet-beta.solana.com',
+    ChainId: ChainId.MainnetBeta,
+  },
+  {
+    name: 'mainnet-beta (Serum)',
+    endpoint: 'https://solana-api.projectserum.com/',
+    ChainId: ChainId.MainnetBeta,
   },
   {
     name: 'testnet',
-    label: 'testnet',
-    url: clusterApiUrl('testnet'),
-    chainId: ChainId.Testnet,
+    endpoint: clusterApiUrl('testnet'),
+    ChainId: ChainId.Testnet,
   },
   {
     name: 'devnet',
-    label: 'devnet',
-    url: clusterApiUrl('devnet'),
-    chainId: ChainId.Devnet,
+    endpoint: clusterApiUrl('devnet'),
+    ChainId: ChainId.Devnet,
   },
 ];
 
-const DEFAULT_ENDPOINT = ENDPOINTS[0];
+const DEFAULT = ENDPOINTS[0].endpoint;
+const DEFAULT_CONNECTION_TIMEOUT = 300 * 1000;
 
 interface ConnectionConfig {
   connection: Connection;
-  endpoint: Endpoint;
-  tokens: Map<string, TokenInfo>;
+  endpoint: string;
+  env: ENV;
+  setEndpoint: (val: string) => void;
+  tokens: TokenInfo[];
+  tokenMap: Map<string, TokenInfo>;
 }
 
 const ConnectionContext = React.createContext<ConnectionConfig>({
-  connection: new Connection(DEFAULT_ENDPOINT.url, 'recent'),
-  endpoint: DEFAULT_ENDPOINT,
-  tokens: new Map(),
+  endpoint: DEFAULT,
+  setEndpoint: () => { },
+  connection: new Connection(DEFAULT, { commitment: 'recent', confirmTransactionInitialTimeout:  DEFAULT_CONNECTION_TIMEOUT }),
+  env: ENDPOINTS[0].name,
+  tokens: [],
+  tokenMap: new Map<string, TokenInfo>(),
 });
 
-export function ConnectionProvider({ children }: { children: any }) {
+export function ConnectionProvider({
+  children = undefined,
+}: {
+  children: ReactNode;
+}) {
   const searchParams = useQuerySearch();
-  const [networkStorage, setNetworkStorage] =
-    useLocalStorageState<ENDPOINT_NAME>('network', DEFAULT_ENDPOINT.name);
-  const networkParam = searchParams.get('network');
+  const network = searchParams.get('network');
+  const queryEndpoint =
+    network && ENDPOINTS.find(({ name }) => name.startsWith(network))?.endpoint;
 
-  let maybeEndpoint;
-  if (networkParam) {
-    let endpointParam = ENDPOINTS.find(({ name }) => name === networkParam);
-    if (endpointParam) {
-      maybeEndpoint = endpointParam;
-    }
-  }
+  const [savedEndpoint, setEndpoint] = useLocalStorageState(
+    'connectionEndpoint',
+    ENDPOINTS[0].endpoint,
+  );
+  const endpoint = queryEndpoint || savedEndpoint;
 
-  if (networkStorage && !maybeEndpoint) {
-    let endpointStorage = ENDPOINTS.find(({ name }) => name === networkStorage);
-    if (endpointStorage) {
-      maybeEndpoint = endpointStorage;
-    }
-  }
+  const connection = useMemo(
+    () => new Connection(endpoint, { commitment: 'recent', confirmTransactionInitialTimeout: DEFAULT_CONNECTION_TIMEOUT }),
+    [endpoint],
+  );
 
-  const endpoint = maybeEndpoint || DEFAULT_ENDPOINT;
+  const env =
+    ENDPOINTS.find(end => end.endpoint === endpoint)?.name || ENDPOINTS[0].name;
 
-  const { current: connection } = useRef(new Connection(endpoint.url));
-
-  const [tokens, setTokens] = useState<Map<string, TokenInfo>>(new Map());
-
+  const [tokens, setTokens] = useState<TokenInfo[]>([]);
+  const [tokenMap, setTokenMap] = useState<Map<string, TokenInfo>>(new Map());
   useEffect(() => {
-    function fetchTokens() {
-      return new TokenListProvider().resolve().then(container => {
-        const list = container
-          .excludeByTag('nft')
-          .filterByChainId(endpoint.chainId)
-          .getList();
+    // fetch token files
+    new TokenListProvider().resolve().then(container => {
+      const list = container
+        .excludeByTag('nft')
+        .filterByChainId(
+          ENDPOINTS.find(end => end.endpoint === endpoint)?.ChainId ||
+          ChainId.MainnetBeta,
+        )
+        .getList();
 
-        const map = new Map(list.map(item => [item.address, item]));
-        setTokens(map);
-      });
-    }
+      const knownMints = [...list].reduce((map, item) => {
+        map.set(item.address, item);
+        return map;
+      }, new Map<string, TokenInfo>());
 
-    fetchTokens();
-  }, []);
+      setTokenMap(knownMints);
+      setTokens(list);
+    });
+  }, [env]);
 
-  useEffect(() => {
-    function updateNetworkInLocalStorageIfNeeded() {
-      if (networkStorage !== endpoint.name) {
-        setNetworkStorage(endpoint.name);
-      }
-    }
-
-    updateNetworkInLocalStorageIfNeeded();
-  }, []);
-
-  // solana/web3.js closes its websocket connection when the subscription list
-  // is empty after opening for the first time, preventing subsequent
-  // subscriptions from receiving responses.
-  // This is a hack to prevent the list from ever being empty.
+  // The websocket library solana/web3.js uses closes its websocket connection when the subscription list
+  // is empty after opening its first time, preventing subsequent subscriptions from receiving responses.
+  // This is a hack to prevent the list from every getting empty
   useEffect(() => {
     const id = connection.onAccountChange(
       Keypair.generate().publicKey,
-      () => {},
+      () => { },
     );
     return () => {
       connection.removeAccountChangeListener(id);
     };
-  }, []);
+  }, [connection]);
 
   useEffect(() => {
     const id = connection.onSlotChange(() => null);
     return () => {
       connection.removeSlotChangeListener(id);
     };
-  }, []);
-
-  const contextValue = React.useMemo(() => {
-    return {
-      endpoint,
-      connection,
-      tokens,
-    };
-  }, [tokens]);
+  }, [connection]);
 
   return (
-    <ConnectionContext.Provider value={contextValue}>
+    <ConnectionContext.Provider
+      value={{
+        endpoint,
+        setEndpoint,
+        connection,
+        tokens,
+        tokenMap,
+        env,
+      }}
+    >
       {children}
     </ConnectionContext.Provider>
   );
 }
 
-export function useConnection() {
-  const { connection } = useContext(ConnectionContext);
-  return connection;
+export function useConnection(): Connection {
+  return useContext(ConnectionContext).connection;
 }
 
 export function useConnectionConfig() {
-  const { endpoint, tokens } = useContext(ConnectionContext);
+  const context = useContext(ConnectionContext);
   return {
-    endpoint,
-    tokens,
+    endpoint: context.endpoint,
+    setEndpoint: context.setEndpoint,
+    env: context.env,
+    tokens: context.tokens,
+    tokenMap: context.tokenMap,
   };
 }
 
@@ -240,7 +244,7 @@ export async function sendTransactionsWithManualRetry(
   let stopPoint = 0;
   let tries = 0;
   let lastInstructionsLength = null;
-  let toRemoveSigners: Record<number, boolean> = {};
+  const toRemoveSigners: Record<number, boolean> = {};
   instructions = instructions.filter((instr, i) => {
     if (instr.length > 0) {
       return true;
@@ -300,8 +304,8 @@ export const sendTransactions = async (
   signersSet: Keypair[][],
   sequenceType: SequenceType = SequenceType.Parallel,
   commitment: Commitment = 'singleGossip',
-  successCallback: (txid: string, ind: number) => void = (txid, ind) => {},
-  failCallback: (reason: string, ind: number) => boolean = (txid, ind) => false,
+  successCallback: (txid: string, ind: number) => void = () => { },
+  failCallback: (reason: string, ind: number) => boolean = () => false,
   block?: BlockhashAndFeeCalculator,
 ): Promise<number> => {
   if (!wallet.publicKey) throw new WalletNotConnectedError();
@@ -320,7 +324,7 @@ export const sendTransactions = async (
       continue;
     }
 
-    let transaction = new Transaction();
+    const transaction = new Transaction();
     instructions.forEach(instruction => transaction.add(instruction));
     transaction.recentBlockhash = block.blockhash;
     transaction.setSigners(
@@ -340,7 +344,7 @@ export const sendTransactions = async (
 
   const pendingTxns: Promise<{ txid: string; slot: number }>[] = [];
 
-  let breakEarlyObject = { breakEarly: false, i: 0 };
+  const breakEarlyObject = { breakEarly: false, i: 0 };
   console.log(
     'Signed txns length',
     signedTxns.length,
@@ -354,12 +358,13 @@ export const sendTransactions = async (
     });
 
     signedTxnPromise
-      .then(({ txid, slot }) => {
+      .then(({ txid }) => {
+        console.log(`Instructions set ${i} succeeded. Transaction Id ${txid}`);
         successCallback(txid, i);
       })
-      .catch(reason => {
-        // @ts-ignore
-        failCallback(signedTxns[i], i);
+      .catch((e) => {
+        failCallback(e.message, i);
+        console.log(`Instructions set ${i} failed.`);
         if (sequenceType === SequenceType.StopOnFailure) {
           breakEarlyObject.breakEarly = true;
           breakEarlyObject.i = i;
@@ -424,7 +429,7 @@ export const sendTransaction = async (
   }
 
   const rawTransaction = transaction.serialize();
-  let options = {
+  const options = {
     skipPreflight: true,
     commitment,
   };
@@ -450,8 +455,8 @@ export const sendTransaction = async (
         message: 'Transaction failed...',
         description: (
           <>
-            {errors.map(err => (
-              <div>{err}</div>
+            {errors.map((err, i) => (
+              <div key={i}>{err}</div>
             ))}
             <ExplorerLink address={txid} type="transaction" />
           </>
@@ -477,7 +482,7 @@ export const sendTransactionWithRetry = async (
   includesFeePayer: boolean = false,
   block?: BlockhashAndFeeCalculator,
   beforeSend?: () => void,
-) => {
+): Promise<{ txid: string, slot: number }> => {
   if (!wallet.publicKey) throw new WalletNotConnectedError();
 
   let transaction = new Transaction();
@@ -519,12 +524,11 @@ export const getUnixTs = () => {
   return new Date().getTime() / 1000;
 };
 
-const DEFAULT_TIMEOUT = 15000;
+const DEFAULT_TIMEOUT = 30000;
 
 export async function sendSignedTransaction({
   signedTransaction,
   connection,
-  timeout = DEFAULT_TIMEOUT,
 }: {
   signedTransaction: Transaction;
   connection: Connection;
@@ -534,78 +538,27 @@ export async function sendSignedTransaction({
   timeout?: number;
 }): Promise<{ txid: string; slot: number }> {
   const rawTransaction = signedTransaction.serialize();
-  const startTime = getUnixTs();
   let slot = 0;
-  const txid: TransactionSignature = await connection.sendRawTransaction(
+
+  const txid = await sendAndConfirmRawTransaction(
+    connection,
     rawTransaction,
     {
       skipPreflight: true,
-    },
+      commitment: 'confirmed'
+    }
   );
 
-  console.log('Started awaiting confirmation for', txid);
+  const confirmation = await connection.getConfirmedTransaction(txid, 'confirmed');
 
-  let done = false;
-  (async () => {
-    while (!done && getUnixTs() - startTime < timeout) {
-      connection.sendRawTransaction(rawTransaction, {
-        skipPreflight: true,
-      });
-      await sleep(500);
-    }
-  })();
-  try {
-    const confirmation = await awaitTransactionSignatureConfirmation(
-      txid,
-      timeout,
-      connection,
-      'recent',
-      true,
-    );
-
-    if (!confirmation)
-      throw new Error('Timed out awaiting confirmation on transaction');
-
-    if (confirmation.err) {
-      console.error(confirmation.err);
-      throw new Error('Transaction failed: Custom instruction error');
-    }
-
-    slot = confirmation?.slot || 0;
-  } catch (err: any) {
-    console.error('Timeout Error caught', err);
-    if (err.timeout) {
-      throw new Error('Timed out awaiting confirmation on transaction');
-    }
-    let simulateResult: SimulatedTransactionResponse | null = null;
-    try {
-      simulateResult = (
-        await simulateTransaction(connection, signedTransaction, 'single')
-      ).value;
-    } catch (e) {}
-    if (simulateResult && simulateResult.err) {
-      if (simulateResult.logs) {
-        for (let i = simulateResult.logs.length - 1; i >= 0; --i) {
-          const line = simulateResult.logs[i];
-          if (line.startsWith('Program log: ')) {
-            throw new Error(
-              'Transaction failed: ' + line.slice('Program log: '.length),
-            );
-          }
-        }
-      }
-      throw new Error(JSON.stringify(simulateResult.err));
-    }
-    // throw new Error('Transaction failed');
-  } finally {
-    done = true;
+  if (confirmation) {
+    slot = confirmation.slot;
   }
 
-  console.log('Latency', txid, getUnixTs() - startTime);
   return { txid, slot };
 }
 
-async function simulateTransaction(
+export async function simulateTransaction(
   connection: Connection,
   transaction: Transaction,
   commitment: Commitment,
@@ -620,7 +573,7 @@ async function simulateTransaction(
   // @ts-ignore
   const wireTransaction = transaction._serialize(signData);
   const encodedTransaction = wireTransaction.toString('base64');
-  const config: any = { encoding: 'base64', commitment };
+  const config = { encoding: 'base64', commitment };
   const args = [encodedTransaction, config];
 
   // @ts-ignore
@@ -645,7 +598,7 @@ async function awaitTransactionSignatureConfirmation(
     err: null,
   };
   let subId = 0;
-  status = await new Promise(async (resolve, reject) => {
+  status = await new Promise((resolve, reject) => {
     setTimeout(() => {
       if (done) {
         return;
@@ -707,7 +660,7 @@ async function awaitTransactionSignatureConfirmation(
           }
         }
       })();
-      await sleep(2000);
+      return sleep(2000);
     }
   });
 

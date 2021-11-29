@@ -1,153 +1,155 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Button, Menu, Modal } from 'antd';
+import { ConnectButton, useStore } from '@oyster/common';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { Notifications } from '../Notifications';
-import useWindowDimensions from '../../utils/layout';
-import { MenuOutlined } from '@ant-design/icons';
+import { Col, Menu, Row, Space } from 'antd';
+import React, { ReactNode, useMemo } from 'react';
+import { Link, matchPath, useLocation } from 'react-router-dom';
+import { Cog, CurrentUserBadge } from '../CurrentUserBadge';
 import { HowToBuyModal } from '../HowToBuyModal';
-import {
-  Cog,
-  CurrentUserBadge,
-  CurrentUserBadgeMobile,
-} from '../CurrentUserBadge';
-import { ConnectButton } from '@oyster/common';
-
-const getDefaultLinkActions = (connected: boolean) => {
-  return [
-    <Link to={`/`} key={'explore'}>
-      <Button className="app-btn">Explore</Button>
-    </Link>,
-    <Link to={`/artworks`} key={'artwork'}>
-      <Button className="app-btn">{connected ? 'My Items' : 'Artwork'}</Button>
-    </Link>,
-    <Link to={`/artists`} key={'artists'}>
-      <Button className="app-btn">Creators</Button>
-    </Link>,
-  ];
+import { Notifications } from '../Notifications';
+type P = {
+  logo: string;
 };
 
-const DefaultActions = ({ vertical = false }: { vertical?: boolean }) => {
-  const { connected } = useWallet();
-  return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: vertical ? 'column' : 'row',
-      }}
-    >
-      {getDefaultLinkActions(connected)}
-    </div>
+export const AppBar = (props: P) => {
+  const { connected, publicKey } = useWallet();
+  const location = useLocation();
+  const locationPath = location.pathname.toLowerCase();
+  const { ownerAddress } = useStore();
+
+  // Array of menu item descriptions
+  const menuInfo: {
+    /** The React iterator key prop for this item */
+    key: string;
+    /** The content of this item */
+    title: ReactNode;
+    /**
+     * The link target for this item.
+     *
+     * Any routes matching this link (and, if `exact` is false, any child
+     * routes) will cause the menu item to appear highlighted.
+     */
+    link: string;
+    /** Whether child routes should match against the value of `link` */
+    exact: boolean;
+    /**
+     * Zero or more alternate routes to check against for highlighting this
+     * item.
+     *
+     * The item will never link to these routes, but they will be queried for
+     * highlighting similar to the `link` property.
+     */
+    alt: {
+      /**
+       * An alternate route path or prefix to match against.
+       *
+       * See the `link` property for more info.
+       */
+      path: string;
+      /** Whether child routes should match against the value of `path` */
+      exact: boolean;
+    }[];
+  }[] = useMemo(() => {
+    let menu = [
+      {
+        key: 'listings',
+        title: 'Listings',
+        link: '/',
+        exact: true,
+        alt: [{ path: '/auction', exact: false }],
+      },
+      {
+        key: 'artists',
+        title: 'Artists',
+        link: `/artists/${ownerAddress}`,
+        exact: true,
+        alt: [
+          { path: '/artists', exact: false },
+          { path: '/artworks', exact: false },
+        ],
+      },
+    ];
+
+    if (connected) {
+      menu = [
+        ...menu,
+        {
+          key: 'owned',
+          title: 'Owned',
+          link: '/owned',
+          exact: true,
+          alt: [],
+        },
+      ];
+    }
+
+    if (publicKey?.toBase58() === ownerAddress) {
+      menu = [
+        ...menu,
+        {
+          key: 'admin',
+          title: 'Admin',
+          link: '/admin',
+          exact: true,
+          alt: [],
+        },
+      ];
+    }
+
+    return menu;
+  }, [connected]);
+
+  const menuItems = useMemo(
+    () =>
+      menuInfo.map(({ key, link, title }) => (
+        <Menu.Item key={key}>
+          <Link to={link}>{title}</Link>
+        </Menu.Item>
+      )),
+    [menuInfo],
   );
-};
 
-const MetaplexMenu = () => {
-  const { width } = useWindowDimensions();
-  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-  const { connected } = useWallet();
-
-  if (width < 768)
-    return (
-      <>
-        <Modal
-          title={<img src={'/metaplex-logo.svg'} />}
-          visible={isModalVisible}
-          footer={null}
-          className={'modal-box'}
-          closeIcon={
-            <img
-              onClick={() => setIsModalVisible(false)}
-              src={'/modals/close.svg'}
-            />
-          }
-        >
-          <div className="site-card-wrapper mobile-menu-modal">
-            <Menu onClick={() => setIsModalVisible(false)}>
-              {getDefaultLinkActions(connected).map((item, idx) => (
-                <Menu.Item key={idx}>{item}</Menu.Item>
-              ))}
-            </Menu>
-            <div className="actions">
-              {!connected ? (
-                <div className="actions-buttons">
-                  <ConnectButton
-                    onClick={() => setIsModalVisible(false)}
-                    className="secondary-btn"
-                  />
-                  <HowToBuyModal
-                    onClick={() => setIsModalVisible(false)}
-                    buttonClassName="black-btn"
-                  />
-                </div>
-              ) : (
-                <>
-                  <CurrentUserBadgeMobile
-                    showBalance={false}
-                    showAddress={true}
-                    iconSize={24}
-                    closeModal={() => {
-                      setIsModalVisible(false);
-                    }}
-                  />
-                  <Notifications />
-                  <Cog />
-                </>
-              )}
-            </div>
-          </div>
-        </Modal>
-        <MenuOutlined
-          onClick={() => setIsModalVisible(true)}
-          style={{ fontSize: '1.4rem' }}
-        />
-      </>
-    );
-
-  return <DefaultActions />;
-};
-
-export const LogoLink = () => {
-  return (
-    <Link to={`/`}>
-      <p className='m-0'>AKKOROS</p>
-    </Link>
+  const activeItems = useMemo(
+    () =>
+      menuInfo
+        .filter(({ link, alt, exact }) =>
+          [{ path: link, exact }, ...alt].find(({ path, exact }) =>
+            matchPath(locationPath, { path, exact }),
+          ),
+        )
+        .map(({ key }) => key),
+    [locationPath, menuInfo],
   );
-};
 
-export const AppBar = () => {
-  const { connected } = useWallet();
   return (
     <>
-      <div id="mobile-navbar">
-        <LogoLink />
-        <MetaplexMenu />
-      </div>
-      <div id="desktop-navbar">
-        <div className="app-left">
-          <LogoLink />
-          &nbsp;&nbsp;&nbsp;
-          <MetaplexMenu />
-        </div>
-        <div className="app-right">
-          {!connected && (
-            <HowToBuyModal buttonClassName="modal-button-default" />
-          )}
-          {!connected && (
-            <ConnectButton style={{ height: 48 }} allowWalletChange />
-          )}
-          {connected && (
-            <>
-              <CurrentUserBadge
-                showBalance={false}
-                showAddress={true}
-                iconSize={24}
-              />
-              <Notifications />
-              <Cog />
-            </>
-          )}
-        </div>
-      </div>
+      <Row wrap={false} align="middle">
+        <Col flex="0 0 auto">
+          <Link to="/" id="metaplex-header-logo">
+            <img src={props.logo} />
+          </Link>
+        </Col>
+        <Col flex="1 0 0" style={{ overflow: 'hidden' }}>
+          <Menu theme="dark" mode="horizontal" selectedKeys={activeItems}>
+            {menuItems}
+          </Menu>
+        </Col>
+        <Col flex="0 1 auto">
+          <Space className="metaplex-display-flex" align="center">
+            {connected ? (
+              <>
+                <CurrentUserBadge showAddress={true} buttonType="text" />
+                <Notifications buttonType="text" />
+                <Cog buttonType="text" />
+              </>
+            ) : (
+              <>
+                <HowToBuyModal buttonType="text" />
+                <ConnectButton type="text" allowWalletChange={false} />
+              </>
+            )}
+          </Space>
+        </Col>
+      </Row>
     </>
   );
 };

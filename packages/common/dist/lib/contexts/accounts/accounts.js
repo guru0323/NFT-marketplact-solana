@@ -135,10 +135,9 @@ function AccountsProvider({ children = null }) {
         const subs = [];
         cache_1.cache.emitter.onCache(args => {
             if (args.isNew && args.isActive) {
-                let id = args.id;
-                let deserialize = args.parser;
+                const { id, parser } = args;
                 connection.onAccountChange(new web3_js_1.PublicKey(id), info => {
-                    cache_1.cache.add(id, info, deserialize);
+                    cache_1.cache.add(id, info, parser);
                 });
             }
         });

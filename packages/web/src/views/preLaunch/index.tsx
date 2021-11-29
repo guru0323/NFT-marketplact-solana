@@ -1,14 +1,19 @@
-import React, { useCallback, useEffect, useState } from 'react';
-
-import { Button, Input, Layout, Modal, Form, Spin } from 'antd';
-import { ModalProps } from 'antd/lib/modal';
-import { LogoLink } from '../../components/AppBar';
-import { textContent } from './textContent';
-import useMagicLink from '../../hooks/magicLink/useMagicLink';
 import { shortenAddress } from '@oyster/common';
+import { Button, Form, Input, Layout, Modal, Spin } from 'antd';
+import { ModalProps } from 'antd/lib/modal';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import useMagicLink from '../../hooks/magicLink/useMagicLink';
+import { textContent } from './textContent';
 import { getUser, getWalletAddress, saveUser } from './userInfo';
 
 const { Content } = Layout;
+
+const LogoLink = () => (
+  <Link to="/">
+    <img src="metaplex-logo.svg" />
+  </Link>
+);
 
 export interface GotEmailButtonProps
   extends ModalProps,
@@ -21,11 +26,11 @@ export interface GotEmailButtonProps
 
 const DiscordButton = () => (
   <a
-    className={'discord-button'}
-    target={'_blank'}
-    href={'https://discord.com/invite/metaplex'}
+    target="_blank"
+    rel="noopener noreferrer"
+    href="https://discord.com/invite/metaplex"
   >
-    <span></span> Join our Discord
+    Join our Discord
   </a>
 );
 
@@ -36,7 +41,6 @@ const PreLaunchModal = (props: GotEmailButtonProps) => {
     titleText,
     descriptionText,
     extraButton,
-    className,
     ...rest
   } = props;
   const handleOnCancel = useCallback(
@@ -52,15 +56,11 @@ const PreLaunchModal = (props: GotEmailButtonProps) => {
       visible={visible}
       onCancel={e => handleOnCancel(e)}
       footer={null}
-      className={`pre-modal ${className || ''}`}
-      closeIcon={<img src={'/modals/close.svg'} />}
+      closeIcon={<img src="/modals/close.svg" />}
       {...rest}
     >
-      <span className={'how-to-step'}>
-        <span className={'how-to-logo ok s64'}></span>
-      </span>
-      <div className={'got-title'}>{titleText}</div>
-      <div className={'got-description'}>{descriptionText}</div>
+      <div>{titleText}</div>
+      <div>{descriptionText}</div>
       {extraButton && extraButton}
     </Modal>
   );
@@ -76,7 +76,7 @@ export const PreLaunchView = () => {
   const [loadingUser, setLoadingUser] = useState(false);
   const auth = useMagicLink();
 
-  const handleSaveWallet = async (verifiedEmail, wallet) => {
+  const handleSaveWallet = async (verifiedEmail: string, wallet: string) => {
     await saveUser(verifiedEmail, wallet, () => {
       setSentVisible(true);
       setSubmitted(true);
@@ -106,10 +106,7 @@ export const PreLaunchView = () => {
     verifyUser();
   }, [auth.loggedIn]);
   return (
-    <Layout id={'pre-launch-layout'}>
-      <div className={'main-asset-banner'}>
-        <div className={'right-gradient'}></div>
-      </div>
+    <Layout>
       <PreLaunchModal
         titleText={textContent.gotEmail}
         descriptionText={textContent.gotEmailDescription}
@@ -129,23 +126,20 @@ export const PreLaunchView = () => {
         }}
         extraButton={<DiscordButton />}
       />
-      <Layout id={'width-layout'}>
+      <Layout>
         {!verified ? (
-          <Content className={'pre-main-content'}>
-            <div className={'upper-content'}>
-              <div className={'logo'}>
+          <Content>
+            <div>
+              <div>
                 <LogoLink />
               </div>
-              <div className={'pre-title'}>{textContent.mainTitle}</div>
-              <div className={'pre-context'}>
-                {textContent.titleDescription}
-              </div>
-              <div className={'pre-input'}>
+              <div>{textContent.mainTitle}</div>
+              <div>{textContent.titleDescription}</div>
+              <div>
                 {auth.loading || loadingUser ? (
                   <Spin />
                 ) : (
                   <Form
-                    className={'footer-sign-up'}
                     onFinish={values => {
                       auth.login(values.email);
                       setGotVisible(true);
@@ -160,65 +154,46 @@ export const PreLaunchView = () => {
                         },
                         { required: true, message: 'Please input your email!' },
                       ]}
-                      style={{ display: 'flex !important' }}
                     >
-                      <Input
-                        className={'footer-input'}
-                        placeholder="Email Address"
-                        name="email"
-                      />
+                      <Input placeholder="Email Address" name="email" />
                     </Form.Item>
-                    <Button
-                      className={'secondary-btn sign-up'}
-                      htmlType="submit"
-                    >
-                      Sign Up
-                    </Button>
+                    <Button htmlType="submit">Sign Up</Button>
                   </Form>
                 )}
               </div>
             </div>
-            <div className={'lower-content'}>
-              <div className={'how-to-get'}>How to get your NFT:</div>
-              <div className={'how-to-step fst'}>
-                <span className={'how-to-logo email'}></span>
-                <span className={'how-to-description'}>
-                  Enter your email address. We&apos;ll send you an email so you
-                  can verify your account. (One entry per email.)
-                </span>
+            <div>
+              <div>How to get your NFT:</div>
+              <div>
+                Enter your email address. We&apos;ll send you an email so you
+                can verify your account. (One entry per email.)
               </div>
-              <div className={'how-to-step'}>
-                <span className={'how-to-logo wallet'}></span>
-                <span className={'how-to-description'}>
-                  After verification, we&apos;ll help you set up a Solana
-                  crypto-wallet. This is where we&apos;ll send the NFT.
-                </span>
+              <div>
+                After verification, we&apos;ll help you set up a Solana
+                crypto-wallet. This is where we&apos;ll send the NFT.
               </div>
             </div>
           </Content>
         ) : verified && !submitted ? (
-          <Content className={'pre-main-content second'}>
-            <div className={'logo'}>
+          <Content>
+            <div>
               <LogoLink />
             </div>
-            <div className={'verify-message'}>
+            <div>
               <span>Thanks for verifying</span>
-              <span className={'high-light'}>{email}</span>
+              <span>{email}</span>
             </div>
-            <div className={'verify-message mb32'}>
-              <span>Paste your Solana wallet address here.</span>
-            </div>
+            <div>Paste your Solana wallet address here.</div>
             {loadingUser ? (
               <Spin />
             ) : (
-              <div className={'pre-input wallet'}>
+              <div>
                 <Input
                   value={walletAddress}
-                  placeholder={'Wallet address'}
+                  placeholder="Wallet address"
                   onChange={val => setWalletAddress(val.target.value)}
                 />
                 <Button
-                  className={'secondary-btn sign-up'}
                   onClick={async () => {
                     await handleSaveWallet(email, walletAddress);
                   }}
@@ -227,32 +202,27 @@ export const PreLaunchView = () => {
                 </Button>
               </div>
             )}
-            <div className={'verify-message mb40'}>
-              <span>How to create a wallet:</span>
-            </div>
-            <div className={'steps'}>
-              <div className={'step'}>
-                <span className={'step-title'}>Step 1</span>
-                <span className={'step-desc'}>Install Phantom.</span>
-                <div className={'step-asset step1'}></div>
-                <span className={'step-desc'}>
+            <div>How to create a wallet:</div>
+            <div>
+              <div>
+                <span>Step 1</span>
+                <span>Install Phantom.</span>
+                <span>
                   Install the Phantom wallet in Google Chrome, Firefox, Brave,
                   or Edge via Phantom’s website. It’s free to use!
                 </span>
               </div>
-              <div className={'step'}>
-                <span className={'step-title'}>Step 2</span>
-                <span className={'step-desc'}>Create a new wallet.</span>
-                <div className={'step-asset step2'}></div>
-                <span className={'step-desc'}>
+              <div>
+                <span>Step 2</span>
+                <span>Create a new wallet.</span>
+                <span>
                   Once it’s installed, follow the steps to create a new wallet.
                 </span>
               </div>
-              <div className={'step'}>
-                <span className={'step-title'}>Step 3</span>
-                <span className={'step-desc'}>Copy your wallet address.</span>
-                <div className={'step-asset step3'}></div>
-                <span className={'step-desc'}>
+              <div>
+                <span>Step 3</span>
+                <span>Copy your wallet address.</span>
+                <span>
                   Once you’re signed in click the top bar to copy your wallet
                   address. In Phantom it displays a condensed version (ex:
                   CRWJ...ch67), but when you paste it here, you should see a
@@ -262,21 +232,15 @@ export const PreLaunchView = () => {
             </div>
           </Content>
         ) : (
-          <Content className={'pre-main-content third'}>
-            <div className={'logo'}>
+          <Content>
+            <div>
               <LogoLink />
             </div>
 
-            <div className={'verify-message'}>
-              <span className={'display-block mb32'}>
-                Your NFT is on the way.
-              </span>
-              <span className={'high-light'} style={{ marginLeft: 0 }}>
-                {email}
-              </span>
-              <span className={'high-light'}>
-                {shortenAddress(walletAddress)}
-              </span>
+            <div>
+              <span>Your NFT is on the way.</span>
+              <span>{email}</span>
+              <span>{shortenAddress(walletAddress)}</span>
             </div>
             <DiscordButton />
           </Content>
@@ -288,24 +252,15 @@ export const PreLaunchView = () => {
 
 export const ComingSoonView = () => {
   return (
-    <Layout id={'pre-launch-layout'}>
-      <div className={'main-asset-banner'}>
-        {/*Gradient does not match*/}
-        {/*<div className={"right-gradient"}></div>*/}
-      </div>
-      <Layout id={'width-layout'}>
-        <Content className={'pre-main-content'}>
-          <div className={'logo'}>
-            <LogoLink />
-          </div>
-          <div className={'full-height-content'}>
-            <div className={'pre-title'}>{textContent.comingSoonTitle}</div>
-            <div className={'pre-context'}>
-              {textContent.comingSoonTitleDescription}
-            </div>
-            <div className={'pre-input'}>
+    <Layout>
+      <Layout>
+        <Content>
+          <LogoLink />
+          <div>
+            <div>{textContent.comingSoonTitle}</div>
+            <div>{textContent.comingSoonTitleDescription}</div>
+            <div>
               <Form
-                className={'footer-sign-up'}
                 onFinish={values => {
                   console.log(values);
                 }}
@@ -319,21 +274,14 @@ export const ComingSoonView = () => {
                     },
                     { required: true, message: 'Please input your email!' },
                   ]}
-                  style={{ display: 'flex !important' }}
                 >
-                  <Input
-                    className={'footer-input'}
-                    placeholder="Email Address"
-                    name="email"
-                  />
+                  <Input placeholder="Email Address" name="email" />
                 </Form.Item>
-                <Button className={'secondary-btn sign-up'} htmlType="submit">
-                  Sign Up
-                </Button>
+                <Button htmlType="submit">Sign Up</Button>
               </Form>
             </div>
           </div>
-          <div className={'lower-content'}>
+          <div>
             <DiscordButton />
           </div>
         </Content>

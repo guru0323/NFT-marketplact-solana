@@ -12,5 +12,4 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./account"), exports);
 __exportStar(require("./metaplex"), exports);
-__exportStar(require("./packs"), exports);
 //# sourceMappingURL=index.js.map

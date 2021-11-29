@@ -1,26 +1,27 @@
-/// <reference types="react" />
-import { TokenInfo, ENV as ChainId } from '@solana/spl-token-registry';
-import { Keypair, Commitment, Connection, Transaction, TransactionInstruction, Blockhash, FeeCalculator } from '@solana/web3.js';
+import { ENV as ChainId, TokenInfo } from '@solana/spl-token-registry';
+import { Blockhash, Commitment, Connection, FeeCalculator, Keypair, RpcResponseAndContext, SimulatedTransactionResponse, Transaction, TransactionInstruction } from '@solana/web3.js';
+import { ReactNode } from 'react';
 import { WalletSigner } from './wallet';
 interface BlockhashAndFeeCalculator {
     blockhash: Blockhash;
     feeCalculator: FeeCalculator;
 }
-export declare type ENDPOINT_NAME = 'mainnet-beta' | 'mainnet-beta-solana' | 'mainnet-beta-serum' | 'testnet' | 'devnet' | 'localnet' | 'lending';
-declare type Endpoint = {
-    name: ENDPOINT_NAME;
-    label: string;
-    url: string;
-    chainId: ChainId;
-};
-export declare const ENDPOINTS: Array<Endpoint>;
-export declare function ConnectionProvider({ children }: {
-    children: any;
+export declare type ENV = 'mainnet-beta (Triton)' | 'mainnet-beta (Triton Staging)' | 'mainnet-beta (Solana)' | 'mainnet-beta (Serum)' | 'testnet' | 'devnet' | 'localnet' | 'lending';
+export declare const ENDPOINTS: {
+    name: ENV;
+    endpoint: string;
+    ChainId: ChainId;
+}[];
+export declare function ConnectionProvider({ children, }: {
+    children: ReactNode;
 }): JSX.Element;
 export declare function useConnection(): Connection;
 export declare function useConnectionConfig(): {
-    endpoint: Endpoint;
-    tokens: Map<string, TokenInfo>;
+    endpoint: string;
+    setEndpoint: (val: string) => void;
+    env: ENV;
+    tokens: TokenInfo[];
+    tokenMap: Map<string, TokenInfo>;
 };
 export declare const getErrorForTransaction: (connection: Connection, txid: string) => Promise<string[]>;
 export declare enum SequenceType {
@@ -39,7 +40,7 @@ export declare const sendTransactionWithRetry: (connection: Connection, wallet: 
     slot: number;
 }>;
 export declare const getUnixTs: () => number;
-export declare function sendSignedTransaction({ signedTransaction, connection, timeout, }: {
+export declare function sendSignedTransaction({ signedTransaction, connection, }: {
     signedTransaction: Transaction;
     connection: Connection;
     sendingMessage?: string;
@@ -50,5 +51,6 @@ export declare function sendSignedTransaction({ signedTransaction, connection, t
     txid: string;
     slot: number;
 }>;
+export declare function simulateTransaction(connection: Connection, transaction: Transaction, commitment: Commitment): Promise<RpcResponseAndContext<SimulatedTransactionResponse>>;
 export {};
 //# sourceMappingURL=connection.d.ts.map

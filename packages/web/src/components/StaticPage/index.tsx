@@ -1,13 +1,12 @@
-import React, { Fragment, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { Col, Divider, Row } from 'antd';
 import BN from 'bn.js';
-
-import Masonry from 'react-masonry-css';
-import { CardLoader } from '../MyLoader';
+import React, { Fragment, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useMeta } from '../../contexts';
-import { AuctionRenderCard } from '../AuctionRenderCard';
 import { AuctionViewState, useAuctions } from '../../hooks';
+import { AuctionRenderCard } from '../AuctionRenderCard';
+import { MetaplexMasonry } from '../MetaplexMasonry';
+import { CardLoader } from '../MyLoader';
 
 interface Connect {
   label: string;
@@ -92,12 +91,6 @@ export const StaticPage = (props: {
   });
   const auctions = useAuctions(AuctionViewState.Live);
   const { isLoading } = useMeta();
-  const breakpointColumnsObj = {
-    default: 4,
-    1100: 3,
-    700: 2,
-    500: 1,
-  };
 
   const liveAuctions = auctions.sort(
     (a, b) =>
@@ -107,11 +100,7 @@ export const StaticPage = (props: {
   );
 
   const liveAuctionsView = (
-    <Masonry
-      breakpointCols={breakpointColumnsObj}
-      className="my-masonry-grid"
-      columnClassName="my-masonry-grid_column"
-    >
+    <MetaplexMasonry>
       {!isLoading
         ? liveAuctions.map((m, idx) => {
             const id = m.auction.pubkey;
@@ -122,9 +111,10 @@ export const StaticPage = (props: {
             );
           })
         : [...Array(10)].map((_, idx) => <CardLoader key={idx} />)}
-    </Masonry>
+    </MetaplexMasonry>
   );
 
+  // TODO: remove use of .style
   const addGradients = () => {
     const headerGradient = document.getElementById('static-header-gradient');
     const endGradient = document.getElementById('static-end-gradient');
@@ -160,32 +150,29 @@ export const StaticPage = (props: {
   }, []);
 
   const headerSection = (
-    <section id="header-container">
-      {/*<span id="header-gradient"></span>*/}
+    <section>
       <Row>
-        <Col span={24} xl={8} className="header-left">
-          <p className="header-subtitle">{props.headContent.subtitle}</p>
+        <Col span={24} xl={8}>
+          <p>{props.headContent.subtitle}</p>
           <Divider />
-          <p className="header-title">{props.headContent.title}</p>
+          <p>{props.headContent.title}</p>
 
           {props.headContent.author && (
-            <div className="author-container">
+            <div>
               <img
                 src={props.headContent.author.avatar}
-                className="author-avatar"
                 width="32px"
                 height="32px"
                 alt="author image"
               />
-              <p className="author-name">{props.headContent.author.name}</p>
+              <p>{props.headContent.author.name}</p>
             </div>
           )}
         </Col>
 
-        <Col xl={16} span={24} className="header-right">
+        <Col xl={16} span={24}>
           <img
             src={props.headContent.bannerImage}
-            className="header-image"
             width="880px"
             height="620px"
             alt={`${props.headContent.title} image`}
@@ -195,48 +182,41 @@ export const StaticPage = (props: {
     </section>
   );
   const leftSection = props.leftContent && (
-    <section id="left-container" className="author-container">
-      <img
-        src={props.leftContent?.author.avatar}
-        className="author-avatar"
-        alt="author image"
-      />
-      <p className="author-name">{props.leftContent?.author.name}</p>
-      <div className="author-details">
-        <p className="author-subtitle">Details</p>
+    <section>
+      <img src={props.leftContent?.author.avatar} alt="author image" />
+      <p>{props.leftContent?.author.name}</p>
+      <div>
+        <p>Details</p>
         <p>{props.leftContent?.author.details}</p>
       </div>
-      <div className="author-stats">
-        <p className="author-subtitle">Stats</p>
+      <div>
+        <p>Stats</p>
         {props.leftContent?.author.stats?.map((e, i) => (
           <p key={i}>{e}</p>
         ))}
       </div>
-      <div className="author-connect">
-        <p className="author-subtitle">Connect with the artist</p>
+      <div>
+        <p>Connect with the artist</p>
         {props.leftContent?.author.connectWith?.map((e, i) => (
-          <p>
-            <a key={i} href={e.url}>
-              {e.label}
-            </a>
+          <p key={i}>
+            <a href={e.url}>{e.label}</a>
           </p>
         ))}
       </div>
     </section>
   );
   const middleSection = (
-    <section id="middle-container">
+    <section>
       {props.midContent.sections.map((section, i) => (
-        <div key={i} className="mid-section-item">
-          {section.title && <span className="mid-title">{section.title}</span>}
-          {section.paragraphs?.map(paragraph => (
-            <p className="paragraph-text">{paragraph}</p>
+        <div key={i}>
+          {section.title && <span>{section.title}</span>}
+          {section.paragraphs?.map((paragraph, i) => (
+            <p key={i}>{paragraph}</p>
           ))}
 
           {section.image && (
             <img
               src={section.image}
-              className="image"
               width="720px"
               height="450px"
               alt={`${section.title} image`}
@@ -244,9 +224,13 @@ export const StaticPage = (props: {
           )}
 
           {section.caption && (
-            <p className="image-caption">
+            <p>
               {section.caption.text}
-              <a href={section.caption.linkUrl} target="_blank">
+              <a
+                href={section.caption.linkUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 {section.caption.linkText}
               </a>
             </p>
@@ -255,10 +239,10 @@ export const StaticPage = (props: {
       ))}
     </section>
   );
-  const rightSection = <section id="right-container"></section>;
+  const rightSection = <section></section>;
   const finalSection = (
-    <section id="bottom-container">
-      <p className="bottom-title">Shop the Collection</p>
+    <section>
+      <p>Shop the Collection</p>
       {liveAuctionsView}
     </section>
   );
@@ -266,7 +250,7 @@ export const StaticPage = (props: {
   return (
     <Fragment>
       {headerSection}
-      <Row className="static-page-container">
+      <Row>
         <Col xs={24} md={4}>
           {leftSection}
         </Col>

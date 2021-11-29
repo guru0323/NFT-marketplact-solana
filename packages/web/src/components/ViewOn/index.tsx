@@ -1,41 +1,36 @@
 import React from 'react';
-import { Col, Button } from 'antd';
+import { Space, Button, Typography } from 'antd';
 import { useArt } from '../../hooks';
 import { useConnectionConfig } from '@oyster/common';
+import { Art } from '../../types';
 
-export const ViewOn = ({ id }: { id: string }) => {
-  const { endpoint } = useConnectionConfig();
-  const art = useArt(id);
+type ViewOnProps = { id: string; art?: undefined } | { art: Art };
+const { Text } = Typography;
+
+export const ViewOn = (props: ViewOnProps) => {
+  const { env } = useConnectionConfig();
+  const art = props.art ?? useArt(props.id);
 
   return (
-    <>
-      <Col>
-        <h6>View on</h6>
-        <div style={{ display: 'flex' }}>
-          <Button
-            className="tag"
-            onClick={() => window.open(art.uri || '', '_blank')}
-          >
-            Arweave
-          </Button>
-          <Button
-            className="tag"
-            onClick={() => {
-              const cluster = endpoint.name;
-              const explorerURL = new URL(
-                `account/${art?.mint || ''}`,
-                'https://explorer.solana.com',
-              );
-              if (!cluster.includes('mainnet')) {
-                explorerURL.searchParams.set('cluster', cluster);
-              }
-              window.open(explorerURL.href, '_blank');
-            }}
-          >
-            Solana
-          </Button>
-        </div>
-      </Col>
-    </>
+    <Space direction="vertical" size="small">
+      <Text>View on</Text>
+      <Space direction="horizontal">
+        <Button onClick={() => window.open(art.uri || '', '_blank')}>
+          Metadata
+        </Button>
+        <Button
+          onClick={() =>
+            window.open(
+              `https://explorer.solana.com/account/${art?.mint || ''}${
+                env.indexOf('main') >= 0 ? '' : `?cluster=${env}`
+              }`,
+              '_blank',
+            )
+          }
+        >
+          Transaction
+        </Button>
+      </Space>
+    </Space>
   );
 };

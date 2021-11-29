@@ -5,5 +5,7 @@ export * from './useAuction';
 export * from './useBidsForAuction';
 export * from './useUserBalance';
 export * from './useCreator';
-export * from './useCreatorArts';
 export * from './useCreators';
+export * from './useCreatorArts';
+export * from './useNotifications';
+export * from './useAuctionManagersToCache';

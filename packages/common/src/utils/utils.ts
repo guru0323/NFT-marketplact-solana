@@ -16,15 +16,11 @@ export const formatPriceNumber = new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 8,
 });
 
-export function useLocalStorageState<T>(
-  key: string,
-  defaultState?: T,
-): [T, (key: string) => void] {
+export function useLocalStorageState(key: string, defaultState?: string) {
   const localStorage = useLocalStorage();
   const [state, setState] = useState(() => {
-    console.debug('Querying local storage', key);
+    // NOTE: Not sure if this is ok
     const storedState = localStorage.getItem(key);
-    console.debug('Retrieved local storage', storedState);
     if (storedState) {
       return JSON.parse(storedState);
     }
@@ -224,10 +220,6 @@ const abbreviateNumber = (number: number, precision: number) => {
     const scale = Math.pow(10, tier * 3);
     scaled = number / scale;
   }
-  // Added this to remove unneeded decimals when abbreviating number
-  precision = Number.isInteger(scaled) ? 0 : precision;
-
-  //console.log("Number", scaled, precision)
 
   return scaled.toFixed(precision) + suffix;
 };
@@ -244,7 +236,7 @@ export function formatTokenAmount(
   rate: number = 1.0,
   prefix = '',
   suffix = '',
-  precision = 3,
+  precision = 2,
   abbr = false,
 ): string {
   if (!account) {

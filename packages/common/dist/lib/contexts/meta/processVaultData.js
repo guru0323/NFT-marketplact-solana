@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.processVaultData = void 0;
 const actions_1 = require("../../actions");
 const utils_1 = require("../../utils");
-const processVaultData = ({ account, pubkey }, setter) => {
+const processVaultData = async ({ account, pubkey }, setter) => {
     if (!isVaultAccount(account))
         return;
     try {
@@ -32,7 +32,7 @@ const processVaultData = ({ account, pubkey }, setter) => {
     }
 };
 exports.processVaultData = processVaultData;
-const isVaultAccount = (account) => account && utils_1.pubkeyToString(account.owner) === utils_1.VAULT_ID;
+const isVaultAccount = (account) => utils_1.pubkeyToString(account === null || account === void 0 ? void 0 : account.owner) === utils_1.VAULT_ID;
 const isSafetyDepositBoxV1Account = (account) => account.data[0] === actions_1.VaultKey.SafetyDepositBoxV1;
 const isVaultV1Account = (account) => account.data[0] === actions_1.VaultKey.VaultV1;
 //# sourceMappingURL=processVaultData.js.map

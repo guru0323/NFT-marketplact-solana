@@ -6,7 +6,7 @@ import BN from 'bn.js';
 import { TokenInfo } from '@solana/spl-token-registry';
 export declare type KnownTokenMap = Map<string, TokenInfo>;
 export declare const formatPriceNumber: Intl.NumberFormat;
-export declare function useLocalStorageState<T>(key: string, defaultState?: T): [T, (key: string) => void];
+export declare function useLocalStorageState(key: string, defaultState?: string): any[];
 export declare const findProgramAddress: (seeds: (Buffer | Uint8Array)[], programId: PublicKey) => Promise<[string, number]>;
 export declare function shortenAddress(address: string, chars?: number): string;
 export declare function getTokenName(map: KnownTokenMap, mint?: string | PublicKey, shorten?: boolean): string;

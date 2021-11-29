@@ -118,24 +118,7 @@ class Metadata {
         this.editionNonce = (_a = args.editionNonce) !== null && _a !== void 0 ? _a : null;
     }
     async init() {
-        //const metadata = toPublicKey(programIds().metadata);
-        /*
-        This nonce stuff doesnt work - we are doing something wrong here. TODO fix.
-        if (this.editionNonce !== null) {
-          this.edition = (
-            await PublicKey.createProgramAddress(
-              [
-                Buffer.from(METADATA_PREFIX),
-                metadata.toBuffer(),
-                toPublicKey(this.mint).toBuffer(),
-                new Uint8Array([this.editionNonce || 0]),
-              ],
-              metadata,
-            )
-          ).toBase58();
-        } else {*/
         this.edition = await getEdition(this.mint);
-        //}
         this.masterEdition = this.edition;
     }
 }
@@ -188,6 +171,7 @@ exports.METADATA_SCHEMA = new Map([
                 ['data', { kind: 'option', type: Data }],
                 ['updateAuthority', { kind: 'option', type: 'pubkeyAsString' }],
                 ['primarySaleHappened', { kind: 'option', type: 'u8' }],
+                ['editionNonce', { kind: 'option', type: 'u8' }],
             ],
         },
     ],
@@ -280,8 +264,7 @@ exports.METADATA_SCHEMA = new Map([
                 ['mint', 'pubkeyAsString'],
                 ['data', Data],
                 ['primarySaleHappened', 'u8'],
-                ['isMutable', 'u8'],
-                ['editionNonce', { kind: 'option', type: 'u8' }],
+                ['isMutable', 'u8'], // bool
             ],
         },
     ],

@@ -8,14 +8,8 @@ const react_1 = __importDefault(require("react"));
 const antd_1 = require("antd");
 const MetaplexOverlay = (props) => {
     const { children, ...rest } = props;
-    const content = (react_1.default.createElement("div", { style: {
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            pointerEvents: 'auto',
-            justifyContent: 'center',
-        } }, children));
-    return (react_1.default.createElement(antd_1.Modal, { centered: true, modalRender: () => content, width: '100vw', mask: false, ...rest }));
+    const content = react_1.default.createElement("div", { className: "metaplex-overlay-content" }, children);
+    return (react_1.default.createElement(antd_1.Modal, { ...rest, centered: true, modalRender: () => content, mask: false, wrapClassName: "metaplex-overlay-modal" }));
 };
 exports.MetaplexOverlay = MetaplexOverlay;
 //# sourceMappingURL=index.js.map

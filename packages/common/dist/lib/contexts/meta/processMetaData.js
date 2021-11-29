@@ -16,8 +16,8 @@ const processMetaData = async ({ account, pubkey }, setter) => {
                     account,
                     info: metadata,
                 };
-                await setter('metadataByMint', metadata.mint, parsedAccount);
-                await setter('metadataByMetadata', pubkey, parsedAccount);
+                setter('metadataByMint', metadata.mint, parsedAccount);
+                setter('metadataByMetadata', pubkey, parsedAccount);
             }
         }
         if (isEditionV1Account(account)) {

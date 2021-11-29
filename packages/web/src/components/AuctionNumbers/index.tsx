@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { Row, Col } from 'antd';
-
 import {
-  formatTokenAmount,
-  useMint,
-  fromLamports,
   CountdownState,
+  formatTokenAmount,
+  fromLamports,
   PriceFloorType,
+  useMint,
 } from '@oyster/common';
+import { Col, Row, Typography } from 'antd';
+import React from 'react';
 import { AuctionView, AuctionViewState, useBidsForAuction } from '../../hooks';
-import { AmountLabel } from '../AmountLabel';
 import { useAuctionCountdown } from '../../hooks/useAuctionCountdown';
-import { useTokenList } from '../../contexts/tokenList';
+import { AmountLabel } from '../AmountLabel';
+
+const { Text } = Typography;
 
 export const AuctionCountdown = (props: {
   auctionView: AuctionView;
@@ -20,7 +20,6 @@ export const AuctionCountdown = (props: {
   const { auctionView } = props;
   const state = useAuctionCountdown(auctionView);
   const ended = isEnded(state);
-
   if (!props.labels) {
     return <Countdown state={state} />;
   }
@@ -35,7 +34,7 @@ export const AuctionNumbers = (props: {
   auctionView: AuctionView;
   hideCountdown?: boolean;
   showAsRow?: boolean;
-  displaySymbol?: boolean;
+  displaySOL?: boolean;
 }) => {
   const { auctionView } = props;
   const state = useAuctionCountdown(auctionView);
@@ -53,19 +52,16 @@ export const AuctionNumbers = (props: {
   const isUpcoming = auctionView.state === AuctionViewState.Upcoming;
   const isStarted = auctionView.state === AuctionViewState.Live;
 
-  const tokenInfo = useTokenList().mainnetTokens.filter(m=>m.address == auctionView.auction.info.tokenMint)[0]
   const ended = isEnded(state);
 
   return (
-    <div style={{ maxWidth: 350 }}>
+    <div>
       {(!ended || auctionView.isInstantSale) && (
         <>
           {(isUpcoming || bids.length === 0 || auctionView.isInstantSale) && (
             <AmountLabel
-              displaySymbol={tokenInfo?.symbol || "CUSTOM"}
-              style={{ marginBottom: props.showAsRow ? 0 : 10 }}
+              displaySOL={props.displaySOL}
               title={auctionView.isInstantSale ? 'Price' : 'Starting bid'}
-              tokenInfo = {tokenInfo}
               amount={fromLamports(
                 participationOnly ? participationFixedPrice : priceFloor,
                 mintInfo,
@@ -74,13 +70,8 @@ export const AuctionNumbers = (props: {
           )}
           {!auctionView.isInstantSale && isStarted && bids.length > 0 && (
             <AmountLabel
-            displaySymbol={tokenInfo?.symbol || "CUSTOM"}
-              style={{ marginBottom: props.showAsRow ? 0 : 10 }}
-              containerStyle={{
-                flexDirection: props.showAsRow ? ' row' : 'column',
-              }}
+              displaySOL={props.displaySOL}
               title="Highest bid"
-              tokenInfo = {tokenInfo}
               amount={formatTokenAmount(bids[0].info.lastBid, mintInfo)}
             />
           )}
@@ -110,36 +101,25 @@ const Countdown = ({ state }: { state?: CountdownState }) => {
     };
   }
   return (
-    <Row
-      style={{ width: '100%', flexWrap: 'nowrap' }}
-      className={'no-label-cd'}
-    >
+    <Row gutter={8}>
       {localState.days > 0 && (
         <Col>
-          <div className="cd-number">
-            {localState.days}
-            <span style={{ opacity: 0.5 }}>days</span>
-          </div>
+          {localState.days}
+          <Text type="secondary"> days</Text>
         </Col>
       )}
       <Col>
-        <div className="cd-number">
-          {localState.hours}
-          <span style={{ opacity: 0.5 }}>hours</span>
-        </div>
+        {localState.hours}
+        <Text type="secondary"> hours</Text>
       </Col>
       <Col>
-        <div className="cd-number">
-          {localState.minutes}
-          <span style={{ opacity: 0.5 }}>min</span>
-        </div>
+        {localState.minutes}
+        <Text type="secondary"> min</Text>
       </Col>
       {!localState.days && (
         <Col>
-          <div className="cd-number">
-            {localState.seconds}
-            <span style={{ opacity: 0.5 }}>sec</span>
-          </div>
+          {localState.seconds}
+          <Text type="secondary"> sec</Text>
         </Col>
       )}
     </Row>
@@ -149,53 +129,43 @@ const Countdown = ({ state }: { state?: CountdownState }) => {
 const LabeledCountdown = ({ state }: { state?: CountdownState }) => {
   return (
     <>
-      <div style={{ width: '100%' }}>
+      <div>
         <>
-          <div
-            className="info-header"
-            style={{
-              margin: '12px 0',
-              fontSize: 18,
-            }}
-          >
-            Time left
-          </div>
+          <div>Time left</div>
           {state &&
             (isEnded(state) ? (
-              <Row style={{ width: '100%' }}>
-                <div className="cd-number">This auction has ended</div>
+              <Row>
+                <div>This auction has ended</div>
               </Row>
             ) : (
-              <Row style={{ width: '100%', flexWrap: 'nowrap' }}>
+              <Row>
                 {state && state.days > 0 && (
                   <Col>
-                    <div className="cd-number">
+                    <div>
                       {state.days}
-                      <span style={{ opacity: 0.5 }}>:</span>
+                      <span>:</span>
                     </div>
-                    <div className="cd-label">days</div>
+                    <div>days</div>
                   </Col>
                 )}
                 <Col>
-                  <div className="cd-number">
+                  <div>
                     {state.hours}
-                    <span style={{ opacity: 0.5 }}>:</span>
+                    <span>:</span>
                   </div>
-                  <div className="cd-label">hour</div>
+                  <div>hour</div>
                 </Col>
                 <Col>
-                  <div className="cd-number">
+                  <div>
                     {state.minutes}
-                    {state.days === 0 && (
-                      <span style={{ opacity: 0.5 }}>:</span>
-                    )}
+                    {state.days === 0 && <span>:</span>}
                   </div>
-                  <div className="cd-label">mins</div>
+                  <div>mins</div>
                 </Col>
                 {!state.days && (
                   <Col>
-                    <div className="cd-number">{state.seconds}</div>
-                    <div className="cd-label">secs</div>
+                    <div>{state.seconds}</div>
+                    <div>secs</div>
                   </Col>
                 )}
               </Row>

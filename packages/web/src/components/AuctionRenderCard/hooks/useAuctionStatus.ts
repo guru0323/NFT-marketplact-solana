@@ -1,10 +1,8 @@
 import {
-  AuctionState,
-  BidStateType,
   formatTokenAmount,
   fromLamports,
-  PriceFloorType,
   useMint,
+  PriceFloorType,
 } from '@oyster/common';
 import {
   AuctionView,
@@ -14,10 +12,47 @@ import {
 } from '../../../hooks';
 import { BN } from 'bn.js';
 
+export type AuctionStatus =
+  | {
+      isInstantSale: false;
+      isLive: boolean;
+      hasBids: boolean;
+    }
+  | {
+      isInstantSale: true;
+      isLive: boolean;
+      soldOut: boolean;
+    };
+
 interface AuctionStatusLabels {
-  status: string;
+  status: AuctionStatus;
   amount: string | number;
 }
+
+export const getHumanStatus = (status: AuctionStatus): string => {
+  // isInstantSale cannot be destructured due to TypeScript type limitations
+  const { isLive } = status;
+
+  if (status.isInstantSale) {
+    const { soldOut } = status;
+
+    if (soldOut) {
+      return 'Sold Out';
+    } else if (isLive) {
+      return '';
+    }
+
+    return 'Ended';
+  } else {
+    const { hasBids } = status;
+
+    if (isLive) {
+      return hasBids ? 'Current Bid' : 'Starting Bid';
+    } else {
+      return hasBids ? 'Winning Bid' : 'Ended';
+    }
+  }
+};
 
 export const useAuctionStatus = (
   auctionView: AuctionView,
@@ -34,68 +69,48 @@ export const useAuctionStatus = (
       ? auctionView.auction.info.priceFloor.minPrice?.toNumber() || 0
       : 0;
 
-  let status = 'Starting Bid';
-
   let amount: string | number = fromLamports(
     participationOnly ? participationFixedPrice : priceFloor,
     mintInfo,
   );
 
   const countdown = auctionView.auction.info.timeToEnd();
-  const isOpen =
-    auctionView.auction.info.bidState.type === BidStateType.OpenEdition;
 
-  if (isOpen) {
-    status = 'Open Sale';
-  }
-
-  const ended =
-    countdown?.hours === 0 &&
-    countdown?.minutes === 0 &&
-    countdown?.seconds === 0 &&
-    auctionView.auction.info.state === AuctionState.Ended;
+  let isLive = auctionView.state !== AuctionViewState.Ended;
 
   if (auctionView.isInstantSale) {
-    const soldOut = bids.length === auctionView.items.length;
-
-    status = auctionView.state === AuctionViewState.Ended ? 'Ended' : 'Price';
-
-    if (soldOut && !isOpen) {
-      status = 'Sold Out';
-    }
+    const soldOut =
+      bids.length === auctionView.auctionManager.numWinners.toNumber();
 
     amount = formatTokenAmount(
       auctionView.auctionDataExtended?.info.instantSalePrice?.toNumber(),
-      mintInfo
     );
 
     return {
-      status,
+      status: { isInstantSale: true, isLive, soldOut },
       amount,
     };
   }
 
-  if (bids.length > 0 && !isOpen) {
-    amount = formatTokenAmount(winningBid.info.lastBid);
-    status = 'Current Bid';
-  }
+  isLive =
+    isLive &&
+    !(
+      countdown?.days === 0 &&
+      countdown?.hours === 0 &&
+      countdown?.minutes === 0 &&
+      countdown?.seconds === 0
+    );
 
-  if (ended) {
-    if (bids.length === 0) {
-      return {
-        status: 'Ended',
-        amount,
-      };
-    }
+  const hasBids = bids.length > 0;
 
-    return {
-      status: 'Winning Bid',
-      amount,
-    };
-  }
+  if (hasBids) amount = formatTokenAmount(winningBid.info.lastBid);
 
   return {
-    status,
+    status: {
+      isInstantSale: false,
+      isLive,
+      hasBids,
+    },
     amount,
   };
 };

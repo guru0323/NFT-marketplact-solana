@@ -8,9 +8,9 @@ const antd_1 = require("antd");
 const react_1 = __importDefault(require("react"));
 const icons_1 = require("@ant-design/icons");
 const Info = (props) => {
-    return (react_1.default.createElement(antd_1.Popover, { trigger: "hover", content: react_1.default.createElement("div", { style: { width: 300 } }, props.text) },
+    return (react_1.default.createElement(antd_1.Popover, { trigger: "hover", content: react_1.default.createElement("div", null, props.text) },
         react_1.default.createElement(antd_1.Button, { type: "text", shape: "circle" },
-            react_1.default.createElement(icons_1.InfoCircleOutlined, { style: props.style }))));
+            react_1.default.createElement(icons_1.InfoCircleOutlined, null))));
 };
 exports.Info = Info;
 //# sourceMappingURL=info.js.map

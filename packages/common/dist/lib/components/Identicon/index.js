@@ -24,28 +24,32 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Identicon = void 0;
 const react_1 = __importStar(require("react"));
-const jazzicon_1 = __importDefault(require("jazzicon"));
-const bs58_1 = __importDefault(require("bs58"));
-const Identicon = (props) => {
-    var _a;
-    const { style, className, alt } = props;
-    const address = typeof props.address === 'string'
-        ? props.address
-        : (_a = props.address) === null || _a === void 0 ? void 0 : _a.toBase58();
-    const ref = react_1.useRef();
-    react_1.useEffect(() => {
-        if (address && ref.current) {
-            try {
-                ref.current.innerHTML = '';
-                ref.current.className = className || '';
-                ref.current.appendChild(jazzicon_1.default((style === null || style === void 0 ? void 0 : style.width) || 16, parseInt(bs58_1.default.decode(address).toString('hex').slice(5, 15), 16)));
-            }
-            catch (err) {
-                // TODO
-            }
+const jazzicon_1 = __importDefault(require("@metamask/jazzicon"));
+const web3_js_1 = require("@solana/web3.js");
+const Identicon = ({ size, address, alt, }) => {
+    const pubkey = typeof address === 'string' ? new web3_js_1.PublicKey(address) : address;
+    const ref = react_1.useRef(null);
+    const el = react_1.useMemo(() => {
+        if (!pubkey)
+            return undefined;
+        const el = jazzicon_1.default(72, Array.from(new Uint32Array(pubkey.toBytes())));
+        // There's no need for jazzicon to dictate the element size, this allows
+        // auto-scaling the element and its contents
+        const svg = el.querySelector('svg');
+        if (svg) {
+            svg.setAttribute('viewBox', '0 0 72 72');
+            svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+            ['x', 'y', 'width', 'height'].forEach(a => svg.removeAttribute(a));
         }
-    }, [address, style, className]);
-    return (react_1.default.createElement("div", { className: "identicon-wrapper", title: alt, ref: ref, style: props.style }));
+        return el;
+    }, [pubkey]);
+    react_1.useEffect(() => {
+        // TODO: the current TSC toolchain does not have a correct definition for replaceChildren
+        // @ts-ignore
+        if (el && ref.current)
+            ref.current.replaceChildren(el);
+    }, [el, ref.current]);
+    return (react_1.default.createElement("div", { title: alt, ref: ref, style: size ? { width: size, height: size } : {}, className: "metaplex-jazzicon" }));
 };
 exports.Identicon = Identicon;
 //# sourceMappingURL=index.js.map

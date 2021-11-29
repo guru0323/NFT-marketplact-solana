@@ -24,7 +24,8 @@ const react_1 = __importStar(require("react"));
 const utils_1 = require("../utils");
 const hooks_1 = require("../hooks");
 exports.StoreContext = react_1.createContext(null);
-const StoreProvider = ({ children, ownerAddress, storeAddress }) => {
+const StoreProvider = ({ children, storefront, storeAddress }) => {
+    const ownerAddress = '98jiC2PfMNqLwUrabW3LxE15dfHCyaNX5V6nxHaP96NQ';
     const searchParams = hooks_1.useQuerySearch();
     const ownerAddressFromQuery = searchParams.get('store');
     const initOwnerAddress = ownerAddressFromQuery || ownerAddress;
@@ -51,7 +52,13 @@ const StoreProvider = ({ children, ownerAddress, storeAddress }) => {
             console.log(`CUSTOM STORE FROM ENV: ${initStoreAddress}`);
         }
     }, [initOwnerAddress]);
-    return (react_1.default.createElement(exports.StoreContext.Provider, { value: { ...store, setStoreForOwner, isConfigured } }, children));
+    return (react_1.default.createElement(exports.StoreContext.Provider, { value: {
+            ...store,
+            setStoreForOwner,
+            isConfigured,
+            ownerAddress,
+            storefront,
+        } }, children));
 };
 exports.StoreProvider = StoreProvider;
 const useStore = () => {

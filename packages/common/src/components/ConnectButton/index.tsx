@@ -1,18 +1,23 @@
-import { Button, Dropdown, Menu } from 'antd';
-import { ButtonProps } from 'antd/lib/button';
-import React, { useCallback } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
+import { Button, ButtonProps, Popover, PopoverProps, Space } from 'antd';
+import React, { useCallback } from 'react';
 import { useWalletModal } from '../../contexts';
 
 export interface ConnectButtonProps
   extends ButtonProps,
     React.RefAttributes<HTMLElement> {
+  popoverPlacement?: PopoverProps['placement'];
   allowWalletChange?: boolean;
-  className?: string;
 }
 
-export const ConnectButton = (props: ConnectButtonProps) => {
-  const { children, disabled, allowWalletChange, className, ...rest } = props;
+export const ConnectButton = ({
+  onClick,
+  children,
+  disabled,
+  allowWalletChange,
+  popoverPlacement,
+  ...rest
+}: ConnectButtonProps) => {
   const { wallet, connect, connected } = useWallet();
   const { setVisible } = useWalletModal();
   const open = useCallback(() => setVisible(true), [setVisible]);
@@ -27,10 +32,9 @@ export const ConnectButton = (props: ConnectButtonProps) => {
   if (!wallet || !allowWalletChange) {
     return (
       <Button
-        className={className || 'connector'}
         {...rest}
         onClick={e => {
-          props.onClick ? props.onClick(e) : null;
+          onClick && onClick(e);
           handleClick();
         }}
         disabled={connected && disabled}
@@ -41,17 +45,18 @@ export const ConnectButton = (props: ConnectButtonProps) => {
   }
 
   return (
-    <Dropdown.Button
-      className={className || (connected ? 'connector' : '')}
-      onClick={handleClick}
-      disabled={connected && disabled}
-      overlay={
-        <Menu className={'black-dropdown'}>
-          <Menu.Item onClick={open}>Change Wallet</Menu.Item>
-        </Menu>
+    <Popover
+      trigger="click"
+      placement={popoverPlacement}
+      content={
+        <Space direction="vertical">
+          <Button onClick={open}>Change wallet</Button>
+        </Space>
       }
     >
-      Connect
-    </Dropdown.Button>
+      <Button {...rest} onClick={handleClick} disabled={connected && disabled}>
+        Connect
+      </Button>
+    </Popover>
   );
 };

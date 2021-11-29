@@ -19,130 +19,122 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendSignedTransaction = exports.getUnixTs = exports.sendTransactionWithRetry = exports.sendTransaction = exports.sendTransactions = exports.sendTransactionsWithManualRetry = exports.SequenceType = exports.getErrorForTransaction = exports.useConnectionConfig = exports.useConnection = exports.ConnectionProvider = exports.ENDPOINTS = void 0;
-const react_1 = __importStar(require("react"));
+exports.simulateTransaction = exports.sendSignedTransaction = exports.getUnixTs = exports.sendTransactionWithRetry = exports.sendTransaction = exports.sendTransactions = exports.sendTransactionsWithManualRetry = exports.SequenceType = exports.getErrorForTransaction = exports.useConnectionConfig = exports.useConnection = exports.ConnectionProvider = exports.ENDPOINTS = void 0;
 const spl_token_registry_1 = require("@solana/spl-token-registry");
 const wallet_adapter_base_1 = require("@solana/wallet-adapter-base");
 const web3_js_1 = require("@solana/web3.js");
-const utils_1 = require("../utils/utils");
-const notifications_1 = require("../utils/notifications");
+const react_1 = __importStar(require("react"));
 const ExplorerLink_1 = require("../components/ExplorerLink");
 const hooks_1 = require("../hooks");
+const notifications_1 = require("../utils/notifications");
+const utils_1 = require("../utils/utils");
 exports.ENDPOINTS = [
     {
-        name: 'mainnet-beta',
-        label: 'mainnet-beta',
-        url: 'https://api.metaplex.solana.com/',
-        chainId: spl_token_registry_1.ENV.MainnetBeta,
+        name: 'mainnet-beta (Triton)',
+        endpoint: 'https://holaplex.rpcpool.com',
+        ChainId: spl_token_registry_1.ENV.MainnetBeta,
     },
     {
-        name: 'mainnet-beta-solana',
-        label: 'mainnet-beta (Solana)',
-        url: 'https://api.mainnet-beta.solana.com',
-        chainId: spl_token_registry_1.ENV.MainnetBeta,
+        name: 'mainnet-beta (Triton Staging)',
+        endpoint: 'https://stage.mainnet.rpcpool.com/4715f6087c8269548f2edb003a5e',
+        ChainId: spl_token_registry_1.ENV.MainnetBeta,
     },
     {
-        name: 'mainnet-beta-serum',
-        label: 'mainnet-beta (Serum)',
-        url: 'https://solana-api.projectserum.com/',
-        chainId: spl_token_registry_1.ENV.MainnetBeta,
+        name: 'mainnet-beta (Solana)',
+        endpoint: 'https://api.mainnet-beta.solana.com',
+        ChainId: spl_token_registry_1.ENV.MainnetBeta,
+    },
+    {
+        name: 'mainnet-beta (Serum)',
+        endpoint: 'https://solana-api.projectserum.com/',
+        ChainId: spl_token_registry_1.ENV.MainnetBeta,
     },
     {
         name: 'testnet',
-        label: 'testnet',
-        url: web3_js_1.clusterApiUrl('testnet'),
-        chainId: spl_token_registry_1.ENV.Testnet,
+        endpoint: web3_js_1.clusterApiUrl('testnet'),
+        ChainId: spl_token_registry_1.ENV.Testnet,
     },
     {
         name: 'devnet',
-        label: 'devnet',
-        url: web3_js_1.clusterApiUrl('devnet'),
-        chainId: spl_token_registry_1.ENV.Devnet,
+        endpoint: web3_js_1.clusterApiUrl('devnet'),
+        ChainId: spl_token_registry_1.ENV.Devnet,
     },
 ];
-const DEFAULT_ENDPOINT = exports.ENDPOINTS[0];
+const DEFAULT = exports.ENDPOINTS[0].endpoint;
+const DEFAULT_CONNECTION_TIMEOUT = 300 * 1000;
 const ConnectionContext = react_1.default.createContext({
-    connection: new web3_js_1.Connection(DEFAULT_ENDPOINT.url, 'recent'),
-    endpoint: DEFAULT_ENDPOINT,
-    tokens: new Map(),
+    endpoint: DEFAULT,
+    setEndpoint: () => { },
+    connection: new web3_js_1.Connection(DEFAULT, { commitment: 'recent', confirmTransactionInitialTimeout: DEFAULT_CONNECTION_TIMEOUT }),
+    env: exports.ENDPOINTS[0].name,
+    tokens: [],
+    tokenMap: new Map(),
 });
-function ConnectionProvider({ children }) {
+function ConnectionProvider({ children = undefined, }) {
+    var _a, _b;
     const searchParams = hooks_1.useQuerySearch();
-    const [networkStorage, setNetworkStorage] = utils_1.useLocalStorageState('network', DEFAULT_ENDPOINT.name);
-    const networkParam = searchParams.get('network');
-    let maybeEndpoint;
-    if (networkParam) {
-        let endpointParam = exports.ENDPOINTS.find(({ name }) => name === networkParam);
-        if (endpointParam) {
-            maybeEndpoint = endpointParam;
-        }
-    }
-    if (networkStorage && !maybeEndpoint) {
-        let endpointStorage = exports.ENDPOINTS.find(({ name }) => name === networkStorage);
-        if (endpointStorage) {
-            maybeEndpoint = endpointStorage;
-        }
-    }
-    const endpoint = maybeEndpoint || DEFAULT_ENDPOINT;
-    const { current: connection } = react_1.useRef(new web3_js_1.Connection(endpoint.url));
-    const [tokens, setTokens] = react_1.useState(new Map());
+    const network = searchParams.get('network');
+    const queryEndpoint = network && ((_a = exports.ENDPOINTS.find(({ name }) => name.startsWith(network))) === null || _a === void 0 ? void 0 : _a.endpoint);
+    const [savedEndpoint, setEndpoint] = utils_1.useLocalStorageState('connectionEndpoint', exports.ENDPOINTS[0].endpoint);
+    const endpoint = queryEndpoint || savedEndpoint;
+    const connection = react_1.useMemo(() => new web3_js_1.Connection(endpoint, { commitment: 'recent', confirmTransactionInitialTimeout: DEFAULT_CONNECTION_TIMEOUT }), [endpoint]);
+    const env = ((_b = exports.ENDPOINTS.find(end => end.endpoint === endpoint)) === null || _b === void 0 ? void 0 : _b.name) || exports.ENDPOINTS[0].name;
+    const [tokens, setTokens] = react_1.useState([]);
+    const [tokenMap, setTokenMap] = react_1.useState(new Map());
     react_1.useEffect(() => {
-        function fetchTokens() {
-            return new spl_token_registry_1.TokenListProvider().resolve().then(container => {
-                const list = container
-                    .excludeByTag('nft')
-                    .filterByChainId(endpoint.chainId)
-                    .getList();
-                const map = new Map(list.map(item => [item.address, item]));
-                setTokens(map);
-            });
-        }
-        fetchTokens();
-    }, []);
-    react_1.useEffect(() => {
-        function updateNetworkInLocalStorageIfNeeded() {
-            if (networkStorage !== endpoint.name) {
-                setNetworkStorage(endpoint.name);
-            }
-        }
-        updateNetworkInLocalStorageIfNeeded();
-    }, []);
-    // solana/web3.js closes its websocket connection when the subscription list
-    // is empty after opening for the first time, preventing subsequent
-    // subscriptions from receiving responses.
-    // This is a hack to prevent the list from ever being empty.
+        // fetch token files
+        new spl_token_registry_1.TokenListProvider().resolve().then(container => {
+            var _a;
+            const list = container
+                .excludeByTag('nft')
+                .filterByChainId(((_a = exports.ENDPOINTS.find(end => end.endpoint === endpoint)) === null || _a === void 0 ? void 0 : _a.ChainId) ||
+                spl_token_registry_1.ENV.MainnetBeta)
+                .getList();
+            const knownMints = [...list].reduce((map, item) => {
+                map.set(item.address, item);
+                return map;
+            }, new Map());
+            setTokenMap(knownMints);
+            setTokens(list);
+        });
+    }, [env]);
+    // The websocket library solana/web3.js uses closes its websocket connection when the subscription list
+    // is empty after opening its first time, preventing subsequent subscriptions from receiving responses.
+    // This is a hack to prevent the list from every getting empty
     react_1.useEffect(() => {
         const id = connection.onAccountChange(web3_js_1.Keypair.generate().publicKey, () => { });
         return () => {
             connection.removeAccountChangeListener(id);
         };
-    }, []);
+    }, [connection]);
     react_1.useEffect(() => {
         const id = connection.onSlotChange(() => null);
         return () => {
             connection.removeSlotChangeListener(id);
         };
-    }, []);
-    const contextValue = react_1.default.useMemo(() => {
-        return {
+    }, [connection]);
+    return (react_1.default.createElement(ConnectionContext.Provider, { value: {
             endpoint,
+            setEndpoint,
             connection,
             tokens,
-        };
-    }, [tokens]);
-    return (react_1.default.createElement(ConnectionContext.Provider, { value: contextValue }, children));
+            tokenMap,
+            env,
+        } }, children));
 }
 exports.ConnectionProvider = ConnectionProvider;
 function useConnection() {
-    const { connection } = react_1.useContext(ConnectionContext);
-    return connection;
+    return react_1.useContext(ConnectionContext).connection;
 }
 exports.useConnection = useConnection;
 function useConnectionConfig() {
-    const { endpoint, tokens } = react_1.useContext(ConnectionContext);
+    const context = react_1.useContext(ConnectionContext);
     return {
-        endpoint,
-        tokens,
+        endpoint: context.endpoint,
+        setEndpoint: context.setEndpoint,
+        env: context.env,
+        tokens: context.tokens,
+        tokenMap: context.tokenMap,
     };
 }
 exports.useConnectionConfig = useConnectionConfig;
@@ -179,7 +171,7 @@ async function sendTransactionsWithManualRetry(connection, wallet, instructions,
     let stopPoint = 0;
     let tries = 0;
     let lastInstructionsLength = null;
-    let toRemoveSigners = {};
+    const toRemoveSigners = {};
     instructions = instructions.filter((instr, i) => {
         if (instr.length > 0) {
             return true;
@@ -214,7 +206,7 @@ async function sendTransactionsWithManualRetry(connection, wallet, instructions,
     }
 }
 exports.sendTransactionsWithManualRetry = sendTransactionsWithManualRetry;
-const sendTransactions = async (connection, wallet, instructionSet, signersSet, sequenceType = SequenceType.Parallel, commitment = 'singleGossip', successCallback = (txid, ind) => { }, failCallback = (txid, ind) => false, block) => {
+const sendTransactions = async (connection, wallet, instructionSet, signersSet, sequenceType = SequenceType.Parallel, commitment = 'singleGossip', successCallback = () => { }, failCallback = () => false, block) => {
     if (!wallet.publicKey)
         throw new wallet_adapter_base_1.WalletNotConnectedError();
     const unsignedTxns = [];
@@ -227,7 +219,7 @@ const sendTransactions = async (connection, wallet, instructionSet, signersSet, 
         if (instructions.length === 0) {
             continue;
         }
-        let transaction = new web3_js_1.Transaction();
+        const transaction = new web3_js_1.Transaction();
         instructions.forEach(instruction => transaction.add(instruction));
         transaction.recentBlockhash = block.blockhash;
         transaction.setSigners(
@@ -240,7 +232,7 @@ const sendTransactions = async (connection, wallet, instructionSet, signersSet, 
     }
     const signedTxns = await wallet.signAllTransactions(unsignedTxns);
     const pendingTxns = [];
-    let breakEarlyObject = { breakEarly: false, i: 0 };
+    const breakEarlyObject = { breakEarly: false, i: 0 };
     console.log('Signed txns length', signedTxns.length, 'vs handed in length', instructionSet.length);
     for (let i = 0; i < signedTxns.length; i++) {
         const signedTxnPromise = sendSignedTransaction({
@@ -248,12 +240,13 @@ const sendTransactions = async (connection, wallet, instructionSet, signersSet, 
             signedTransaction: signedTxns[i],
         });
         signedTxnPromise
-            .then(({ txid, slot }) => {
+            .then(({ txid }) => {
+            console.log(`Instructions set ${i} succeeded. Transaction Id ${txid}`);
             successCallback(txid, i);
         })
-            .catch(reason => {
-            // @ts-ignore
-            failCallback(signedTxns[i], i);
+            .catch((e) => {
+            failCallback(e.message, i);
+            console.log(`Instructions set ${i} failed.`);
             if (sequenceType === SequenceType.StopOnFailure) {
                 breakEarlyObject.breakEarly = true;
                 breakEarlyObject.i = i;
@@ -302,7 +295,7 @@ const sendTransaction = async (connection, wallet, instructions, signers, awaitC
         transaction = await wallet.signTransaction(transaction);
     }
     const rawTransaction = transaction.serialize();
-    let options = {
+    const options = {
         skipPreflight: true,
         commitment,
     };
@@ -318,7 +311,7 @@ const sendTransaction = async (connection, wallet, instructions, signers, awaitC
             notifications_1.notify({
                 message: 'Transaction failed...',
                 description: (react_1.default.createElement(react_1.default.Fragment, null,
-                    errors.map(err => (react_1.default.createElement("div", null, err))),
+                    errors.map((err, i) => (react_1.default.createElement("div", { key: i }, err))),
                     react_1.default.createElement(ExplorerLink_1.ExplorerLink, { address: txid, type: "transaction" }))),
                 type: 'error',
             });
@@ -362,61 +355,18 @@ const getUnixTs = () => {
     return new Date().getTime() / 1000;
 };
 exports.getUnixTs = getUnixTs;
-const DEFAULT_TIMEOUT = 15000;
-async function sendSignedTransaction({ signedTransaction, connection, timeout = DEFAULT_TIMEOUT, }) {
+const DEFAULT_TIMEOUT = 30000;
+async function sendSignedTransaction({ signedTransaction, connection, }) {
     const rawTransaction = signedTransaction.serialize();
-    const startTime = exports.getUnixTs();
     let slot = 0;
-    const txid = await connection.sendRawTransaction(rawTransaction, {
+    const txid = await web3_js_1.sendAndConfirmRawTransaction(connection, rawTransaction, {
         skipPreflight: true,
+        commitment: 'confirmed'
     });
-    console.log('Started awaiting confirmation for', txid);
-    let done = false;
-    (async () => {
-        while (!done && exports.getUnixTs() - startTime < timeout) {
-            connection.sendRawTransaction(rawTransaction, {
-                skipPreflight: true,
-            });
-            await utils_1.sleep(500);
-        }
-    })();
-    try {
-        const confirmation = await awaitTransactionSignatureConfirmation(txid, timeout, connection, 'recent', true);
-        if (!confirmation)
-            throw new Error('Timed out awaiting confirmation on transaction');
-        if (confirmation.err) {
-            console.error(confirmation.err);
-            throw new Error('Transaction failed: Custom instruction error');
-        }
-        slot = (confirmation === null || confirmation === void 0 ? void 0 : confirmation.slot) || 0;
+    const confirmation = await connection.getConfirmedTransaction(txid, 'confirmed');
+    if (confirmation) {
+        slot = confirmation.slot;
     }
-    catch (err) {
-        console.error('Timeout Error caught', err);
-        if (err.timeout) {
-            throw new Error('Timed out awaiting confirmation on transaction');
-        }
-        let simulateResult = null;
-        try {
-            simulateResult = (await simulateTransaction(connection, signedTransaction, 'single')).value;
-        }
-        catch (e) { }
-        if (simulateResult && simulateResult.err) {
-            if (simulateResult.logs) {
-                for (let i = simulateResult.logs.length - 1; i >= 0; --i) {
-                    const line = simulateResult.logs[i];
-                    if (line.startsWith('Program log: ')) {
-                        throw new Error('Transaction failed: ' + line.slice('Program log: '.length));
-                    }
-                }
-            }
-            throw new Error(JSON.stringify(simulateResult.err));
-        }
-        // throw new Error('Transaction failed');
-    }
-    finally {
-        done = true;
-    }
-    console.log('Latency', txid, exports.getUnixTs() - startTime);
     return { txid, slot };
 }
 exports.sendSignedTransaction = sendSignedTransaction;
@@ -438,6 +388,7 @@ async function simulateTransaction(connection, transaction, commitment) {
     }
     return res.result;
 }
+exports.simulateTransaction = simulateTransaction;
 async function awaitTransactionSignatureConfirmation(txid, timeout, connection, commitment = 'recent', queryStatus = false) {
     let done = false;
     let status = {
@@ -446,7 +397,7 @@ async function awaitTransactionSignatureConfirmation(txid, timeout, connection, 
         err: null,
     };
     let subId = 0;
-    status = await new Promise(async (resolve, reject) => {
+    status = await new Promise((resolve, reject) => {
         setTimeout(() => {
             if (done) {
                 return;
@@ -510,7 +461,7 @@ async function awaitTransactionSignatureConfirmation(txid, timeout, connection, 
                     }
                 }
             })();
-            await utils_1.sleep(2000);
+            return utils_1.sleep(2000);
         }
     });
     //@ts-ignore

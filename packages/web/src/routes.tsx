@@ -1,10 +1,9 @@
+import { Storefront } from '@oyster/common';
 import React from 'react';
-import {HashRouter, Route, Switch} from 'react-router-dom';
-import {Providers} from './providers';
+import { HashRouter, Route, Switch } from 'react-router-dom';
+import { Providers } from './providers';
 import {
-  AnalyticsView,
   ArtCreateView,
-  ArtistsView,
   ArtistView,
   ArtView,
   ArtworksView,
@@ -13,72 +12,45 @@ import {
   HomeView,
   StaticPageView,
 } from './views';
-import {AdminView} from './views/admin';
-import {PackView} from './views/pack';
-import {PackCreateView} from './views/packCreate';
-import {BillingView} from './views/auction/billing';
+import { AdminView } from './views/admin';
+import { BillingView } from './views/auction/billing';
 
-export function Routes() {
-  const shouldEnableNftPacks = process.env.NEXT_ENABLE_NFT_PACKS;
+interface RoutesProps {
+  storefront: Storefront;
+}
+
+export function Routes({ storefront }: RoutesProps) {
   return (
     <>
-      <style global jsx>{`
-        html,
-        body {
-          color: #fff !important;
-          font-family: monospace !important;
-        }
-      `}</style>
-      <HashRouter basename={'/'}>
-        <Providers>
+      <HashRouter basename="/">
+        <Providers storefront={storefront}>
           <Switch>
-            <Route exact path='/admin' component={() => <AdminView />} />
-            {shouldEnableNftPacks && (
-              <Route
-                exact
-                path='/admin/pack/create/:stepParam?'
-                component={() => <PackCreateView />}
-              />
-            )}
+            <Route exact path="/admin" component={() => <AdminView />} />
             <Route
               exact
-              path='/analytics'
-              component={() => <AnalyticsView />}
-            />
-            <Route
-              exact
-              path='/art/create/:step_param?'
+              path="/artworks/new/:step_param?"
               component={() => <ArtCreateView />}
             />
+            <Route exact path="/owned" component={() => <ArtworksView />} />
+            <Route exact path="/artworks/:id" component={() => <ArtView />} />
+            <Route path="/artists/:id" component={() => <ArtistView />} />
             <Route
               exact
-              path='/artworks/:id?'
-              component={() => <ArtworksView />}
-            />
-            <Route exact path='/art/:id' component={() => <ArtView />} />
-            <Route exact path='/artists/:id' component={() => <ArtistView />} />
-            <Route exact path='/artists' component={() => <ArtistsView />} />
-
-            {shouldEnableNftPacks && (
-              <Route exact path='/pack/:id?' component={() => <PackView />} />
-            )}
-            <Route
-              exact
-              path='/auction/create/:step_param?'
+              path="/auction/create/:step_param?"
               component={() => <AuctionCreateView />}
             />
             <Route
               exact
-              path='/auction/:id'
+              path="/auction/:id"
               component={() => <AuctionView />}
             />
             <Route
               exact
-              path='/auction/:id/billing'
+              path="/auction/:id/billing"
               component={() => <BillingView />}
             />
-            <Route path='/about' component={() => <StaticPageView />} />
-            <Route path='/' component={() => <HomeView />} />
+            <Route path="/about" component={() => <StaticPageView />} />
+            <Route path="/" component={() => <HomeView />} />
           </Switch>
         </Providers>
       </HashRouter>

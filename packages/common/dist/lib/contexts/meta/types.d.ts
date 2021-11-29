@@ -2,8 +2,7 @@
 import { AccountInfo } from '@solana/web3.js';
 import { AuctionData, AuctionDataExtended, BidderMetadata, BidderPot, Edition, MasterEditionV1, MasterEditionV2, Metadata, SafetyDepositBox, Vault } from '../../actions';
 import { AuctionCache, AuctionManagerV1, AuctionManagerV2, BidRedemptionTicket, BidRedemptionTicketV2, PayoutTicket, PrizeTrackingTicket, SafetyDepositConfig, Store, StoreIndexer, WhitelistedCreator } from '../../models/metaplex';
-import { PackSet } from '../../models/packs/accounts/PackSet';
-import { PublicKeyStringAndAccount, StringPublicKey } from '../../utils';
+import { PublicKeyStringAndAccount } from '../../utils';
 import { ParsedAccount } from '../accounts/types';
 export interface MetaState {
     metadata: ParsedAccount<Metadata>[];
@@ -31,26 +30,18 @@ export interface MetaState {
     payoutTickets: Record<string, ParsedAccount<PayoutTicket>>;
     auctionCaches: Record<string, ParsedAccount<AuctionCache>>;
     storeIndexer: ParsedAccount<StoreIndexer>[];
-    packs: Record<string, ParsedAccount<PackSet>>;
+    auctionCachesByAuctionManager: Record<string, ParsedAccount<AuctionCache>>;
 }
 export interface MetaContextState extends MetaState {
     isLoading: boolean;
-    update: (auctionAddress?: any, bidderAddress?: any) => [
-        ParsedAccount<AuctionData>,
-        ParsedAccount<BidderPot>,
-        ParsedAccount<BidderMetadata>
-    ];
-    pullAuctionPage: (auctionAddress: StringPublicKey) => Promise<MetaState>;
-    pullBillingPage: (auctionAddress: StringPublicKey) => void;
-    pullAllSiteData: () => void;
-    pullAllMetadata: () => void;
+    patchState: (...args: Partial<MetaState>[]) => void;
 }
 export declare type AccountAndPubkey = {
     pubkey: string;
     account: AccountInfo<Buffer>;
 };
 export declare type UpdateStateValueFunc<T = void> = (prop: keyof MetaState, key: string, value: ParsedAccount<any>) => T;
-export declare type ProcessAccountsFunc = (account: PublicKeyStringAndAccount<Buffer>, setter: UpdateStateValueFunc) => void;
+export declare type ProcessAccountsFunc = (account: PublicKeyStringAndAccount<Buffer>, setter: UpdateStateValueFunc) => Promise<void>;
 export declare type CheckAccountFunc = (account: AccountInfo<Buffer>) => boolean;
 export declare type UnPromise<T extends Promise<any>> = T extends Promise<infer U> ? U : never;
 //# sourceMappingURL=types.d.ts.map

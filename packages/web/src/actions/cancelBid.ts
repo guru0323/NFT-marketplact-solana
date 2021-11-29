@@ -12,8 +12,6 @@ import {
   StringPublicKey,
   WalletSigner,
   toPublicKey,
-  pubkeyToString,
-  WRAPPED_SOL_MINT,
 } from '@oyster/common';
 import { AccountLayout } from '@solana/spl-token';
 import { TransactionInstruction, Keypair, Connection } from '@solana/web3.js';
@@ -23,7 +21,7 @@ import {
   PrizeTrackingTicket,
 } from '@oyster/common/dist/lib/models/metaplex/index';
 import { claimUnusedPrizes } from './claimUnusedPrizes';
-import { findAta, setupPlaceBid } from './sendPlaceBid';
+import { setupPlaceBid } from './sendPlaceBid';
 import { WalletNotConnectedError } from '@solana/wallet-adapter-base';
 
 export async function sendCancelBid(
@@ -68,7 +66,6 @@ export async function sendCancelBid(
     wallet,
     signers,
     instructions,
-    connection,
   );
 
   if (
@@ -115,7 +112,6 @@ export async function setupCancelBid(
   wallet: WalletSigner,
   signers: Array<Keypair[]>,
   instructions: Array<TransactionInstruction[]>,
-  connection: Connection,
 ) {
   if (!wallet.publicKey) throw new WalletNotConnectedError();
 
@@ -127,23 +123,18 @@ export async function setupCancelBid(
   const mint = cache.get(auctionView.auction.info.tokenMint);
 
   if (mint && auctionView.myBidderPot) {
-    let receivingSolAccountOrAta = '';
-    if (auctionView.auction.info.tokenMint == WRAPPED_SOL_MINT.toBase58()) {
-      receivingSolAccountOrAta = ensureWrappedAccount(
-        cancelInstructions,
-        cleanupInstructions,
-        tokenAccount,
-        wallet.publicKey,
-        accountRentExempt,
-        cancelSigners,
-      );
-    } else {
-      receivingSolAccountOrAta = await findAta(auctionView, wallet, connection);
-    }
+    const receivingSolAccount = ensureWrappedAccount(
+      cancelInstructions,
+      cleanupInstructions,
+      tokenAccount,
+      wallet.publicKey,
+      accountRentExempt,
+      cancelSigners,
+    );
 
     await cancelBid(
       wallet.publicKey.toBase58(),
-      pubkeyToString(receivingSolAccountOrAta),
+      receivingSolAccount,
       auctionView.myBidderPot.info.bidderPot,
       auctionView.auction.info.tokenMint,
       auctionView.vault.pubkey,

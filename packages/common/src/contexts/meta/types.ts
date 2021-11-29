@@ -24,15 +24,13 @@ import {
   StoreIndexer,
   WhitelistedCreator,
 } from '../../models/metaplex';
-import { PackSet } from '../../models/packs/accounts/PackSet';
-import { PublicKeyStringAndAccount, StringPublicKey } from '../../utils';
+import { PublicKeyStringAndAccount } from '../../utils';
 import { ParsedAccount } from '../accounts/types';
 
 export interface MetaState {
   metadata: ParsedAccount<Metadata>[];
   metadataByMint: Record<string, ParsedAccount<Metadata>>;
   metadataByMetadata: Record<string, ParsedAccount<Metadata>>;
-
   metadataByAuction: Record<string, ParsedAccount<Metadata>[]>;
   metadataByMasterEdition: Record<string, ParsedAccount<Metadata>>;
   editions: Record<string, ParsedAccount<Edition>>;
@@ -79,23 +77,12 @@ export interface MetaState {
   payoutTickets: Record<string, ParsedAccount<PayoutTicket>>;
   auctionCaches: Record<string, ParsedAccount<AuctionCache>>;
   storeIndexer: ParsedAccount<StoreIndexer>[];
-  packs: Record<string, ParsedAccount<PackSet>>;
+  auctionCachesByAuctionManager: Record<string, ParsedAccount<AuctionCache>>;
 }
 
 export interface MetaContextState extends MetaState {
   isLoading: boolean;
-  update: (
-    auctionAddress?: any,
-    bidderAddress?: any,
-  ) => [
-    ParsedAccount<AuctionData>,
-    ParsedAccount<BidderPot>,
-    ParsedAccount<BidderMetadata>,
-  ];
-  pullAuctionPage: (auctionAddress: StringPublicKey) => Promise<MetaState>;
-  pullBillingPage: (auctionAddress: StringPublicKey) => void;
-  pullAllSiteData: () => void;
-  pullAllMetadata: () => void;
+  patchState: (...args: Partial<MetaState>[]) => void;
 }
 
 export type AccountAndPubkey = {
@@ -112,7 +99,7 @@ export type UpdateStateValueFunc<T = void> = (
 export type ProcessAccountsFunc = (
   account: PublicKeyStringAndAccount<Buffer>,
   setter: UpdateStateValueFunc,
-) => void;
+) => Promise<void>;
 
 export type CheckAccountFunc = (account: AccountInfo<Buffer>) => boolean;
 

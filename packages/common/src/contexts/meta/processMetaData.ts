@@ -30,8 +30,8 @@ export const processMetaData: ProcessAccountsFunc = async (
           info: metadata,
         };
 
-        await setter('metadataByMint', metadata.mint, parsedAccount);
-        await setter('metadataByMetadata', pubkey, parsedAccount);
+        setter('metadataByMint', metadata.mint, parsedAccount);
+        setter('metadataByMetadata', pubkey, parsedAccount);
       }
     }
 

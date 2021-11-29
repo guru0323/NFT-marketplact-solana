@@ -1,33 +1,21 @@
-import React from 'react';
+import { Storefront } from '@oyster/common';
 import { Layout } from 'antd';
-
+import React, { ReactNode } from 'react';
 import { AppBar } from '../AppBar';
-import { Footer } from '../Footer';
 
 const { Header, Content } = Layout;
 
-export const AppLayout = React.memo((props: any) => {
+export const AppLayout = React.memo(function AppLayout(props: {
+  children?: ReactNode;
+  storefront?: Storefront;
+}) {
   return (
     <>
-      <Layout id={'main-layout'}>
-        <span id={'main-bg'}></span>
-        <span id={'bg-gradient'}></span>
-        <span id={'static-header-gradient'}></span>
-        <span id={'static-end-gradient'}></span>
-        <Header className="App-Bar">
-          <AppBar />
+      <Layout>
+        <Header>
+          <AppBar logo={props.storefront?.theme?.logo || ''} />
         </Header>
-        <Layout id={'width-layout'}>
-          <Content
-            style={{
-              overflow: 'scroll',
-              padding: '30px 48px ',
-            }}
-          >
-            {props.children}
-          </Content>
-        </Layout>
-        {/*<Footer />*/}
+        <Content id="metaplex-layout-content">{props.children}</Content>
       </Layout>
     </>
   );

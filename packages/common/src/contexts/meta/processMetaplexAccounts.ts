@@ -103,7 +103,15 @@ export const processMetaplexAccounts: ProcessAccountsFunc = async (
         account,
         info: cache,
       };
-      setter('auctionCaches', pubkey, parsedAccount);
+
+      if (parsedAccount.info.store === STORE_ID?.toBase58()) {
+        setter('auctionCaches', pubkey, parsedAccount);
+        setter(
+          'auctionCachesByAuctionManager',
+          parsedAccount.info.auctionManager,
+          parsedAccount,
+        );
+      }
     }
 
     if (isStoreIndexerV1Account(account)) {
@@ -190,7 +198,7 @@ export const processMetaplexAccounts: ProcessAccountsFunc = async (
 };
 
 const isMetaplexAccount = (account: AccountInfo<Buffer>) =>
-  account && pubkeyToString(account.owner) === METAPLEX_ID;
+  pubkeyToString(account?.owner) === METAPLEX_ID;
 
 const isAuctionManagerV1Account = (account: AccountInfo<Buffer>) =>
   account.data[0] === MetaplexKey.AuctionManagerV1;
@@ -218,7 +226,9 @@ const isSafetyDepositConfigV1Account = (account: AccountInfo<Buffer>) =>
 
 const isWhitelistedCreatorV1Account = (account: AccountInfo<Buffer>) =>
   account.data[0] === MetaplexKey.WhitelistedCreatorV1;
+
 const isAuctionCacheV1Account = (account: AccountInfo<Buffer>) =>
   account.data[0] === MetaplexKey.AuctionCacheV1;
+
 const isStoreIndexerV1Account = (account: AccountInfo<Buffer>) =>
   account.data[0] === MetaplexKey.StoreIndexerV1;

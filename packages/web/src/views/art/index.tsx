@@ -1,36 +1,34 @@
-import React, { useState } from 'react';
 import {
-  Row,
-  Col,
-  Divider,
-  Layout,
-  Tag,
-  Button,
-  Skeleton,
-  List,
-  Card,
-} from 'antd';
-import { useParams } from 'react-router-dom';
-import { useArt, useExtendedArt } from '../../hooks';
-
-import { ArtContent } from '../../components/ArtContent';
-import { shortenAddress, useConnection } from '@oyster/common';
+  loadArtwork,
+  shortenAddress,
+  useConnection,
+  useMeta,
+  loadMultipleAccounts,
+} from '@oyster/common';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { MetaAvatar } from '../../components/MetaAvatar';
+import { Button, Col, Divider, List, Row, Skeleton, Space, Tag, Typography } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { sendSignMetadata } from '../../actions/sendSignMetadata';
-import { ViewOn } from '../../components/ViewOn';
-import { ArtType } from '../../types';
+import { ArtContent } from '../../components/ArtContent';
 import { ArtMinting } from '../../components/ArtMinting';
+import { MetaAvatar } from '../../components/MetaAvatar';
+import { ViewOn } from '../../components/ViewOn';
+import { useArt, useExtendedArt } from '../../hooks';
+import { ArtType } from '../../types';
 
-const { Content } = Layout;
+const { Text } = Typography;
 
 export const ArtView = () => {
   const { id } = useParams<{ id: string }>();
   const wallet = useWallet();
+  const { patchState, whitelistedCreatorsByCreator } = useMeta();
   const [remountArtMinting, setRemountArtMinting] = useState(0);
+  const [validating, setValidating] = useState(false);
 
   const connection = useConnection();
   const art = useArt(id);
+
   let badge = '';
   let maxSupply = '';
   if (art.type === ArtType.NFT) {
@@ -47,12 +45,17 @@ export const ArtView = () => {
   }
   const { ref, data } = useExtendedArt(id);
 
-  // const { userAccounts } = useUserAccounts();
+  useEffect(() => {
+    (async () => {
+      const artState = await loadArtwork(
+        connection,
+        whitelistedCreatorsByCreator,
+        id,
+      );
 
-  // const accountByMint = userAccounts.reduce((prev, acc) => {
-  //   prev.set(acc.info.mint.toBase58(), acc);
-  //   return prev;
-  // }, new Map<string, TokenAccount>());
+      patchState(artState);
+    })();
+  }, [connection]);
 
   const description = data?.description;
   const attributes = data?.attributes;
@@ -60,7 +63,7 @@ export const ArtView = () => {
   const pubkey = wallet?.publicKey?.toBase58() || '';
 
   const tag = (
-    <div className="info-header">
+    <div>
       <Tag color="blue">UNVERIFIED</Tag>
     </div>
   );
@@ -68,7 +71,7 @@ export const ArtView = () => {
   const unverified = (
     <>
       {tag}
-      <div style={{ fontSize: 12 }}>
+      <div>
         <i>
           This artwork is still missing verification from{' '}
           {art.creators?.filter(c => !c.verified).length} contributors before it
@@ -80,113 +83,94 @@ export const ArtView = () => {
   );
 
   return (
-    <Content>
-      <Col>
-        <Row ref={ref}>
-          <Col
-            xs={{ span: 24 }}
-            md={{ span: 12 }}
-            style={{ paddingRight: '30px' }}
-          >
-            <ArtContent
-              style={{ width: '100%', height: 'auto', margin: '0 auto' }}
-              height={300}
-              width={300}
-              className="artwork-image"
-              pubkey={id}
-              active={true}
-              allowMeshRender={true}
-              artView={true}
-            />
-          </Col>
-          {/* <Divider /> */}
-          <Col
-            xs={{ span: 24 }}
-            md={{ span: 12 }}
-            style={{ textAlign: 'left', fontSize: '1.4rem' }}
-          >
-            <Row>
-              <div style={{ fontWeight: 700, fontSize: '4rem' }}>
-                {art.title || <Skeleton paragraph={{ rows: 0 }} />}
+    <Row ref={ref} gutter={32}>
+      <Col xs={{ span: 24 }} md={{ span: 12 }}>
+        <ArtContent
+          pubkey={id}
+          active={true}
+          allowMeshRender={true}
+          artView={true}
+        />
+      </Col>
+      {/* <Divider /> */}
+      <Col xs={{ span: 24 }} md={{ span: 12 }}>
+        <Space direction="vertical" className="metaplex-fullwidth">
+          <h1>{art.title || <Skeleton paragraph={{ rows: 0 }} />}</h1>
+          <Row>
+            <Col span={6}>
+              <Text>Royalties</Text>
+              <div>
+                {((art.seller_fee_basis_points || 0) / 100).toFixed(2)}%
               </div>
-            </Row>
-            <Row>
-              <Col span={6}>
-                <h6>Royalties</h6>
-                <div className="royalties">
-                  {((art.seller_fee_basis_points || 0) / 100).toFixed(2)}%
-                </div>
-              </Col>
-              <Col span={12}>
-                <ViewOn id={id} />
-              </Col>
-            </Row>
-            <Row>
-              <Col>
-                <h6 style={{ marginTop: 5 }}>Created By</h6>
-                <div className="creators">
-                  {(art.creators || []).map((creator, idx) => {
-                    return (
-                      <div
-                        key={idx}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          marginBottom: 5,
-                        }}
-                      >
-                        <MetaAvatar creators={[creator]} size={64} />
-                        <div>
-                          <span className="creator-name">
-                            {creator.name ||
-                              shortenAddress(creator.address || '')}
-                          </span>
-                          <div style={{ marginLeft: 10 }}>
-                            {!creator.verified &&
-                              (creator.address === pubkey ? (
-                                <Button
-                                  onClick={async () => {
-                                    try {
-                                      await sendSignMetadata(
-                                        connection,
-                                        wallet,
-                                        id,
-                                      );
-                                    } catch (e) {
-                                      console.error(e);
-                                      return false;
-                                    }
-                                    return true;
-                                  }}
-                                >
-                                  Approve
-                                </Button>
-                              ) : (
-                                tag
-                              ))}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </Col>
-            </Row>
-            <Row>
-              <Col>
-                <h6 style={{ marginTop: 5 }}>Edition</h6>
-                <div className="art-edition">{badge}</div>
-              </Col>
-            </Row>
-            {art.type === ArtType.Master && (
-              <Row>
-                <Col>
-                  <h6 style={{ marginTop: 5 }}>Max Supply</h6>
-                  <div className="art-edition">{maxSupply}</div>
-                </Col>
-              </Row>
-            )}
-            {/* <Button
+            </Col>
+            <Col span={12}>
+              <ViewOn id={id} />
+            </Col>
+          </Row>
+          <Space direction="vertical">
+            {(art.creators || []).map((creator, idx) => {
+              return (
+                <Space direction="horizontal" key={idx}>
+                  <MetaAvatar creators={[creator]} size={64} />
+                  <div>
+                    <span>
+                      {creator.name || shortenAddress(creator.address || '')}
+                    </span>
+                    <div>
+                      {!creator.verified &&
+                        (creator.address === pubkey ? (
+                          <Button
+                            loading={validating}
+                            onClick={async () => {
+                              setValidating(true);
+
+                              try {
+                                const txid = await sendSignMetadata(connection, wallet, id);
+
+                                const tx = await connection.getTransaction(txid, {
+                                  commitment: 'confirmed',
+                                });
+
+                                const keys = tx?.transaction.message.accountKeys || [];
+
+                                const patch = await loadMultipleAccounts(
+                                  connection,
+                                  keys.map(k => k.toBase58()),
+                                  'confirmed',
+                                );
+                                
+                                patchState(patch);
+                              } catch (e) {
+                                console.error(e);
+                                return false;
+                              } finally {
+                                setValidating(false);
+                              }
+                              return true;
+                            }}
+                          >
+                            Approve
+                          </Button>
+                        ) : (
+                          tag
+                        ))}
+                    </div>
+                  </div>
+                </Space>
+              );
+            })}
+          </Space>
+          <div>
+            <Text>Edition</Text>
+            <div>{badge}</div>
+          </div>
+          {art.type === ArtType.Master && (
+            <div>
+              <Text>Max Supply</Text>
+              <div>{maxSupply}</div>
+            </div>
+          )}
+          {/* <Button
                   onClick={async () => {
                     if(!art.mint) {
                       return;
@@ -212,45 +196,47 @@ export const ArtView = () => {
                   Mark as Sold
                 </Button> */}
 
-            {/* TODO: Add conversion of MasterEditionV1 to MasterEditionV2 */}
-            <ArtMinting
-              id={id}
-              key={remountArtMinting}
-              onMint={async () => await setRemountArtMinting(prev => prev + 1)}
-            />
-          </Col>
-          <Col span="12">
-            <Divider />
-            {art.creators?.find(c => !c.verified) && unverified}
-            <br />
-            <div className="info-header">ABOUT THE CREATION</div>
-            <div className="info-content">{description}</div>
-            <br />
-            {/*
-              TODO: add info about artist
-            <div className="info-header">ABOUT THE CREATOR</div>
-            <div className="info-content">{art.about}</div> */}
-          </Col>
-          <Col span="12">
-            {attributes && (
-              <>
-                <Divider />
-                <br />
-                <div className="info-header">Attributes</div>
-                <List size="large" grid={{ column: 4 }}>
-                  {attributes.map(attribute => (
-                    <List.Item key={attribute.trait_type}>
-                      <Card title={attribute.trait_type}>
-                        {attribute.value}
-                      </Card>
-                    </List.Item>
-                  ))}
-                </List>
-              </>
-            )}
-          </Col>
-        </Row>
+          {/* TODO: Add conversion of MasterEditionV1 to MasterEditionV2 */}
+          <ArtMinting
+            id={id}
+            key={remountArtMinting}
+            onMint={async () => await setRemountArtMinting(prev => prev + 1)}
+          />
+        </Space>
       </Col>
-    </Content>
+      <Col span="12">
+        <Divider />
+        {art.creators?.find(c => !c.verified) && unverified}
+        <br />
+        <div>ABOUT THE CREATION</div>
+        <div>{description}</div>
+        <br />
+        {/*
+              TODO: add info about artist
+            <div>ABOUT THE CREATOR</div>
+            <div>{art.about}</div> */}
+      </Col>
+      <Col span="12">
+        {attributes && (
+          <>
+            <Divider />
+            <br />
+            <div>Attributes</div>
+
+            <List>
+              {attributes.map((attribute, i) => {
+                return (
+                  <List.Item key={i}>
+                    <List.Item.Meta
+                      title={<Text type="secondary"> {attribute.trait_type} </Text>}
+                      description={<Text> {attribute.value} </Text>} />
+                  </List.Item>
+                );
+              })}
+            </List>
+          </>
+        )}
+      </Col>
+    </Row>
   );
 };

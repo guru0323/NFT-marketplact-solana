@@ -22,15 +22,11 @@ const TokenDisplay = (props) => {
         }
     }
     return (react_1.default.createElement(react_1.default.Fragment, null,
-        react_1.default.createElement("div", { title: mintAddress, key: mintAddress, style: {
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-            } },
-            react_1.default.createElement("div", { style: { display: 'flex', alignItems: 'center' } },
+        react_1.default.createElement("div", { title: mintAddress, key: mintAddress },
+            react_1.default.createElement("div", null,
                 icon || react_1.default.createElement(TokenIcon_1.TokenIcon, { mintAddress: mintAddress }),
                 name),
-            showBalance ? (react_1.default.createElement("span", { title: balance.toString(), key: mintAddress, className: "token-balance" },
+            showBalance ? (react_1.default.createElement("span", { title: balance.toString(), key: mintAddress },
                 "\u00A0",
                 ' ',
                 hasBalance

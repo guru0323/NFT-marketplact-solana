@@ -18,6 +18,7 @@ import { AuctionView } from '../hooks';
 
 import { claimBid } from '@oyster/common/dist/lib/models/metaplex/claimBid';
 import { emptyPaymentAccount } from '@oyster/common/dist/lib/models/metaplex/emptyPaymentAccount';
+import { QUOTE_MINT } from '../constants';
 import { setupPlaceBid } from './sendPlaceBid';
 import { WalletNotConnectedError } from '@solana/wallet-adapter-base';
 
@@ -108,7 +109,7 @@ async function emptyPaymentAccountForAllTokens(
             [
               toPublicKey(addresses[k]).toBuffer(),
               PROGRAM_IDS.token.toBuffer(),
-              toPublicKey(auctionView.auction.info.tokenMint).toBuffer(),
+              QUOTE_MINT.toBuffer(),
             ],
             PROGRAM_IDS.associatedToken,
           )
@@ -122,7 +123,7 @@ async function emptyPaymentAccountForAllTokens(
             toPublicKey(ata),
             wallet.publicKey,
             toPublicKey(addresses[k]),
-            toPublicKey(auctionView.auction.info.tokenMint),
+            QUOTE_MINT,
           );
 
         ataLookup[ata] = true;

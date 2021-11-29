@@ -4,7 +4,7 @@ import { useSwappableTokens, useTokenList } from "../../contexts/tokenList";
 import { Row, Col, Typography, Modal, Tabs, Input, List } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import { TokenInfo } from "@solana/spl-token-registry";
-import { TokenCircle } from "../Custom";
+import { SolCircle } from "../Custom";
 import { MetaplexModal, shortenAddress, toPublicKey } from "@oyster/common";
 
 const { Search } = Input;
@@ -31,7 +31,7 @@ export function TokenButton({
     <Row onClick={onClick} className={'token-button'} justify='space-between'>
       <Col>
         <Row>
-          <TokenCircle iconSize={40} iconFile={tokenInfo?.logoURI} style={{ marginTop: 2.5 }} />
+          <SolCircle />
           <TokenName mint={mint} style={{ fontSize: 14, fontWeight: 700 }} />
         </Row>
       </Col>

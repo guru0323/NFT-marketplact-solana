@@ -116,7 +116,7 @@ export const AuctionListView = () => {
             if (auctionView.isInstantSale) {
 
               return {
-                status: {isInstantSale: true, isLive, soldOut:0},
+                status: {isInstantSale: true, isLive, soldOut:false},
                 amount:0,
               };
             }

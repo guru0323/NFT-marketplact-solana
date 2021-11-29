@@ -95,7 +95,7 @@ function AppWrapper({ storefront }: AppProps) {
             <link rel="icon" type="image/png" href={storefront.meta.favicon} />
           </>
         )}
-        <title>{storefront.meta.title}</title>
+        <title>AKKOROS.xyz</title>
         <meta
           name="description"
           content={storefront.meta.description}

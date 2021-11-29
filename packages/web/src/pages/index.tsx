@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import dynamic from 'next/dynamic';
-import { NextPageContext } from 'next';
+import {NextPageContext} from 'next';
 import Head from 'next/head';
-import { Storefront } from '@oyster/common';
-import { getStorefront } from './../actions/getStorefront';
+import {Storefront} from '@oyster/common';
+import {getStorefront} from './../actions/getStorefront';
 import Bugsnag from '@bugsnag/js';
 import BugsnagPluginReact from '@bugsnag/plugin-react';
-import { applyTheme } from '../actions/applyTheme';
+import {applyTheme} from '../actions/applyTheme';
 
 const CreateReactAppEntryPoint = dynamic(() => import('../App'), {
   ssr: false,
@@ -40,10 +40,35 @@ export async function getServerSideProps(context: NextPageContext) {
     subdomain = process.env.SUBDOMAIN;
   }
 
-  const storefront = await getStorefront(subdomain);
+  const storefront = {
+    subdomain: 'akkoros',
+    pubkey: '98jiC2PfMNqLwUrabW3LxE15dfHCyaNX5V6nxHaP96NQ',
+    theme: {
+      logo:
+        'https://ipfs.io/ipfs/QmWQdbBQWujc2qsB59oqt3snQhKeNzGTPBvbcG7cX3egrD?filename=replicate-prediction-7alwxcfzjnaghmy2yjlknacsvy.png',
+      banner:
+        'https://arweave.cache.holaplex.dev/mzrwTBBn27kU8viZpKm5R5yiS3MHq0zYYyauKxXPLlk',
+      stylesheet:
+        'https://arweave.cache.holaplex.dev/GfF6WrFBhEXbBZDecdbmUPYhuke7nz5UHR_7p4Y-bVQ',
+      color: {
+        background: '#121111',
+        primary: '#e4d000',
+      },
+      font: {
+        title: 'Montserrat',
+        text: 'Montserrat',
+      },
+    },
+    meta: {
+      favicon:
+        'https://ipfs.io/ipfs/QmWQdbBQWujc2qsB59oqt3snQhKeNzGTPBvbcG7cX3egrD?filename=replicate-prediction-7alwxcfzjnaghmy2yjlknacsvy.png',
+      title: 'AKKOROS',
+      description: 'AKKOROS: An Open-Source NFT Market and Community.',
+    },
+  };
 
   if (storefront) {
-    return { props: { storefront } };
+    return {props: {storefront}};
   }
 
   return {
@@ -51,7 +76,7 @@ export async function getServerSideProps(context: NextPageContext) {
   };
 }
 
-function AppWrapper({ storefront }: AppProps) {
+function AppWrapper({storefront}: AppProps) {
   const [isMounted, setIsMounted] = useState(false);
   const [hasLogo, setHasLogo] = useState(false);
   const [hasStylesheet, setHasStylesheet] = useState(false);
@@ -64,6 +89,7 @@ function AppWrapper({ storefront }: AppProps) {
 
   useEffect(() => {
     const doc = document.documentElement;
+    console.log(storefront);
 
     const cleanup = applyTheme(storefront.theme, doc.style, document.head);
     setHasStylesheet(true);

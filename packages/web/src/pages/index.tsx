@@ -47,7 +47,7 @@ export async function getServerSideProps(context: NextPageContext) {
       logo:
         'https://ipfs.io/ipfs/QmWQdbBQWujc2qsB59oqt3snQhKeNzGTPBvbcG7cX3egrD?filename=replicate-prediction-7alwxcfzjnaghmy2yjlknacsvy.png',
       banner:
-        'https://arweave.cache.holaplex.dev/mzrwTBBn27kU8viZpKm5R5yiS3MHq0zYYyauKxXPLlk',
+        '',
       stylesheet:
         'https://arweave.cache.holaplex.dev/GfF6WrFBhEXbBZDecdbmUPYhuke7nz5UHR_7p4Y-bVQ',
       color: {

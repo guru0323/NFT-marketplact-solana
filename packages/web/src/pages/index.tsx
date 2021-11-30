@@ -1,12 +1,12 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import {NextPageContext} from 'next';
+import { NextPageContext } from 'next';
 import Head from 'next/head';
-import {Storefront} from '@oyster/common';
-import {getStorefront} from './../actions/getStorefront';
+import { Storefront } from '@oyster/common';
+import { getStorefront } from './../actions/getStorefront';
 import Bugsnag from '@bugsnag/js';
 import BugsnagPluginReact from '@bugsnag/plugin-react';
-import {applyTheme} from '../actions/applyTheme';
+import { applyTheme } from '../actions/applyTheme';
 
 const CreateReactAppEntryPoint = dynamic(() => import('../App'), {
   ssr: false,
@@ -76,7 +76,7 @@ export async function getServerSideProps(context: NextPageContext) {
   };
 }
 
-function AppWrapper({storefront}: AppProps) {
+function AppWrapper({ storefront }: AppProps) {
   const [isMounted, setIsMounted] = useState(false);
   const [hasLogo, setHasLogo] = useState(false);
   const [hasStylesheet, setHasStylesheet] = useState(false);
@@ -89,7 +89,6 @@ function AppWrapper({storefront}: AppProps) {
 
   useEffect(() => {
     const doc = document.documentElement;
-    console.log(storefront);
 
     const cleanup = applyTheme(storefront.theme, doc.style, document.head);
     setHasStylesheet(true);
@@ -116,12 +115,12 @@ function AppWrapper({storefront}: AppProps) {
   const appBody = (
     <>
       <Head>
-        {/* {storefront.meta.favicon && (
+        {storefront.meta.favicon && (
           <>
             <link rel="icon" type="image/png" href={storefront.meta.favicon} />
           </>
-        )} */}
-        <title>AKKOROS.xyz</title>
+        )}
+        <title>{storefront.meta.title}</title>
         <meta
           name="description"
           content={storefront.meta.description}
@@ -129,7 +128,7 @@ function AppWrapper({storefront}: AppProps) {
         />
         <meta
           property="og:title"
-          content={'AKKOROS.xyz'}
+          content={storefront.meta.title}
           key="og:title"
         />
         <meta

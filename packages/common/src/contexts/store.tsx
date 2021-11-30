@@ -89,7 +89,7 @@ export const StoreProvider: FC<{
   storefront: Storefront;
   storeAddress?: string;
 }> = ({ children, storefront, storeAddress }) => {
-  const ownerAddress = '98jiC2PfMNqLwUrabW3LxE15dfHCyaNX5V6nxHaP96NQ';
+  const ownerAddress = storefront.pubkey;
   const searchParams = useQuerySearch();
   const ownerAddressFromQuery = searchParams.get('store');
 

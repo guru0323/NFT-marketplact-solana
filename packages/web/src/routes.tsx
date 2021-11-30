@@ -1,7 +1,7 @@
-import {Storefront} from '@oyster/common';
+import { Storefront } from '@oyster/common';
 import React from 'react';
-import {HashRouter, Route, Switch} from 'react-router-dom';
-import {Providers} from './providers';
+import { HashRouter, Route, Switch } from 'react-router-dom';
+import { Providers } from './providers';
 import {
   ArtCreateView,
   ArtistView,

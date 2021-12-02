@@ -25,7 +25,7 @@ const utils_1 = require("../utils");
 const hooks_1 = require("../hooks");
 exports.StoreContext = react_1.createContext(null);
 const StoreProvider = ({ children, storefront, storeAddress }) => {
-    const ownerAddress = '98jiC2PfMNqLwUrabW3LxE15dfHCyaNX5V6nxHaP96NQ';
+    const ownerAddress = storefront.pubkey;
     const searchParams = hooks_1.useQuerySearch();
     const ownerAddressFromQuery = searchParams.get('store');
     const initOwnerAddress = ownerAddressFromQuery || ownerAddress;

@@ -7,6 +7,7 @@ const accounts_1 = require("../accounts");
 const AUCTION_BLACK_LIST = [
     '9zcrbzSmBPdDjAGYXkfufP2wy1kbHKac8UYLBmHpbuYy',
     'DzR58tU6ZXx2sMBVjaL2dhNF9SL9qd42eYXLbtu5qcCx',
+    '5c87cDHxwiF3jeapwrYEtJjCxoddMrRKRwrFh7NAATtg',
 ];
 const processAuctions = async ({ account, pubkey }, setter) => {
     if (!isAuctionAccount(account) || isOnBlackList(pubkey))

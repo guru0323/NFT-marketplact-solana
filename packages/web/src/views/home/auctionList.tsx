@@ -81,8 +81,8 @@ export const AuctionListView = () => {
       {storefront.theme.banner && (
         <Banner
           src={storefront.theme.banner}
-          headingText={''}
-          subHeadingText={''}
+          headingText={storefront.meta.title}
+          subHeadingText={storefront.meta.description}
         />
       )}
       <MetaplexMasonry>

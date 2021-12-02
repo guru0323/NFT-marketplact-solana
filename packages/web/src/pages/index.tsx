@@ -39,7 +39,7 @@ export async function getServerSideProps(context: NextPageContext) {
   if (process.env.SUBDOMAIN && !process.env.STRICT_SUBDOMAIN) {
     subdomain = process.env.SUBDOMAIN;
   }
-
+  // console.log('subdomain', await getStorefront('somniumspace'));
   const storefront = {
     subdomain: 'akkoros',
     pubkey: '98jiC2PfMNqLwUrabW3LxE15dfHCyaNX5V6nxHaP96NQ',
@@ -63,7 +63,7 @@ export async function getServerSideProps(context: NextPageContext) {
       favicon:
         'https://ipfs.io/ipfs/QmWQdbBQWujc2qsB59oqt3snQhKeNzGTPBvbcG7cX3egrD?filename=replicate-prediction-7alwxcfzjnaghmy2yjlknacsvy.png',
       title: 'AKKOROS',
-      description: 'AKKOROS: An Open-Source NFT Market and Community.',
+      description: 'An Open-Source NFT Market and Community Built on Solana and Powered by Metaplex.',
     },
   };
 

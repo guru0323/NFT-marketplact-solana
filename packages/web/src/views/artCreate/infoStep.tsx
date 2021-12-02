@@ -90,63 +90,64 @@ export const InfoStep = (props: {
             </label>
 
             <label>
-              <h3>Maximum Supply (100)</h3>
+              <h3>Maximum Supply</h3>
               <InputNumber
-              max={100}
-              // value={props.attributes.properties?.max_supply}
-                className='metaplex-fullwidth'
-                placeholder='Quantity'
+                className="metaplex-fullwidth"
+                placeholder="Quantity"
                 onChange={(val: number) => {
-                  if (val <= 100)
-                    props.setAttributes({
-                      ...props.attributes,
-                      properties: {
-                        ...props.attributes.properties,
-                        maxSupply: val,
-                      },
-                    });
+                  props.setAttributes({
+                    ...props.attributes,
+                    properties: {
+                      ...props.attributes.properties,
+                      maxSupply: val,
+                    },
+                  });
                 }}
               />
             </label>
             <label>
               <h3>Attributes</h3>
             </label>
-            <Form name='dynamic_attributes' form={form} autoComplete='off'>
-              <Form.List name='attributes'>
-                {(fields, {add, remove}) => (
+            <Form name="dynamic_attributes" form={form} autoComplete="off">
+              <Form.List name="attributes">
+                {(fields, { add, remove }) => (
                   <>
-                    {fields.map(({key, name, fieldKey}) => (
-                      <Space key={key} align='baseline'>
+                    {fields.map(({ key, name, fieldKey }) => (
+                      <Space key={key} align="baseline">
                         <Form.Item
                           name={[name, 'trait_type']}
                           fieldKey={[fieldKey, 'trait_type']}
-                          hasFeedback>
-                          <Input placeholder='trait_type (Optional)' />
+                          hasFeedback
+                        >
+                          <Input placeholder="trait_type (Optional)" />
                         </Form.Item>
                         <Form.Item
                           name={[name, 'value']}
                           fieldKey={[fieldKey, 'value']}
-                          rules={[{required: true, message: 'Missing value'}]}
-                          hasFeedback>
-                          <Input placeholder='value' />
+                          rules={[{ required: true, message: 'Missing value' }]}
+                          hasFeedback
+                        >
+                          <Input placeholder="value" />
                         </Form.Item>
                         <Form.Item
                           name={[name, 'display_type']}
                           fieldKey={[fieldKey, 'display_type']}
-                          hasFeedback>
-                          <Input placeholder='display_type (Optional)' />
+                          hasFeedback
+                        >
+                          <Input placeholder="display_type (Optional)" />
                         </Form.Item>
-                        <Button type='text' onClick={() => remove(name)}>
+                        <Button type="text" onClick={() => remove(name)}>
                           <MinusCircleOutlined />
                         </Button>
                       </Space>
                     ))}
                     <Form.Item>
                       <Button
-                        type='dashed'
+                        type="dashed"
                         onClick={() => add()}
                         block
-                        icon={<PlusOutlined />}>
+                        icon={<PlusOutlined />}
+                      >
                         Add attribute
                       </Button>
                     </Form.Item>

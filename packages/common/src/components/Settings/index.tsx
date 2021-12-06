@@ -30,7 +30,7 @@ export const Settings = ({
               </div>
             </Tooltip>
 
-            <Link to={`/owned`}>View Owned</Link>
+            <Link to={`/profile`}>View Profile</Link>
           </>
         )}
       </Space>

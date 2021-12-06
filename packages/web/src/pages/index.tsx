@@ -8,6 +8,8 @@ import Bugsnag from '@bugsnag/js';
 import BugsnagPluginReact from '@bugsnag/plugin-react';
 import { applyTheme } from '../actions/applyTheme';
 
+import 'bootstrap/dist/css/bootstrap-utilities.min.css';
+// import 'bootstrap/dist/css/bootstrap.min.css';
 const CreateReactAppEntryPoint = dynamic(() => import('../App'), {
   ssr: false,
 });

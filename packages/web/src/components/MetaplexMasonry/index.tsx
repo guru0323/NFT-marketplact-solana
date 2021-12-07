@@ -19,7 +19,7 @@ export const MetaplexMasonry = ({
   'ref' | 'className' | 'columnClassName'
 > & { className?: string }) => (
   <Masonry
-    className={className ? `${CLASS_NAME} ${className}` : CLASS_NAME}
+    className={className ? `${CLASS_NAME} ${className}` : `${CLASS_NAME}  flex-wrap`}
     columnClassName="metaplex-masonry-column"
     breakpointCols={props.breakpointCols ?? COL_BREAKPOINTS}
     {...props}

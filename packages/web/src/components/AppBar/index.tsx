@@ -122,6 +122,16 @@ export const AppBar = (props: P) => {
 
   return (
     <>
+      <style global jsx>
+        {`
+          .ant-layout-header {
+            padding: 0 25px;
+          }
+          .ant-btn {
+            padding: 2.5px 10px;
+          }
+        `}
+      </style>
       <Row wrap={false} align='middle'>
         <Col flex='0 0 auto'>
           <Link to='/' id='metaplex-header-logo'>

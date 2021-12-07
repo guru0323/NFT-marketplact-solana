@@ -10,9 +10,9 @@ import {
   useNativeAccount,
   useWalletModal,
 } from '@oyster/common';
-import { useWallet } from '@solana/wallet-adapter-react';
-import { LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js';
-import { Button, ButtonProps, Popover, Select, Space } from 'antd';
+import {useWallet} from '@solana/wallet-adapter-react';
+import {LAMPORTS_PER_SOL, PublicKey} from '@solana/web3.js';
+import {Button, ButtonProps, Popover, Select, Space} from 'antd';
 import React, {
   Dispatch,
   SetStateAction,
@@ -20,14 +20,14 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { Link } from 'react-router-dom';
-import { useMeta, useSolPrice } from '../../contexts';
-import { SolCircle } from '../Custom';
+import {Link} from 'react-router-dom';
+import {useMeta, useSolPrice} from '../../contexts';
+import {SolCircle} from '../Custom';
 import CogSvg from '../svgs/cog';
 
-const UserActions = (props: { mobile?: boolean; onClick?: () => void }) => {
-  const { publicKey } = useWallet();
-  const { whitelistedCreatorsByCreator, store } = useMeta();
+const UserActions = (props: {mobile?: boolean; onClick?: () => void}) => {
+  const {publicKey} = useWallet();
+  const {whitelistedCreatorsByCreator, store} = useMeta();
   const pubkey = publicKey?.toBase58() || '';
 
   const canCreate = useMemo(() => {
@@ -42,26 +42,66 @@ const UserActions = (props: { mobile?: boolean; onClick?: () => void }) => {
       {store &&
         (props.mobile ? (
           <div>
-            {canCreate && (
-              <Link to="/artworks/new">
-                <Button
-                  onClick={() => {
-                    props.onClick ? props.onClick() : null;
-                  }}
-                >
-                  Create
-                </Button>
-              </Link>
+            {canCreate ? (
+              <>
+                <Link to='/artworks/new'>
+                  <Button
+                    onClick={() => {
+                      props.onClick ? props.onClick() : null;
+                    }}>
+                    Create
+                  </Button>
+                </Link>
+                <Link to='/auction/create/'>
+                  <Button
+                    onClick={() => {
+                      props.onClick ? props.onClick() : null;
+                    }}>
+                    Sell
+                  </Button>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link to='/auction/create/'>
+                  <Button
+                    onClick={() => {
+                      props.onClick ? props.onClick() : null;
+                    }}>
+                    Sell
+                  </Button>
+                </Link>
+              </>
             )}
           </div>
         ) : (
           <div>
-            {canCreate && (
+            {canCreate ? (
               <>
-                <Link to="/artworks/new">
+                <Link to='/artworks/new'>
                   <Button>Create</Button>
                 </Link>
-                &nbsp;&nbsp;
+                &nbsp;&nbsp; &nbsp;
+                <Link to='/auction/create/'>
+                  <Button
+                    onClick={() => {
+                      props.onClick ? props.onClick() : null;
+                    }}>
+                    Sell
+                  </Button>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link to='/auction/create/'>
+                  <Button
+                    onClick={() => {
+                      props.onClick ? props.onClick() : null;
+                    }}>
+                    Sell
+                  </Button>
+                </Link>
+                &nbsp;&nbsp; &nbsp;
               </>
             )}
           </div>
@@ -80,8 +120,7 @@ const AddFundsModal = (props: {
     <MetaplexModal
       visible={props.showAddFundsModal}
       onCancel={() => props.setShowAddFundsModal(false)}
-      title="Add Funds"
-    >
+      title='Add Funds'>
       <div>
         <p>
           We partner with <b>FTX</b> to make it simple to start purchasing
@@ -92,7 +131,7 @@ const AddFundsModal = (props: {
           <span>
             {formatNumber.format(props.balance)}&nbsp;&nbsp;
             <span>
-              <img src="/sol.svg" width="10" />
+              <img src='/sol.svg' width='10' />
             </span>{' '}
             SOL
           </span>
@@ -107,13 +146,12 @@ const AddFundsModal = (props: {
             window.open(
               `https://ftx.com/pay/request?coin=SOL&address=${props.publicKey?.toBase58()}&tag=&wallet=sol&memoIsRequired=false`,
               '_blank',
-              'resizable,width=680,height=860',
+              'resizable,width=680,height=860'
             );
-          }}
-        >
+          }}>
           <div>
             <span>Sign with</span>
-            <img src="/ftxpay.png" width="80" />
+            <img src='/ftxpay.png' width='80' />
           </div>
         </Button>
       </div>
@@ -127,8 +165,8 @@ export const CurrentUserBadge = (props: {
   showAddress?: boolean;
   iconSize?: number;
 }) => {
-  const { wallet, publicKey, disconnect } = useWallet();
-  const { account } = useNativeAccount();
+  const {wallet, publicKey, disconnect} = useWallet();
+  const {account} = useNativeAccount();
   const solPrice = useSolPrice();
 
   const [showAddFundsModal, setShowAddFundsModal] = useState<boolean>(false);
@@ -154,19 +192,19 @@ export const CurrentUserBadge = (props: {
   return (
     <>
       <Popover
-        trigger="click"
-        placement="bottomRight"
+        trigger='click'
+        placement='bottomRight'
         content={
           <Settings
             additionalSettings={
-              <Space direction="vertical">
+              <Space direction='vertical'>
                 <h5>BALANCE</h5>
-                <Space direction="horizontal">
+                <Space direction='horizontal'>
                   <SolCircle />
                   <span>{formatNumber.format(balance)} SOL</span>
                   <span>{formatUSD.format(balanceInUSD)}</span>
                 </Space>
-                <Space direction="horizontal">
+                <Space direction='horizontal'>
                   <Button onClick={() => setShowAddFundsModal(true)}>
                     Add Funds
                   </Button>
@@ -176,14 +214,13 @@ export const CurrentUserBadge = (props: {
               </Space>
             }
           />
-        }
-      >
-        <Button className="metaplex-button-appbar" type={props.buttonType}>
-          <Space direction="horizontal">
+        }>
+        <Button className='metaplex-button-appbar' type={props.buttonType}>
+          <Space direction='horizontal'>
             {props.showBalance && (
               <span>
                 {formatNumber.format(
-                  (account?.lamports || 0) / LAMPORTS_PER_SOL,
+                  (account?.lamports || 0) / LAMPORTS_PER_SOL
                 )}{' '}
                 SOL
               </span>
@@ -203,20 +240,20 @@ export const CurrentUserBadge = (props: {
   );
 };
 
-export const Cog = ({ buttonType }: { buttonType?: ButtonProps['type'] }) => {
-  const { endpoint, setEndpoint } = useConnectionConfig();
-  const { setVisible } = useWalletModal();
+export const Cog = ({buttonType}: {buttonType?: ButtonProps['type']}) => {
+  const {endpoint, setEndpoint} = useConnectionConfig();
+  const {setVisible} = useWalletModal();
   const open = useCallback(() => setVisible(true), [setVisible]);
 
   return (
     <Popover
-      trigger="click"
-      placement="bottomRight"
+      trigger='click'
+      placement='bottomRight'
       content={
-        <Space direction="vertical">
+        <Space direction='vertical'>
           <h5>NETWORK</h5>
           <Select onSelect={setEndpoint} value={endpoint} bordered={false}>
-            {ENDPOINTS.map(({ name, endpoint }) => (
+            {ENDPOINTS.map(({name, endpoint}) => (
               <Select.Option value={endpoint} key={endpoint}>
                 {name}
               </Select.Option>
@@ -225,9 +262,8 @@ export const Cog = ({ buttonType }: { buttonType?: ButtonProps['type'] }) => {
 
           <Button onClick={open}>Change wallet</Button>
         </Space>
-      }
-    >
-      <Button className="metaplex-button-appbar" type={buttonType}>
+      }>
+      <Button className='metaplex-button-appbar' type={buttonType}>
         <CogSvg />
       </Button>
     </Popover>
@@ -240,8 +276,8 @@ export const CurrentUserBadgeMobile = (props: {
   iconSize?: number;
   closeModal?: () => void;
 }) => {
-  const { wallet, publicKey, disconnect } = useWallet();
-  const { account } = useNativeAccount();
+  const {wallet, publicKey, disconnect} = useWallet();
+  const {account} = useNativeAccount();
   const solPrice = useSolPrice();
 
   const [showAddFundsModal, setShowAddFundsModal] = useState<boolean>(false);
@@ -274,7 +310,7 @@ export const CurrentUserBadgeMobile = (props: {
         <span>Balance</span>
         <span>
           <span>
-            <img src="/sol.svg" width="10" />
+            <img src='/sol.svg' width='10' />
           </span>{' '}
           {formatNumber.format(balance)}&nbsp;&nbsp; SOL{' '}
           <span>{formatUSD.format(balanceInUSD)}</span>
@@ -285,8 +321,7 @@ export const CurrentUserBadgeMobile = (props: {
           onClick={() => {
             props.closeModal ? props.closeModal() : null;
             setShowAddFundsModal(true);
-          }}
-        >
+          }}>
           Add Funds
         </Button>
         &nbsp;&nbsp;

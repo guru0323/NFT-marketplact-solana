@@ -57,7 +57,7 @@ export function Routes({storefront}: RoutesProps) {
               component={() => <BillingView />}
             />
             <Route path='/about' component={() => <StaticPageView />} />
-            <Route path='/store' component={() => <HomeView />} />
+            <Route path='/explore' component={() => <HomeView />} />
             <Route path='/' component={() => <LandingPageView />} />
           </Switch>
         </Providers>

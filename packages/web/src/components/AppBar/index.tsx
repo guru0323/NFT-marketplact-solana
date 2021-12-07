@@ -51,9 +51,9 @@ export const AppBar = (props: P) => {
   }[] = useMemo(() => {
     let menu = [
       {
-        key: 'store',
-        title: 'Store',
-        link: '/store',
+        key: 'explore',
+        title: 'Explore',
+        link: '/explore',
         exact: true,
         alt: [{path: '/auction', exact: false}],
       },

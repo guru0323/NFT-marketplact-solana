@@ -125,11 +125,11 @@ export const LandingPageView = () => {
                 explore
               </button>
             </Link>
-            <Link to='/artworks/new'>
+            {/* <Link to='/artworks/new'> */}
               <button className='btn btn-outline-light landing-page-btn-create text-uppercase m-3'>
                 create
               </button>
-            </Link>
+            {/* </Link> */}
           </div>
         </div>
         <InstructionsModal

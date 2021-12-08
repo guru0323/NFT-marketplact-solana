@@ -37,7 +37,7 @@ export const LandingPageView = () => {
           }
           .landing-page-btn {
             min-width: 7.8125rem;
-            height: 4.375rem;
+            height: 2.375rem;
             background-color: #f8f9fa;
             border-color: #f8f9fa;
             border-radius: 0.25rem;
@@ -54,7 +54,7 @@ export const LandingPageView = () => {
           }
           .landing-page-btn-explore {
             min-width: 7.8125rem;
-            height: 4.375rem;
+            height: 2.375rem;
             background-color: rgb(32, 129, 226);
             border-color: rgb(32, 129, 226);
             border-radius: 0.25rem;
@@ -70,7 +70,7 @@ export const LandingPageView = () => {
           }
           .landing-page-btn-create {
             min-width: 7.8125rem;
-            height: 4.375rem;
+            height: 2.375rem;
             background-color: rgb(53, 56, 64);
             border: 1px solid rgb(21, 27, 34);
             border-radius: 0.25rem;

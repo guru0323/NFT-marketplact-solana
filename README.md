@@ -20,9 +20,6 @@ Then run:
 
 `yarn start`
 
-Or run the above by:
-`./start.sh`
-
 You may have to rebuild your package more than one time to secure a
 running environment.
 

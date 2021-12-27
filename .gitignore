@@ -4,6 +4,7 @@
 
 # Cache files
 .eslintcache
+yarn.lock
 
 # Map files
 packages/common/dist/lib/models/metaplex/setStoreIndex.d.ts.map
@@ -17,3 +18,4 @@ packages/common/dist/lib/contexts/meta/processMetaData.js.map
 packages/common/dist/lib/contexts/meta/processAuctions.d.ts.map
 packages/common/dist/lib/contexts/meta/processAuctions.js.map
 packages/common/dist/lib/contexts/store.js.map
+

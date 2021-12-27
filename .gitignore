@@ -1,12 +1,46 @@
-# Node files
-**/.next
+# dependencies
+**/.pnp
+**/.pnp.js
+
+# testing
+**/coverage
+
+# build
+**/.cache
+
+# temp files
+**/out
+/tmp
+
+# next.js
+**.next
 **/node_modules
 
-# Cache files
+# production
+**/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
+
+# local env files
+**.env*
+**.env.local
+!/app/.env.local
+
+# vercel
+.vercel
+
+# cache files
 .eslintcache
 yarn.lock
 
-# Map files
+# map files
 packages/common/dist/lib/models/metaplex/setStoreIndex.d.ts.map
 packages/common/dist/lib/models/metaplex/setStoreIndex.js.map
 packages/common/dist/tsconfig.tsbuildinfo

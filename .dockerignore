@@ -1,3 +1,10 @@
+# Git files
 .git
+
+# Cache files
 cache
 dist
+
+# Node files
+**/.next
+**/node_modules

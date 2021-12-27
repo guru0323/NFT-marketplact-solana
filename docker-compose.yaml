@@ -1,0 +1,28 @@
+version: "3"
+
+networks:
+  marketplace-proxy:
+
+volumes:
+  marketplace-data:
+
+services:    
+  marketplace-app:
+    build:
+      context: ./app/.
+      dockerfile: Dockerfile.prod
+      args:
+        #NODE_ENV: "production"
+        NODE_VERSION: "14.17.6"
+    container_name: marketplace
+    user: "node:node"
+    restart: unless-stopped
+    networks:
+      - marketplace-proxy
+    ports:
+      - "3000:3000"
+    volumes:
+      - "marketplace-data:/app:rw"
+    command: "yarn start"
+    working_dir: /app
+    #environment:

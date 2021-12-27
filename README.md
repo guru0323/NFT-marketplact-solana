@@ -10,7 +10,7 @@ Be sure to be running Node v14.17.6 and yarn version 1.22.10.
 
 Build deployment:
 
-`./deploy-web.sh`
+`cd ./app && ./deploy-web.sh`
 
 Bootstrap yarn:
 
@@ -36,7 +36,14 @@ Start a docker container by running:
 
 Changes to the Docker file requires rebuilding:
 
-`sudo docker-compose down && sudo docker-compose build --no-cache && sudo docker-compose up -d`
+`sudo docker-compose down -v && sudo docker-compose build --no-cache && sudo docker-compose up -d`
+
+You may need to clear out your docker cache periodically to save disk space (This will delete all your docker volumes and images, be careful!):
+
+`sudo docker-compose down -v && sudo docker system prune -a`
+
+To force a rebuild on changes using the build cache:
+`sudo docker-compose up -d --build --force-recreate`
 
 ## Known Issues
 

@@ -14,5 +14,6 @@ yarn prestart
 echo "Building 'web'..."
 # TODO: fix linting errors!
 CI=false && yarn build
+cd ..
 
 echo "#done"

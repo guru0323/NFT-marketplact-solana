@@ -1,0 +1,9 @@
+name: nft-marketplace
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - nodejs=14.17.4
+  - yarn
+  - rust

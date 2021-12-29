@@ -6,6 +6,7 @@ import { Storefront } from '@oyster/common';
 import Bugsnag from '@bugsnag/js';
 import BugsnagPluginReact from '@bugsnag/plugin-react';
 import { applyTheme } from '../actions/applyTheme';
+//import '../styles/theme.less';
 import getConfig from 'next/config';
 
 
@@ -49,11 +50,11 @@ export async function getServerSideProps(context: NextPageContext) {
     pubkey: 'CBr3mDvvj5xEF2bAKhRo3GoBdHAzwc6ojQogTXmDrpMS',
     theme: {
       logo:
-        'https://ipfs.io/ipfs/QmWQdbBQWujc2qsB59oqt3snQhKeNzGTPBvbcG7cX3egrD?filename=replicate-prediction-7alwxcfzjnaghmy2yjlknacsvy.png',
+        'https://github.com/QueendomDAO/media/raw/main/logo_square.png',
       banner:
         '',
       stylesheet:
-        'https://arweave.cache.holaplex.dev/GfF6WrFBhEXbBZDecdbmUPYhuke7nz5UHR_7p4Y-bVQ',
+        '../styles/theme.less',
       color: {
         background: '#121111',
         primary: '#e4d000',
@@ -65,9 +66,9 @@ export async function getServerSideProps(context: NextPageContext) {
     },
     meta: {
       favicon:
-        'https://ipfs.io/ipfs/QmWQdbBQWujc2qsB59oqt3snQhKeNzGTPBvbcG7cX3egrD?filename=replicate-prediction-7alwxcfzjnaghmy2yjlknacsvy.png',
+        'https://github.com/QueendomDAO/media/raw/main/logo_square.png',
       title: 'Queendom',
-      description: 'An Open-Source NFT Market and Community Built on Solana and Powered by Metaplex.',
+      description: 'An NFT Market and Community Built on Solana and Powered by Metaplex.',
     },
   };
 

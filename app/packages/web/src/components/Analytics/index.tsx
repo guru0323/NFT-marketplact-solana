@@ -3,9 +3,14 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { ENDPOINTS, useConnectionConfig, useStore } from '@oyster/common';
 import { useLocation } from 'react-router';
 import { useSolPrice } from '../../contexts';
+import getConfig from 'next/config';
+
+
+let nextConfig = getConfig();
+const publicRuntimeConfig = nextConfig.publicRuntimeConfig;
 
 export const GOOGLE_ANALYTICS_ID =
-  process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID || 'G-HLNC4C2YKN';
+  publicRuntimeConfig.publicGoogleAnalyticsId;
 
 interface AnalyticsUserProperties {
   // user dimensions

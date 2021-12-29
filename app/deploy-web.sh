@@ -16,4 +16,4 @@ echo "Building 'web'..."
 CI=false && yarn build
 cd ..
 
-echo "#done"
+echo "Done building 'web'"

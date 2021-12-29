@@ -4,8 +4,12 @@ import {
   ArweaveQueryResponse,
 } from '@oyster/common';
 import { maybeCDN } from '../utils/cdn';
+import getConfig from 'next/config';
 
-const ARWEAVE_URL = process.env.NEXT_PUBLIC_ARWEAVE_URL;
+const nextConfig = getConfig();
+const publicRuntimeConfig = nextConfig.publicRuntimeConfig;
+
+const ARWEAVE_URL = publicRuntimeConfig.publicArweaveUrl;
 
 export const getStorefront = async (
   subdomain: string,

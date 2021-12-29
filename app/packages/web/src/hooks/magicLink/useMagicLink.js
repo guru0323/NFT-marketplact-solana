@@ -4,6 +4,11 @@ import unfetch from 'isomorphic-unfetch';
 import { Sema } from 'async-sema';
 import loadMagicLink from './loadMagicLink';
 import { useConnectionConfig } from '@oyster/common';
+import getConfig from 'next/config';
+
+
+let nextConfig = getConfig();
+const publicRuntimeConfig = nextConfig.publicRuntimeConfig;
 
 const tokenSema = new Sema(1);
 const loggedInSema = new Sema(1);
@@ -62,7 +67,7 @@ function setToken(token, lifespan = ONE_MINUTE * 15) {
 }
 
 export default function useMagicLink() {
-  const magicLinkKey = process.env.NEXT_PUBLIC_MAGICLINK_KEY;
+  const magicLinkKey = publicRuntimeConfig.publicMagiclinkKey;
   if (!magicLinkKey) {
     throw new Error('Magic Link publishableKey required');
   }

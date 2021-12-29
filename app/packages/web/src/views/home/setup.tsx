@@ -11,6 +11,11 @@ import { useHistory } from 'react-router-dom';
 import { saveAdmin } from '../../actions/saveAdmin';
 import { SetupVariables } from '../../components/SetupVariables';
 import { useMeta } from '../../contexts';
+import getConfig from 'next/config';
+
+
+let nextConfig = getConfig();
+const publicRuntimeConfig = nextConfig.publicRuntimeConfig;
 
 export const SetupView = () => {
   const [isInitalizingStore, setIsInitalizingStore] = useState(false);
@@ -27,7 +32,7 @@ export const SetupView = () => {
   const [storeAddress, setStoreAddress] = useState<string | undefined>();
 
   useEffect(() => {
-    if (!process.env.NEXT_PUBLIC_STORE_OWNER_ADDRESS) {
+    if (!publicRuntimeConfig.publicStoreOwnerAddress) {
       const getStore = async () => {
         if (wallet.publicKey) {
           const store = await setStoreForOwner(wallet.publicKey.toBase58());

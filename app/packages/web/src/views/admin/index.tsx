@@ -48,6 +48,11 @@ import { cacheAllAuctions } from '../../actions';
 import { LoadingOutlined } from '@ant-design/icons';
 import { useAuctionManagersToCache, useNotifications } from '../../hooks';
 import Bugsnag from '@bugsnag/browser';
+import getConfig from 'next/config';
+
+
+let nextConfig = getConfig();
+const publicRuntimeConfig = nextConfig.publicRuntimeConfig;
 
 const { Content } = Layout;
 export const AdminView = () => {
@@ -68,7 +73,7 @@ export const AdminView = () => {
       !store &&
       !storeAddress &&
       wallet.publicKey &&
-      !process.env.NEXT_PUBLIC_STORE_OWNER_ADDRESS
+      !publicRuntimeConfig.publicStoreOwnerAddress
     ) {
       setStoreForOwner(wallet.publicKey.toBase58());
     }

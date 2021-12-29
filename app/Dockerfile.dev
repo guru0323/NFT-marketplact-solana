@@ -7,7 +7,6 @@ RUN chown node:node /app
 USER node
 
 ARG NODE_ENV=${NODE_ENV}
-ENV NODE_ENV=${NODE_ENV}
 
 COPY --chown=node:node package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
@@ -40,35 +39,12 @@ ARG \
     NEXT_SPL_TOKEN_MINTS=${NEXT_SPL_TOKEN_MINTS} \
     NEXT_CG_SPL_TOKEN_IDS=${NEXT_CG_SPL_TOKEN_IDS}
 
-ENV \ 
-    NODE_ENV=${NODE_ENV} \
-    NEXT_PORT=${NEXT_PORT} \
-    NEXT_BASE_PATH=${NEXT_BASE_PATH} \
-    NEXT_SUBDOMAIN=${NEXT_SUBDOMAIN} \
-    NEXT_STRICT_SUBDOMAIN=${NEXT_STRICT_SUBDOMAIN} \
-    NEXT_PUBLIC_SOLANA_NETWORK=${NEXT_PUBLIC_SOLANA_NETWORK} \
-    NEXT_PUBLIC_SOLANA_RPC_HOST=${NEXT_PUBLIC_SOLANA_RPC_HOST} \
-    NEXT_PUBLIC_ARWEAVE_CDN=${NEXT_PUBLIC_ARWEAVE_CDN} \
-    NEXT_PUBLIC_ARWEAVE_URL=${NEXT_PUBLIC_ARWEAVE_URL} \
-    NEXT_PUBLIC_GOOGLE_ANALYTICS_ID=${NEXT_PUBLIC_GOOGLE_ANALYTICS_ID} \
-    NEXT_PUBLIC_MAGICLINK_KEY=${NEXT_PUBLIC_MAGICLINK_KEY} \
-    NEXT_PUBLIC_BUGSNAG_API_KEY=${NEXT_PUBLIC_BUGSNAG_API_KEY} \
-    NEXT_PUBLIC_BIG_STORE=${NEXT_PUBLIC_BIG_STORE} \
-    NEXT_PUBLIC_CLIENT_ID=${NEXT_PUBLIC_CLIENT_ID} \
-    NEXT_PUBLIC_STORE_ADDRESS=${NEXT_PUBLIC_STORE_ADDRESS} \
-    NEXT_PUBLIC_STORE_OWNER_ADDRESS=${NEXT_PUBLIC_STORE_OWNER_ADDRESS} \
-    NEXT_ENABLE_NFT_PACKS=${NEXT_ENABLE_NFT_PACKS} \
-    NEXT_SPL_TOKEN_MINTS=${NEXT_SPL_TOKEN_MINTS} \
-    NEXT_CG_SPL_TOKEN_IDS=${NEXT_CG_SPL_TOKEN_IDS}
 
 COPY --from=dependencies --chown=node:node /app/node_modules ./node_modules
-
-#@TODO Git clone repo here instead
-#COPY --chown=node:node . .
+COPY --chown=node:node . .
 
 RUN ./deploy-web.sh
 RUN yarn bootstrap
-RUN yarn deploy
 
 
 FROM node:${NODE_VERSION} as runner
@@ -78,7 +54,6 @@ RUN chown node:node /app
 USER node
 
 ARG NODE_ENV=${NODE_ENV}
-ENV NODE_ENV=${NODE_ENV}
 
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/Procfile ./
@@ -91,4 +66,4 @@ COPY --from=builder /app/packages ./packages
 
 
 EXPOSE 3000
-CMD ["yarn", "start:prod"]
+CMD ["yarn", "start"]

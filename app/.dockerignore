@@ -5,3 +5,6 @@ dist
 # Node files
 **/.next
 **/node_modules
+
+# Environment files
+**/.env*

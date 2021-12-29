@@ -7,7 +7,11 @@ import { getStorefront } from './../actions/getStorefront';
 import Bugsnag from '@bugsnag/js';
 import BugsnagPluginReact from '@bugsnag/plugin-react';
 import { applyTheme } from '../actions/applyTheme';
+import getConfig from 'next/config';
 
+
+let nextConfig = getConfig();
+const publicRuntimeConfig = nextConfig.publicRuntimeConfig;
 
 // import 'bootstrap/dist/css/bootstrap.min.css';
 const CreateReactAppEntryPoint = dynamic(() => import('../App'), {
@@ -18,9 +22,9 @@ interface AppProps {
   storefront: Storefront;
 }
 
-if (process.env.NEXT_PUBLIC_BUGSNAG_API_KEY) {
+  if (publicRuntimeConfig.publicBugsSnagApiKey) {
   Bugsnag.start({
-    apiKey: process.env.NEXT_PUBLIC_BUGSNAG_API_KEY || '',
+    apiKey: publicRuntimeConfig.publicBugsSnagApiKey,
     plugins: [new BugsnagPluginReact()],
   });
 }
@@ -38,8 +42,8 @@ export async function getServerSideProps(context: NextPageContext) {
   const host = (forwarded?.host || headers.host) ?? '';
   let subdomain = host.split(':')[0].split('.')[0];
 
-  if (process.env.SUBDOMAIN && !process.env.STRICT_SUBDOMAIN) {
-    subdomain = process.env.SUBDOMAIN;
+  if (publicRuntimeConfig.subdomain && !publicRuntimeConfig.strictSubdomain) {
+    subdomain = publicRuntimeConfig.subdomain;
   }
   // console.log('subdomain', await getStorefront('somniumspace'));
   const storefront = {
@@ -149,7 +153,7 @@ function AppWrapper({ storefront }: AppProps) {
     </>
   );
 
-  if (process.env.NEXT_PUBLIC_BUGSNAG_API_KEY) {
+  if (publicRuntimeConfig.publicBugsSnagApiKey) {
     //@ts-ignore
     const ErrorBoundary = Bugsnag.getPlugin('react').createErrorBoundary(React);
     return <ErrorBoundary>{appBody}</ErrorBoundary>;

@@ -40,7 +40,6 @@ function checkEnvDefined(envVar = '', envName) {
 
 
 var nextVars = {},
-    reactVars = {},
     sysVars = {};
     
 for(var env in process.env) {
@@ -50,20 +49,15 @@ for(var env in process.env) {
   var value = process.env[env];
   if (env.includes("NEXT_")) {
     var name = camelCase(env.replace('NEXT_',''));
-    nextVars[name] = checkEnvDefined(value, name);
-  } else if (env.includes("REACT_APP_")) {
-    var name = camelCase(env.replace('REACT_APP_',''));
-    reactVars[name] = checkEnvDefined(value, name);
+    nextVars[name] = checkEnvDefined(value, env);
   } else {
     var name = camelCase(env);
-    sysVars[name] = checkEnvDefined(value, name);    
+    sysVars[name] = checkEnvDefined(value, env);    
   }
   // console.debug(`${env}=${value}`);
 }
 console.debug("Next Vars:")
 console.debug(nextVars)
-console.debug("React Vars:")
-console.debug(reactVars)
 console.debug("System Vars:")
 console.debug(sysVars)
 
@@ -111,35 +105,30 @@ module.exports = withPlugins(plugins, {
     ignoreDuringBuilds: true,
   },
   productionBrowserSourceMaps: true,
-  env: {
-    NEXT_PUBLIC_BUGSNAG_API_KEY: process.env.BUGSNAG_API_KEY,
-    NEXT_PUBLIC_ARWEAVE_CDN:
-      process.env.ARWEAVE_CDN || 'https://arweave.cache.holaplex.dev',
-    NEXT_PUBLIC_STORE_OWNER_ADDRESS:
-      process.env.STORE_OWNER_ADDRESS ||
-      process.env.REACT_APP_STORE_OWNER_ADDRESS_ADDRESS,
-    NEXT_PUBLIC_STORE_ADDRESS: process.env.STORE_ADDRESS,
-    NEXT_PUBLIC_ARWEAVE_URL:
-      process.env.NEXT_PUBLIC_ARWEAVE_URL || 'https://arweave.net',
-    NEXT_PUBLIC_BIG_STORE: process.env.REACT_APP_BIG_STORE,
-    NEXT_PUBLIC_CLIENT_ID: process.env.REACT_APP_CLIENT_ID,
-    NEXT_PUBLIC_GOOGLE_ANALYTICS_ID: process.env.REACT_APP_GOOGLE_ANALYTICS_ID,
+  serverRuntimeConfig: {
+    gitDeployKey: sysVars['gitDeploymentKey'],
   },
   publicRuntimeConfig: {
+    nodeEnv: nextVars['nodeEnv'],
+    port: nextVars['port'],
     basePath: basePath,
-    nodeType: nextVars['nodeEnv'],
-    bugsSnagApiKey: sysVars['bugsSnagApiKey'],
-    arweaveCdn: sysVars['arweaveCdn'] || 'https://arweave.cache.holaplex.dev',
-    solanaNetwork: getSolanaNetwork(),
-    solanaRpcHost: getSolanaRpcHost(),
-    storeOwnerAddress: 
-      sysVars['storeOwnerAddress'] ||
-      reactVars['storeOwnerAddressAddress'],
-    publicStoreAddress: sysVars['storeAddress'],
-    arweaveUrl: nextVars['arweaveUrl'],
-    bigStore: reactVars['appBigStre'],
-    clientId: reactVars['clientId'],
-    googleAnalyticsId: reactVars['googleAnalyticsId'],
+    subdomain: nextVars['subdomain'],
+    strictSubdomain: nextVars['strictSubdomain'],
+    publicSolanaNetwork: getSolanaNetwork(),
+    publicSolanaRpcHost: getSolanaRpcHost(),
+    publicArweaveCdn: nextVars['publicArweaveCdn'] || 'https://arweave.cache.holaplex.dev',
+    publicArweaveUrl: nextVars['publicArweaveUrl'],
+    publicGoogleAnalyticsId: nextVars['publicGoogleAnalyticsId'] || 'G-HLNC4C2YKN',
+    publicMagiclinkKey: nextVars['publicMagiclinkKey'],
+    publicBugsSnagApiKey: nextVars['publiBugsSnagApiKey'],
+    publicBigStore: nextVars['publicBigStore'],
+    publicClientId: nextVars['publicClientId'],
+    publicStoreAddress: nextVars['storeAddress'],
+    publicStoreOwnerAddress: nextVars['publicStoreOwnerAddress'],
+    enableNftPacks: nextVars['enableNftPacks'],
+    splTokenMints: nextVars['splTokenMints'],
+    cgSplTokenIds: nextVars['cgSplTokenIds'],
+
   },
   async rewrites() {
     return [

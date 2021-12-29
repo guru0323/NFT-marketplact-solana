@@ -62,13 +62,11 @@ ENV \
     NEXT_CG_SPL_TOKEN_IDS=${NEXT_CG_SPL_TOKEN_IDS}
 
 COPY --from=dependencies --chown=node:node /app/node_modules ./node_modules
-
-#@TODO Git clone repo here instead
-#COPY --chown=node:node . .
+COPY --chown=node:node . .
 
 RUN ./deploy-web.sh
 RUN yarn bootstrap
-RUN yarn deploy
+RUN yarn deploy:test
 
 
 FROM node:${NODE_VERSION} as runner

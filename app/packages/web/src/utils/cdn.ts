@@ -1,4 +1,9 @@
-const ARWEAVE_CDN = process.env.NEXT_PUBLIC_ARWEAVE_CDN;
+import getConfig from 'next/config';
+
+const nextConfig = getConfig();
+const publicRuntimeConfig = nextConfig.publicRuntimeConfig;
+
+const ARWEAVE_CDN = publicRuntimeConfig.publicArweaveCdn;
 
 export const maybeCDN = (uri: string) => {
   if (ARWEAVE_CDN) {

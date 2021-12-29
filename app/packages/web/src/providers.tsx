@@ -12,6 +12,11 @@ import { LoaderProvider } from './components/Loader';
 import { CoingeckoProvider } from './contexts/coingecko';
 import { Storefront } from '@oyster/common';
 import { AnalyticsProvider } from './components/Analytics';
+import getConfig from 'next/config';
+
+
+let nextConfig = getConfig();
+const publicRuntimeConfig = nextConfig.publicRuntimeConfig;
 
 interface ProvidersProps {
   storefront: Storefront;
@@ -23,7 +28,7 @@ export const Providers: FC<ProvidersProps> = ({ children, storefront }) => {
     <ConnectionProvider>
       <StoreProvider
         storefront={storefront}
-        storeAddress={process.env.NEXT_PUBLIC_STORE_ADDRESS}
+        storeAddress={publicRuntimeConfig.publicStoreAddress}
       >
         <WalletProvider>
           <AccountsProvider>

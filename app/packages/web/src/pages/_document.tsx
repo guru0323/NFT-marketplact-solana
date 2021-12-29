@@ -6,9 +6,14 @@ import Document, {
   NextScript,
 } from 'next/document';
 import React from 'react';
+import getConfig from 'next/config';
+
+
+let nextConfig = getConfig();
+const publicRuntimeConfig = nextConfig.publicRuntimeConfig;
 
 const GOOGLE_ANALYTICS_ID =
-  process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID || 'G-HLNC4C2YKN';
+  publicRuntimeConfig.publicGoogleAnalyticsId;
 
 export default class MetaplexDocument extends Document {
   static async getInitialProps(ctx: DocumentContext) {

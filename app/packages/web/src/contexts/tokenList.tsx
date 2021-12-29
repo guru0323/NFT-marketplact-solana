@@ -5,6 +5,11 @@ TokenInfo,
   TokenListProvider,
 } from "@solana/spl-token-registry";
 import { WRAPPED_SOL_MINT } from '@project-serum/serum/lib/token-instructions';
+import getConfig from 'next/config';
+
+
+let nextConfig = getConfig();
+const publicRuntimeConfig = nextConfig.publicRuntimeConfig;
 
 // Tag in the spl-token-registry for sollet wrapped tokens.
 export const SPL_REGISTRY_SOLLET_TAG = "wrapped-sollet";
@@ -28,11 +33,11 @@ const TokenListContext =
 export function SPLTokenListProvider({ children = null as any }) {  
     const [tokenList, setTokenList] = useState<TokenListContainer | null>(null);
     
-    const subscribedTokenMints = process.env.NEXT_SPL_TOKEN_MINTS? 
+    const subscribedTokenMints = publicRuntimeConfig.splTokenMints? 
       [
 
         WRAPPED_SOL_MINT,
-        ...process.env.NEXT_SPL_TOKEN_MINTS.split(",")
+        ...publicRuntimeConfig.splTokenMints.split(",")
       ]: [WRAPPED_SOL_MINT]
 
     useEffect(() => {

@@ -18,6 +18,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.simulateTransaction = exports.sendSignedTransaction = exports.getUnixTs = exports.sendTransactionWithRetry = exports.sendTransaction = exports.sendTransactions = exports.sendTransactionsWithManualRetry = exports.SequenceType = exports.getErrorForTransaction = exports.useConnectionConfig = exports.useConnection = exports.ConnectionProvider = exports.ENDPOINTS = void 0;
 const spl_token_registry_1 = require("@solana/spl-token-registry");
@@ -28,15 +31,13 @@ const ExplorerLink_1 = require("../components/ExplorerLink");
 const hooks_1 = require("../hooks");
 const notifications_1 = require("../utils/notifications");
 const utils_1 = require("../utils/utils");
+const config_1 = __importDefault(require("next/config"));
+let nextConfig = config_1.default();
+const publicRuntimeConfig = nextConfig.publicRuntimeConfig;
 exports.ENDPOINTS = [
     {
-        name: 'mainnet-beta (Triton)',
-        endpoint: 'https://holaplex.rpcpool.com',
-        ChainId: spl_token_registry_1.ENV.MainnetBeta,
-    },
-    {
-        name: 'mainnet-beta (Triton Staging)',
-        endpoint: 'https://stage.mainnet.rpcpool.com/4715f6087c8269548f2edb003a5e',
+        name: publicRuntimeConfig.publicSolanaNetwork,
+        endpoint: publicRuntimeConfig.publicSolanaRpcHost,
         ChainId: spl_token_registry_1.ENV.MainnetBeta,
     },
     {

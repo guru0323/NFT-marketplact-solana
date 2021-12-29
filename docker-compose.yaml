@@ -1,28 +1,41 @@
 version: "3"
 
 networks:
-  marketplace-proxy:
+  app_proxy:
+    name: ${COMPOSE_NET}
 
 volumes:
-  marketplace-data:
+  app_data:
+    name: ${COMPOSE_VOLUME}
 
 services:    
   marketplace-app:
     build:
       context: ./app/.
-      dockerfile: Dockerfile.prod
+      dockerfile: Dockerfile.${SOL_NET}
       args:
-        #NODE_ENV: "production"
-        NODE_VERSION: "14.17.6"
-    container_name: marketplace
+        #NODE_ENV: ${NODE_ENV}
+        NODE_VERSION: ${NODE_VERSION}
+        NEXT_BASE_PATH: ${NEXT_BASE_PATH}
+        NEXT_PUBLIC_SOLANA_NETWORK: ${NEXT_PUBLIC_SOLANA_NETWORK}
+        NEXT_PUBLIC_SOLANA_RPC_HOST: ${NEXT_PUBLIC_SOLANA_RPC_HOST}
+        NEXT_PUBLIC_GOOGLE_ANALYTICS_ID: ${NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}
+        NEXT_PUBLIC_STORE_ADDRESS: ${NEXT_PUBLIC_STORE_ADDRESS}
+        NEXT_ENABLE_NFT_PACKS: ${NEXT_ENABLE_NFT_PACKS}
+        NEXT_SPL_TOKEN_MINTS: ${NEXT_SPL_TOKEN_MINTS}
+        NEXT_CG_SPL_TOKEN_IDS: ${NEXT_CG_SPL_TOKEN_IDS}
+
+    container_name: ${COMPOSE_HOSTNAME}
     user: "node:node"
     restart: unless-stopped
     networks:
-      - marketplace-proxy
+      - app_proxy
     ports:
-      - "3000:3000"
+      - "${COMPOSE_PORT}:${NEXT_PORT}"
     volumes:
-      - "marketplace-data:/app:rw"
-    command: "yarn start"
+      - "app_data:/app:rw"
+    command: ${COMPOSE_COMMAND}
     working_dir: /app
-    #environment:
+    env_file:
+      - ${ENV_FILE}
+

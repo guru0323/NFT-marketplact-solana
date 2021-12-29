@@ -20,8 +20,8 @@
 **/build
 
 # misc
-.DS_Store
-*.pem
+**.DS_Store
+**.pem
 
 # debug
 **/npm-debug.log*
@@ -30,8 +30,7 @@
 
 # local env files
 **.env*
-**.env.local
-!/app/.env.local
+!/app/packages/web/.env.sample
 
 # vercel
 .vercel

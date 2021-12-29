@@ -253,7 +253,6 @@ function InnerAdminView({
   const [newStore, setNewStore] = useState(
     store && store.info && new Store(store.info),
   );
-  const { storefront } = useStore();
   const [updatedCreators, setUpdatedCreators] = useState<
     Record<string, WhitelistedCreator>
   >({});
@@ -483,53 +482,6 @@ function InnerAdminView({
             </Button>
           </Col>
         )}
-        <Col span={11} offset={1}>
-          <h3>Cache Auctions</h3>
-          <p>
-            Activate your storefront listing caches by pressing &ldquo;build
-            cache&rdquo;. This will reduce page load times for your listings.
-            Your storefront will start looking up listing using the cache on
-            November 17th. To preview the speed improvement visit the Holaplex{' '}
-            <a
-              rel="noopener noreferrer"
-              target="_blank"
-              href={`https://${storefront.subdomain}.holaxplex.dev`}
-            >
-              {' '}
-              staging environment
-            </a>{' '}
-            for your storefront.
-          </p>
-          <Space direction="vertical" size="middle" align="center">
-            <Progress
-              type="circle"
-              status="normal"
-              percent={(auctionCacheTotal / auctionManagerTotal) * 100}
-              format={() => `${auctionManagersToCache.length} left`}
-            />
-            {auctionManagersToCache.length > 0 && (
-              <Button
-                size="large"
-                loading={cachingAuctions}
-                onClick={async () => {
-                  setCachingAuctions(true);
-
-                  await cacheAllAuctions(
-                    wallet,
-                    connection,
-                    auctionManagersToCache,
-                    auctionCaches,
-                    storeIndexer,
-                  );
-
-                  setCachingAuctions(false);
-                }}
-              >
-                Build Cache
-              </Button>
-            )}
-          </Space>
-        </Col>
       </Row>
     </Content>
   );

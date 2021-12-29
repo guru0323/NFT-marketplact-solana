@@ -70,7 +70,31 @@ You may need to clear out your docker cache periodically to save disk space (Thi
 To force a rebuild on changes using the build cache:
 `sudo --preserve-env docker-compose --env-file ${ENV_FILE} up -d --build --force-recreate`
 
+## Derivation
+
+- `./app/packages/common` appears to be heavily based off of `https://github.com/solana-labs/oyster/tree/main/packages/common`
+- `./app/packages/web` is derived from `https://github.com/metaplex-foundation/metaplex`
+
+
 ## Known Issues
+
+### Can't run on Node 16.13.0
+
+Compiling 'web' under Node 16.13.0 throws the following error:
+
+`ERR_OSSL_EVP_UNSUPPORTED`
+
+Following suggestions to append package.json with:
+
+`"start": "cross-env NODE_OPTIONS=\"--openssl-legacy-provider\" next dev",`
+`"build": "cross-env NODE_OPTIONS=\"--openssl-legacy-provider\" next build",`
+
+Throws the following error:
+
+`--openssl-legacy-provider is not allowed in NODE_OPTIONS`
+
+As of now I don't see a way of upgraded to Node 16. Will keep an eye on upstream (Metaplex/Holaplex) to see if/how they resolve this.
+
 
 ### Can't find CSS files in common
 

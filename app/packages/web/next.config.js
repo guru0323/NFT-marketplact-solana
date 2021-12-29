@@ -117,7 +117,6 @@ module.exports = withPlugins(plugins, {
     publicSolanaNetwork: getSolanaNetwork(),
     publicSolanaRpcHost: getSolanaRpcHost(),
     publicArweaveCdn: nextVars['publicArweaveCdn'] || 'https://arweave.cache.holaplex.dev',
-    publicArweaveUrl: nextVars['publicArweaveUrl'],
     publicGoogleAnalyticsId: nextVars['publicGoogleAnalyticsId'] || 'G-HLNC4C2YKN',
     publicMagiclinkKey: nextVars['publicMagiclinkKey'],
     publicBugsSnagApiKey: nextVars['publiBugsSnagApiKey'],

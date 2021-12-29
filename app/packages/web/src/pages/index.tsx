@@ -3,7 +3,6 @@ import dynamic from 'next/dynamic';
 import { NextPageContext } from 'next';
 import Head from 'next/head';
 import { Storefront } from '@oyster/common';
-import { getStorefront } from './../actions/getStorefront';
 import Bugsnag from '@bugsnag/js';
 import BugsnagPluginReact from '@bugsnag/plugin-react';
 import { applyTheme } from '../actions/applyTheme';
@@ -45,7 +44,6 @@ export async function getServerSideProps(context: NextPageContext) {
   if (publicRuntimeConfig.subdomain && !publicRuntimeConfig.strictSubdomain) {
     subdomain = publicRuntimeConfig.subdomain;
   }
-  // console.log('subdomain', await getStorefront('somniumspace'));
   const storefront = {
     subdomain: 'market',
     pubkey: 'CBr3mDvvj5xEF2bAKhRo3GoBdHAzwc6ojQogTXmDrpMS',

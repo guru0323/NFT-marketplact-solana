@@ -107,6 +107,8 @@ module.exports = withPlugins(plugins, {
   productionBrowserSourceMaps: true,
   serverRuntimeConfig: {
     gitDeployKey: sysVars['gitDeploymentKey'],
+    stripeSecretKey: sysVars['stripeSecretKey'],
+    stripeWebhookSecret: sysVars['stripeWebhookSecret'],
   },
   publicRuntimeConfig: {
     nodeEnv: nextVars['nodeEnv'],
@@ -125,10 +127,11 @@ module.exports = withPlugins(plugins, {
     publicClientId: nextVars['publicClientId'],
     publicStoreAddress: nextVars['storeAddress'],
     publicStoreOwnerAddress: nextVars['publicStoreOwnerAddress'],
+    publicStripePublishableKey: nextVars['publicStripePublishableKey'],
     enableNftPacks: nextVars['enableNftPacks'],
     splTokenMints: nextVars['splTokenMints'],
     cgSplTokenIds: nextVars['cgSplTokenIds'],
-
+    stripePaymentDescription: sysVars['stripePaymentDescription'],
   },
   async rewrites() {
     return [

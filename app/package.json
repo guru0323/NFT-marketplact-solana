@@ -9,9 +9,9 @@
   "license": "Apache-2.0",
   "scripts": {
     "bootstrap": "lerna link && lerna bootstrap",
-    "build": "lerna run build --scope web --scope @oyster/common",
+    "build": "lerna run build --scope web --scope '{@oyster/common,@stripe/checkout}'",
     "start:prod": "cd packages/web && yarn run start:prod",
-    "start": "cross-env CI=true lerna run start --scope @oyster/common --stream --parallel --scope web",
+    "start": "cross-env CI=true lerna run start --scope '{@oyster/common,@stripe/checkout}' --stream --parallel --scope web",
     "lint": "prettier -c 'packages/*/{src,test}/**/*.ts' && npm run lint:eslint",
     "lint:web": "prettier -c 'packages/{common,web}/{src,test}/**/*.{ts,tsx}' && npm run lint:eslint:web",
     "lint:eslint": "eslint 'packages/*/{src,test}/**/*.{ts,tsx}'",
@@ -55,7 +55,9 @@
     "dotenv": "^10.0.0",
     "next": "^11.0.1",
     "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+    "react-dom": "^17.0.2",
+    "reactjs-popup": "^2.0.5",
+    "styled-components": "^5.3.3"
   },
   "devDependencies": {
     "@commitlint/cli": "^8.2.0",

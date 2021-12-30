@@ -12,13 +12,13 @@ Copy env file:
 
 `cp ./app/packages/web/.env.sample ./app/packages/web/.env`
 
-Build deployment:
-
-`cd ./app && ./deploy-web.sh`
-
 Bootstrap:
 
 `yarn bootstrap`
+
+Build deployment:
+
+`cd ./app && ./deploy-web.sh`
 
 Run development deployment:
 
@@ -61,7 +61,7 @@ Start a docker container by running:
 
 Changes to the Docker file requires rebuilding:
 
-`sudo --preserve-env docker-compose --env-file ${ENV_FILE} -v && sudo --preserve-env docker-compose --env-file ${ENV_FILE} build --no-cache && sudo --preserve-env docker-compose --env-file ${ENV_FILE} up -d`
+`sudo --preserve-env docker-compose --env-file ${ENV_FILE} down -v && sudo --preserve-env docker-compose --env-file ${ENV_FILE} build --no-cache && sudo --preserve-env docker-compose --env-file ${ENV_FILE} up -d`
 
 You may need to clear out your docker cache periodically to save disk space (This will delete all your docker volumes and images, be careful!):
 

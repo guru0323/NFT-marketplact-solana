@@ -41,7 +41,7 @@ import {
 } from 'antd';
 import BN from 'bn.js';
 import moment from 'moment';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState, createContext} from 'react';
 import { Link } from 'react-router-dom';
 import { sendCancelBid } from '../../actions/cancelBid';
 import { findEligibleParticipationBidsForRedemption } from '../../actions/claimUnusedPrizes';
@@ -65,6 +65,15 @@ import { AuctionCountdown, AuctionNumbers } from '../AuctionNumbers';
 import { Confetti } from '../Confetti';
 import { HowAuctionsWorkModal } from '../HowAuctionsWorkModal';
 import { endSale } from './utils/endSale';
+
+import { CheckoutModal } from '../Checkout'
+import { NextPage } from 'next'
+
+import { Elements } from '@stripe/react-stripe-js'
+import { getStripe }  from '@stripe/checkout'
+import { Layout as CheckoutLayout }  from '@stripe/checkout'
+import { ElementsForm }  from '@stripe/checkout'
+
 
 const { Text } = Typography;
 
@@ -218,7 +227,9 @@ export const AuctionCard = ({
   const bids = useBidsForAuction(auctionView.auction.pubkey);
 
   const [value, setValue] = useState<number>();
-  const [loading, setLoading] = useState<boolean>(false);
+  const [solLoading, setSolLoading] = useState<boolean>(false);
+  const [fiatLoading, setFiatLoading] = useState<boolean>(false);
+  const [showCheckoutModal, setShowCheckoutModal] = useState(false);
 
   const [showRedeemedBidModal, setShowRedeemedBidModal] =
     useState<boolean>(false);
@@ -304,7 +315,7 @@ export const AuctionCard = ({
     value === undefined ||
     value * LAMPORTS_PER_SOL < priceFloor ||
     (minBid && value < minBid) ||
-    loading ||
+    solLoading ||
     !accountByMint.get(QUOTE_MINT.toBase58());
 
   useEffect(() => {
@@ -316,7 +327,7 @@ export const AuctionCard = ({
   }, [wallet.connected]);
 
   const endInstantSale = async () => {
-    setLoading(true);
+    setSolLoading(true);
 
     try {
       try {
@@ -343,12 +354,12 @@ export const AuctionCard = ({
 
       setShowEndingBidModal(true);
     } finally {
-      setLoading(false);
+      setSolLoading(false);
     }
   };
 
-  const instantSale = async () => {
-    setLoading(true);
+  const instantSolSale = async () => {
+    setSolLoading(true);
 
     try {
       const instantSalePrice =
@@ -465,8 +476,67 @@ export const AuctionCard = ({
 
       setShowRedeemedBidModal(true);
     } finally {
-      setLoading(false);
+      setSolLoading(false);
     }
+  };
+
+  const instantFiatSale = async () => {
+    setFiatLoading(true);
+
+    try {
+      const instantSalePrice =
+        auctionView.auctionDataExtended?.info.instantSalePrice;
+      const winningConfigType =
+        auctionView.participationItem?.winningConfigType ||
+        auctionView.items[0][0].winningConfigType;
+      const isAuctionItemMaster = [
+        WinningConfigType.FullRightsTransfer,
+        WinningConfigType.TokenOnlyTransfer,
+      ].includes(winningConfigType);
+      const allowBidToPublic =
+        myPayingAccount &&
+        !auctionView.myBidderPot &&
+        isAuctionManagerAuthorityNotWalletOwner;
+      const allowBidToAuctionOwner =
+        myPayingAccount &&
+        !isAuctionManagerAuthorityNotWalletOwner &&
+        isAuctionItemMaster;
+
+      // Placing a "bid" of the full amount results in a purchase to redeem.
+      if (instantSalePrice && (allowBidToPublic || allowBidToAuctionOwner)) {
+        try {
+          console.log('sendPlaceBid');
+          setShowCheckoutModal(true);
+        } catch (e) {
+          console.error('sendPlaceBid', e);
+          return;
+        }
+      }
+
+      // Claim the purchase
+      try {
+        await sendRedeemBid(
+          connection,
+          wallet,
+          myPayingAccount.pubkey,
+          auctionView,
+          accountByMint,
+          prizeTrackingTickets,
+          bidRedemptions,
+          bids,
+        );
+      } catch (e) {
+        console.error('sendRedeemBid', e);
+        setShowRedemptionIssue(true);
+        return;
+      }
+      if (!{ setShowCheckoutModal } ) {
+        setShowRedeemedBidModal(true);
+      }
+    } finally {
+      setFiatLoading(false);
+    }
+
   };
 
   const isOpenEditionSale =
@@ -511,11 +581,11 @@ export const AuctionCard = ({
         !myPayingAccount ||
         (!auctionView.myBidderMetadata &&
           isAuctionManagerAuthorityNotWalletOwner) ||
-        loading ||
+        solLoading ||
         !!auctionView.items.find(i => i.find(it => !it.metadata))
       }
       onClick={async () => {
-        setLoading(true);
+        setSolLoading(true);
         setShowRedemptionIssue(false);
         if (
           wallet?.publicKey?.toBase58() === auctionView.auctionManager.authority
@@ -557,10 +627,10 @@ export const AuctionCard = ({
           console.error(e);
           setShowRedemptionIssue(true);
         }
-        setLoading(false);
+        setSolLoading(false);
       }}
     >
-      {loading ||
+      {solLoading ||
       auctionView.items.find(i => i.find(it => !it.metadata)) ||
       !myPayingAccount ? (
         <Spin indicator={<LoadingOutlined />} />
@@ -602,9 +672,9 @@ export const AuctionCard = ({
       className="metaplex-fullwidth"
       type="primary"
       size="large"
-      loading={loading}
+      loading={solLoading}
       onClick={async () => {
-        setLoading(true);
+        setSolLoading(true);
         try {
           await startAuctionManually(
             connection,
@@ -614,7 +684,7 @@ export const AuctionCard = ({
         } catch (e) {
           console.error(e);
         }
-        setLoading(false);
+        setSolLoading(false);
       }}
     >
       Start auction
@@ -637,14 +707,14 @@ export const AuctionCard = ({
   );
 
   // Conduct an instant sale
-  const instantSaleBtn = (
+  const instantSolSaleBtn = (
     <Button
       className="metaplex-fullwidth"
       type="primary"
       size="large"
       block
-      loading={loading}
-      onClick={canEndInstantSale ? endInstantSale : instantSale}
+      loading={solLoading}
+      onClick={canEndInstantSale ? endInstantSale : instantSolSale}
     >
       {!isAuctionManagerAuthorityNotWalletOwner
         ? canEndInstantSale
@@ -652,7 +722,28 @@ export const AuctionCard = ({
           : 'Claim Item'
         : auctionView.myBidderPot
         ? 'Claim Purchase'
-        : 'Buy Now'}
+        : 'Buy Now with Sol'}
+    </Button>
+  );
+
+  // Conduct an instant sale
+  const instantFiatSaleBtn = (
+    <Button
+      className="metaplex-fullwidth"
+      type="primary"
+      size="large"
+      block
+      loading={fiatLoading}      
+      
+      onClick={canEndInstantSale ? endInstantSale : instantFiatSale}
+    >
+      {!isAuctionManagerAuthorityNotWalletOwner
+        ? canEndInstantSale
+          ? 'End Sale & Claim Item'
+          : 'Claim Item'
+        : auctionView.myBidderPot
+        ? 'Claim Purchase'
+        : 'Buy Now with Fiat'}
     </Button>
   );
 
@@ -678,7 +769,7 @@ export const AuctionCard = ({
           />
         </Col>
         <Col flex="0 0 auto">
-          <Button disabled={loading} onClick={() => setShowPlaceBidUI(false)}>
+          <Button disabled={solLoading} onClick={() => setShowPlaceBidUI(false)}>
             Cancel
           </Button>
         </Col>
@@ -686,9 +777,9 @@ export const AuctionCard = ({
           <Button
             disabled={invalidBid}
             type="primary"
-            loading={loading || !accountByMint.get(QUOTE_MINT.toBase58())}
+            loading={solLoading || !accountByMint.get(QUOTE_MINT.toBase58())}
             onClick={async () => {
-              setLoading(true);
+              setSolLoading(true);
               if (myPayingAccount && value) {
                 const bid = await sendPlaceBid(
                   connection,
@@ -701,7 +792,7 @@ export const AuctionCard = ({
                 setLastBid(bid);
                 // setShowBidModal(false);
                 setShowBidPlaced(true);
-                setLoading(false);
+                setSolLoading(false);
                 track('bid_submitted', {
                   category: 'auction',
                   // label: '',
@@ -776,10 +867,13 @@ export const AuctionCard = ({
             showPlaceBidUI &&
             !auctionView.isInstantSale &&
             placeBidUI}
+          {(showStartAuctionBtn
+              ? startAuctionBtn
+              : auctionView.isInstantSale && instantFiatSaleBtn)}
           {showDefaultNonEndedAction &&
             (showStartAuctionBtn
               ? startAuctionBtn
-              : auctionView.isInstantSale && instantSaleBtn)}
+              : auctionView.isInstantSale && instantSolSaleBtn)}
           {!hideDefaultAction && !wallet.connected && (
             <Button
               className="metaplex-fullwidth"
@@ -789,6 +883,7 @@ export const AuctionCard = ({
             >
               Connect wallet to{' '}
               {auctionView.isInstantSale ? 'purchase' : 'place bid'}
+              {' '}with Sol
             </Button>
           )}
 
@@ -818,7 +913,7 @@ export const AuctionCard = ({
               bid during gap periods to be eligible.
             </Text>
           )}
-          {!loading && value !== undefined && showPlaceBidUI && invalidBid && (
+          {!solLoading && value !== undefined && showPlaceBidUI && invalidBid && (
             <Text type="danger">Invalid amount.</Text>
           )}
         </Space>
@@ -899,6 +994,24 @@ export const AuctionCard = ({
           to redeem their bids for them right now.
         </h3>
       </MetaplexModal>
+
+      <CheckoutModal
+        visible={showCheckoutModal}
+        onCancel={() => setShowCheckoutModal(false)}
+      >
+        <h3>
+          <CheckoutLayout title="Donate with Elements | Next.js + TypeScript Example">
+            <div className="page-container">
+              <h1>Donate with Elements</h1>
+              <p>Donate to our project 💖</p>
+              
+            </div>
+          </CheckoutLayout>
+        </h3>
+        <Button type="primary" onClick={() => setShowCheckoutModal(false)}>
+            Got it
+        </Button>
+      </CheckoutModal>
     </div>
   );
 };

@@ -11,6 +11,8 @@
     "@google/model-viewer": "^1.7.2",
     "@magic-ext/solana": "^0.2.0",
     "@oyster/common": "0.0.2",
+    "@stripe/react-stripe-js": "^1.1.2",
+    "@stripe/checkout": "2.0.0",
     "@project-serum/serum": "^0.13.52",
     "@solana/spl-name-service": "0.1.3",
     "@solana/spl-token": "0.1.6",
@@ -52,7 +54,7 @@
     "camelcase": "^6.2.1"
   },
   "scripts": {
-    "prestart": "npm-link-shared ../common/node_modules/ . react",
+    "prestart": "npm-link-shared ../common/node_modules/ . react && npm-link-shared ../checkout/node_modules/ . react",
     "start": "next dev",
     "build": "next build",
     "export": "next export -o ../../build/web",

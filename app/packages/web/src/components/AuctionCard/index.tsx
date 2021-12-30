@@ -1004,7 +1004,9 @@ export const AuctionCard = ({
             <div className="page-container">
               <h1>Donate with Elements</h1>
               <p>Donate to our project 💖</p>
-              
+              <Elements stripe={getStripe()}>
+                <ElementsForm />
+              </Elements>
             </div>
           </CheckoutLayout>
         </h3>

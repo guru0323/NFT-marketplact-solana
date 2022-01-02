@@ -1,9 +1,10 @@
 import { NextPage } from 'next'
-import Link from 'next/link'
-import { Layout }  from '@stripe/checkout'
+
 import { Elements } from '@stripe/react-stripe-js'
-import { ElementsForm }  from '@stripe/checkout'
-import { getStripe }  from '@stripe/checkout'
+import { getStripe } from '../../utils/stripe'
+import { Layout } from '../../components/Stripe'
+import { ElementsForm } from '../../components/Stripe'
+
 
 export const CheckoutPageView: NextPage = () => {
   return (

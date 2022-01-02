@@ -10,8 +10,7 @@ import { applyTheme } from '../actions/applyTheme';
 import getConfig from 'next/config';
 
 
-let nextConfig = getConfig();
-const publicRuntimeConfig = nextConfig.publicRuntimeConfig;
+const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
 
 // import 'bootstrap/dist/css/bootstrap.min.css';
 const CreateReactAppEntryPoint = dynamic(() => import('../App'), {
@@ -22,9 +21,9 @@ interface AppProps {
   storefront: Storefront;
 }
 
-  if (publicRuntimeConfig.publicBugsSnagApiKey) {
+  if (serverRuntimeConfig.bugsSnagApiKey) {
   Bugsnag.start({
-    apiKey: publicRuntimeConfig.publicBugsSnagApiKey,
+    apiKey: serverRuntimeConfig.bugsSnagApiKey,
     plugins: [new BugsnagPluginReact()],
   });
 }
@@ -42,7 +41,7 @@ export async function getServerSideProps(context: NextPageContext) {
   const host = (forwarded?.host || headers.host) ?? '';
   let subdomain = host.split(':')[0].split('.')[0];
 
-  if (publicRuntimeConfig.subdomain && !publicRuntimeConfig.strictSubdomain) {
+  if (publicRuntimeConfig.subdomain && !serverRuntimeConfig.strictSubdomain) {
     subdomain = publicRuntimeConfig.subdomain;
   }
   const storefront = {
@@ -152,7 +151,7 @@ function AppWrapper({ storefront }: AppProps) {
     </>
   );
 
-  if (publicRuntimeConfig.publicBugsSnagApiKey) {
+  if (serverRuntimeConfig.bugsSnagApiKey) {
     //@ts-ignore
     const ErrorBoundary = Bugsnag.getPlugin('react').createErrorBoundary(React);
     return <ErrorBoundary>{appBody}</ErrorBoundary>;

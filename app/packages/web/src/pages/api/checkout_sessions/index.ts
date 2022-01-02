@@ -1,16 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
-/*
- * Product data can be loaded from anywhere. In this case, we’re loading it from
- * a local JSON file, but this could also come from an async call to your
- * inventory management service, a database query, or some other API call.
- *
- * The important thing is that the product info is loaded from somewhere trusted
- * so you know the pricing information is accurate.
- */
-import { validateCartItems } from 'use-shopping-cart/src/serverUtil';
-import inventory from '../../data/products.json';
+import { CURRENCY, MIN_AMOUNT, MAX_AMOUNT } from '../../../config/stripe';
+import { formatAmountForStripe } from '../../../utils/stripe';
+
 import Stripe from 'stripe';
+
 import getConfig from 'next/config';
 
 const nextConfig = getConfig();
@@ -26,27 +20,32 @@ export default async function handler(
   res: NextApiResponse,
 ) {
   if (req.method === 'POST') {
+    const amount: number = req.body.amount;
     try {
-      // Validate the cart details that were sent from the client.
-      const cartItems = req.body;
-      const line_items = validateCartItems(inventory, cartItems);
+      // Validate the amount that was passed from the client.
+      if (!(amount >= MIN_AMOUNT && amount <= MAX_AMOUNT)) {
+        throw new Error('Invalid amount.');
+      }
       // Create Checkout Sessions from body params.
       const params: Stripe.Checkout.SessionCreateParams = {
-        submit_type: 'pay',
+        submit_type: 'donate',
         payment_method_types: ['card'],
-        billing_address_collection: 'auto',
-        shipping_address_collection: {
-          allowed_countries: ['US', 'CA'],
-        },
-        line_items,
+        line_items: [
+          {
+            name: 'Custom amount donation',
+            amount: formatAmountForStripe(amount, CURRENCY),
+            currency: CURRENCY,
+            quantity: 1,
+          },
+        ],
         success_url: `${req.headers.origin}/result?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${req.headers.origin}/use-shopping-cart`,
+        cancel_url: `${req.headers.origin}/donate-with-checkout`,
       };
       const checkoutSession: Stripe.Checkout.Session =
         await stripe.checkout.sessions.create(params);
 
       res.status(200).json(checkoutSession);
-    } catch (err) {
+    } catch (err: any) {
       res.status(500).json({ statusCode: 500, message: err.message });
     }
   } else {

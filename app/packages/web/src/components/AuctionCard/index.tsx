@@ -66,7 +66,7 @@ import { Confetti } from '../Confetti';
 import { HowAuctionsWorkModal } from '../HowAuctionsWorkModal';
 import { endSale } from './utils/endSale';
 
-import { CheckoutModal } from '../Checkout'
+import { Checkout } from '../Checkout'
 import { NextPage } from 'next'
 
 import { Elements } from '@stripe/react-stripe-js'
@@ -941,7 +941,6 @@ export const AuctionCard = ({
 
       <MetaplexOverlay visible={showEndingBidModal}>
         <Confetti />
-
         <Space
           className="metaplex-fullwidth"
           direction="vertical"
@@ -995,25 +994,18 @@ export const AuctionCard = ({
         </h3>
       </MetaplexModal>
 
-      <CheckoutModal
-        visible={showCheckoutModal}
-        onCancel={() => setShowCheckoutModal(false)}
-      >
-        <h3>
-          <CheckoutLayout title="Donate with Elements | Next.js + TypeScript Example">
-            <div className="page-container">
-              <h1>Donate with Elements</h1>
-              <p>Donate to our project 💖</p>
-              <Elements stripe={getStripe()}>
-                <ElementsForm />
-              </Elements>
-            </div>
-          </CheckoutLayout>
-        </h3>
-        <Button type="primary" onClick={() => setShowCheckoutModal(false)}>
+      <MetaplexOverlay visible={showCheckoutModal}>
+        <Space
+          className="metaplex-fullwidth"
+          direction="vertical"
+          align="center"
+        >
+          <Checkout />
+          <Button type="primary" onClick={() => setShowCheckoutModal(false)}>
             Got it
-        </Button>
-      </CheckoutModal>
+          </Button>
+        </Space>
+      </MetaplexOverlay>
     </div>
   );
 };

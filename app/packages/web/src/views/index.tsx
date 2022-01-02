@@ -8,4 +8,4 @@ export { ArtworksView } from './artworks';
 export { AnalyticsView } from './analytics';
 export { StaticPageView } from './staticPage';
 export { LandingPageView } from './landingPage';
-export { CheckoutPageView } from './checkout';
+export { CheckoutPageView } from './checkoutPage';

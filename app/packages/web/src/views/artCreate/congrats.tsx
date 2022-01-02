@@ -67,3 +67,22 @@ export const Congrats = (props: {
     </Space>
   );
 };
+/*
+<Space
+className="metaplex-fullwidth"
+direction="vertical"
+align="center"
+>
+<div>
+  <h1>Congratulations</h1>
+  <p>
+    Your {auctionView.isInstantSale ? 'purchase' : 'bid'} has been
+    redeemed, you can view your NFTs in{' '}
+    <Link to="/artworks">My Items</Link>.
+  </p>
+</div>
+<Button type="primary" onClick={() => setShowCheckoutModal(false)}>
+  Got it
+</Button>
+</Space>
+*/

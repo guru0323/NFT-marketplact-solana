@@ -1,13 +1,14 @@
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 
-import { Layout }  from '@stripe/checkout'
-import { PrintObject }  from '@stripe/checkout'
-import { Cart }  from '@stripe/checkout'
-import { ClearCart } from '@stripe/checkout'
+import { Layout } from '../../components/Stripe'
+import { PrintObject } from '../../components/Stripe'
+import { Cart } from '../../components/Stripe'
+import { ClearCart } from '../../components/Stripe'
 
-import { fetchGetJSON } from '@stripe/checkout'
+import { fetchGetJSON } from '../../utils/stripe'
 import useSWR from 'swr'
+
 
 const ResultPage: NextPage = () => {
   const router = useRouter()

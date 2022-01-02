@@ -3,6 +3,8 @@ import Head from 'next/head';
 import React from 'react';
 import '../styles/index.less';
 import '../styles/utility.css';
+import '../styles/stripe.css';
+
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <>

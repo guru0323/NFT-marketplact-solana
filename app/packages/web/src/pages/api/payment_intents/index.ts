@@ -1,15 +1,14 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import { CURRENCY, MIN_AMOUNT, MAX_AMOUNT } from '@stripe/checkout';
-import { formatAmountForStripe } from '@stripe/checkout';
+import { CURRENCY, MIN_AMOUNT, MAX_AMOUNT } from '../../../config/stripe';
+import { formatAmountForStripe } from '../../../utils/stripe';
 
 import Stripe from 'stripe';
 
 import getConfig from 'next/config';
 
 const nextConfig = getConfig();
-const { serverRuntimeConfig, publicRuntimeConfig } =
-  nextConfig.serverRuntimeConfig;
+const serverRuntimeConfig = nextConfig.serverRuntimeConfig;
 
 const stripe = new Stripe(serverRuntimeConfig.stripeSecretKey!, {
   // https://github.com/stripe/stripe-node#configuration
@@ -32,13 +31,13 @@ export default async function handler(
         payment_method_types: ['card'],
         amount: formatAmountForStripe(amount, CURRENCY),
         currency: CURRENCY,
-        description: publicRuntimeConfig.stripePaymentDescription ?? '',
+        description: serverRuntimeConfig.stripePaymentDescription ?? '',
       };
       const payment_intent: Stripe.PaymentIntent =
         await stripe.paymentIntents.create(params);
 
       res.status(200).json(payment_intent);
-    } catch (err) {
+    } catch (err: any) {
       res.status(500).json({ statusCode: 500, message: err.message });
     }
   } else {

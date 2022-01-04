@@ -3,10 +3,15 @@
  */
 import { Stripe, loadStripe } from '@stripe/stripe-js';
 
+import getConfig from 'next/config';
+
+const nextConfig = getConfig();
+const publicRuntimeConfig = nextConfig.publicRuntimeConfig;
+
 let stripePromise: Promise<Stripe | null>;
 export const getStripe = () => {
   if (!stripePromise) {
-    stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+    stripePromise = loadStripe(publicRuntimeConfig.publicStripePublishableKey!);
   }
   return stripePromise;
 };

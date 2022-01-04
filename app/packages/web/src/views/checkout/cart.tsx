@@ -1,11 +1,11 @@
 import { NextPage } from 'next'
-import { Layout } from '@stripe/checkout'
 
-import { Cart }  from '@stripe/checkout'
-import { CartSummary }  from '@stripe/checkout'
-import { Products }  from '@stripe/checkout'
+import { Layout } from '../../components/Stripe'
+import { Products } from '../../components/Stripe'
+import { Cart } from '../../components/Stripe'
+import { CartSummary } from '../../components/Stripe'
 
-const DonatePage: NextPage = () => {
+export const CartPageView: NextPage = () => {
   return (
     <Layout title="Shopping Cart | Next.js + TypeScript Example">
       <div className="page-container">
@@ -23,5 +23,3 @@ const DonatePage: NextPage = () => {
     </Layout>
   )
 }
-
-export default DonatePage

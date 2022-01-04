@@ -40,8 +40,8 @@ export default async function handler(
           allowed_countries: ['US', 'CA'],
         },
         line_items,
-        success_url: `${req.headers.origin}/result?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${req.headers.origin}/use-shopping-cart`,
+        success_url: `${req.headers.origin}/#/result/{CHECKOUT_SESSION_ID}`,
+        cancel_url: `${req.headers.origin}/#/cart`,
       };
       const checkoutSession: Stripe.Checkout.Session =
         await stripe.checkout.sessions.create(params);

@@ -37,9 +37,9 @@ export const Layout = ({
             </a>
           </Link>
           <h1>
-            <span className="light">Stripe Sample</span>
+            <span className="light">Page Header (light)</span>
             <br />
-            Next.js, TypeScript, and Stripe 🔒💸
+            Page Header
           </h1>
         </div>
       </header>
@@ -49,19 +49,19 @@ export const Layout = ({
       <span>
         This is a{' '}
         <a
-          href="https://github.com/stripe-samples"
+          href="https://www.queendom.io"
           target="_blank"
           rel="noopener noreferrer"
         >
-          Stripe Sample
+          Queendom
         </a>
-        .{' View code on '}
+        {' checkout page test, view code on '}
         <a
-          href="https://github.com/vercel/next.js/tree/canary/examples/with-stripe-typescript"
+          href="https://github.com/QueendomDAO/nft-marketplace"
           target="_blank"
           rel="noopener noreferrer"
         >
-          GitHub
+          QueendomDAO
         </a>
         .
       </span>

@@ -107,7 +107,9 @@ module.exports = withPlugins(plugins, {
   productionBrowserSourceMaps: true,
   serverRuntimeConfig: {
     nodeEnv: nextVars['nodeEnv'],
-    port: nextVars['port'],
+    port: nextVars['port'] || '3000',
+    stripePort: nextVars['stripePort'],
+    logLevel: sysVars['logLevel'] || 'info',
     gitDeployKey: sysVars['gitDeploymentKey'],
     stripeSecretKey: sysVars['stripeSecretKey'],
     stripeWebhookSecret: sysVars['stripeWebhookSecret'],
@@ -121,7 +123,7 @@ module.exports = withPlugins(plugins, {
     strictSubdomain: nextVars['strictSubdomain'],
   },
   publicRuntimeConfig: {
-    basePath: basePath,
+    basePath: basePath  || '',
     subdomain: nextVars['subdomain'],
     publicSolanaNetwork: getSolanaNetwork(),
     publicSolanaRpcHost: getSolanaRpcHost(),

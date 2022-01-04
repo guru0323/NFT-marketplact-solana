@@ -6,11 +6,12 @@ import { PrintObject } from '../../components/Stripe'
 import { Cart } from '../../components/Stripe'
 import { ClearCart } from '../../components/Stripe'
 
+
 import { fetchGetJSON } from '../../utils/stripe'
 import useSWR from 'swr'
 
 
-const ResultPage: NextPage = () => {
+export const ResultPageView: NextPage = () => {
   const router = useRouter()
 
   // Fetch CheckoutSession from static page via
@@ -38,5 +39,3 @@ const ResultPage: NextPage = () => {
     </Layout>
   )
 }
-
-export default ResultPage

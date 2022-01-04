@@ -4,6 +4,8 @@ import fs from 'fs';
 import next from 'next';
 import getConfig from 'next/config';
 
+import logger from './src/logger';
+import {app as stripeApp } from './src/api/app';
 
 let nextConfig = getConfig();
 const serverRuntimeConfig = nextConfig.serverRuntimeConfig;
@@ -34,4 +36,8 @@ app.prepare().then(() => {
       dev ? 'development' : serverRuntimeConfig.nodeEnv
     }`,
   );
+});
+
+stripeApp.listen(stripeApp.get('port'), (): void => {
+  logger.info(`🌏 Express server started at http://localhost:${stripeApp.get('port')}`);
 });

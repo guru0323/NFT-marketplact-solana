@@ -67,13 +67,14 @@ import { HowAuctionsWorkModal } from '../HowAuctionsWorkModal';
 import { endSale } from './utils/endSale';
 
 import { Checkout } from '../Checkout'
-import { NextPage } from 'next'
+import { webhookHandler } from '../../pages/api/webhooks'
+import * as config from '../../config/stripe'
 
-import { Elements } from '@stripe/react-stripe-js'
-import { getStripe }  from '@stripe/checkout'
-import { Layout as CheckoutLayout }  from '@stripe/checkout'
-import { ElementsForm }  from '@stripe/checkout'
+import { fetchPostJSON } from '../../utils/stripe'
+import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
 
+
+var currentCheckout = new Checkout();
 
 const { Text } = Typography;
 
@@ -230,6 +231,7 @@ export const AuctionCard = ({
   const [solLoading, setSolLoading] = useState<boolean>(false);
   const [fiatLoading, setFiatLoading] = useState<boolean>(false);
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
+  const [showCheckoutResult, setShowCheckoutResult] = useState(false);
 
   const [showRedeemedBidModal, setShowRedeemedBidModal] =
     useState<boolean>(false);
@@ -480,6 +482,17 @@ export const AuctionCard = ({
     }
   };
 
+  const [showStripeInput, setStripeInput] = useState({
+    customDonation: Math.round(config.MAX_AMOUNT / config.AMOUNT_STEP),
+    cardholderName: '',
+   });
+   
+   const [payment, setPayment] = useState({ status: 'initial' });
+   const [errorMessage, setErrorMessage] = useState('');
+
+//   const stripe = useStripe()
+//   const elements = useElements()
+
   const instantFiatSale = async () => {
     setFiatLoading(true);
 
@@ -511,7 +524,57 @@ export const AuctionCard = ({
           console.error('sendPlaceBid', e);
           return;
         }
+        console.log(`setShowCheckoutResult: ${setShowCheckoutResult.toString}`);
+        if ({ setShowCheckoutResult } ) {
+          try {
+            console.log('trying...');
+      //      var testStripe = currentCheckout.stripe;
+            console.log(`event0: ${Object.keys(currentCheckout)}`);
+            console.log(`event1: ${Object.keys(currentCheckout.state)}`);
+            console.log(`event2: ${currentCheckout.state}`);
+            console.log(`event3: ${Object.keys(currentCheckout.state.stripeState)}`);
+            console.log(`event4: ${currentCheckout.state.stripeState}`);
+            console.log(`event5: ${currentCheckout.state.stripeState}`);
+            console.log(`event5: ${currentCheckout.state.showStripeElements}`);
+       //     console.log(`props: ${Object.keys(currentCheckout.props)}`);
+       //     console.log(`props: ${currentCheckout.props}`);
+       //     console.log(`stripe: ${Object.keys(currentCheckout.props.stripe)}`);
+       //     console.log(`paymentStatus: ${Object.keys(currentCheckout.props.paymentStatus)}`);
+       //     console.log(`showErrorMessage: ${Object.keys(currentCheckout.props.showErrorMessage)}`);
+       //     console.log(`showStripeInput: ${Object.keys(currentCheckout.props.showStripeInput)}`);
+      //      console.log(`event2: ${Object.keys(currentCheckout.state)}`);
+       //     console.log(`event0: ${Object.keys(currentCheckout.stripePromise())}`);
+       //     console.log(`event1: ${testStripe}`);
+       //     console.log(`event1: ${Object.keys(currentCheckout.getStripe())}`);
+       //     console.log(`event2: ${Object.keys(currentCheckout.stripe)}`);
+       //     console.log(`event2: ${Object.keys(testStripe)}`);
+       //     const e = await testStripe.then;
+        //    console.log(`event3: ${e}`);
+        //    const paid = session.payment_status as any;
+        //    console.log(`paid: ${paid}`);
+        //    const response = await testStripe.then(
+         //     () => setStripeInput(true),
+//
+  //          );
+          } catch (e) {
+            console.error(`testStripe error: ${e}`);
+            setErrorMessage(e);
+          } finally {
+              setFiatLoading(false);
+          }
+          console.log('testStripe - done')
+          setShowCheckoutResult(false);
+        }
       }
+      // Verify fiat transaction
+//      const fiatTransaction = webhookHandler()
+
+  //    try {
+  //      await testStripe.then(() => set)
+  //    }
+
+     //fetchPostJSON(url: string, data?: {})
+
 
       // Claim the purchase
       try {
@@ -994,15 +1057,22 @@ export const AuctionCard = ({
         </h3>
       </MetaplexModal>
 
-      <MetaplexOverlay visible={showCheckoutModal}>
+      <MetaplexOverlay 
+        visible={showCheckoutModal}
+        onCancel={() => setShowCheckoutResult(true)}
+      >
         <Space
           className="metaplex-fullwidth"
           direction="vertical"
           align="center"
         >
-          <Checkout />
-          <Button type="primary" onClick={() => setShowCheckoutModal(false)}>
-            Got it
+          <currentCheckout.processPayment/>
+          <Button type="primary" onClick={() => {
+            setShowCheckoutModal(false),
+            setShowCheckoutResult(true) 
+            }
+          }>
+          Got it
           </Button>
         </Space>
       </MetaplexOverlay>

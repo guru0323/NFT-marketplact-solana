@@ -26,6 +26,8 @@ Build deployment:
 
 Run development deployment:
 
+Under `./app/packages/web` run:
+
 `yarn start`
 
 Or run testing deployment:

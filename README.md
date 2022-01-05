@@ -1,5 +1,13 @@
 ## Setup
 
+Switch to the dev branch:
+
+`git checkout dev`
+
+You can clone dev directly via:
+
+`git clone --branch dev git@github.com:QueendomDAO/nft-marketplace.git`
+
 Initialize the environment by creating a conda environment:
 
 `conda env create -f environment.yaml`
@@ -10,7 +18,7 @@ activate:
 
 ## Installation
 
-Be sure to be running Node v14.17.6 and yarn version 1.22.10.
+Be sure to be running Node 14 version v14.17.4 or above and at least yarn version 1.22.10.
 
 Copy env file:
 

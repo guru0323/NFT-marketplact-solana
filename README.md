@@ -1,5 +1,9 @@
 ## Setup
 
+Switch to the dev branch:
+
+`git checkout dev`
+
 Initialize the environment by creating a conda environment:
 
 `conda env create -f environment.yaml`

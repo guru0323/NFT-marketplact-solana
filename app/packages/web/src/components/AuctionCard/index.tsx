@@ -536,13 +536,14 @@ export const AuctionCard = ({
           try {
             console.log('trying...');
             var testStripe = currentCheckout.stripe;
-            testStripe.confirmCardPayment(clientSecret).then(function(response) {
+/*            testStripe.confirmCardPayment(clientSecret).then(function(response) {
               if (response.error) {
                 // Handle error here
               } else if (response.paymentIntent && response.paymentIntent.status === 'succeeded') {
                 // Handle successful payment here
               }
             });
+*/
             console.log(`event0: ${Object.keys(currentCheckout)}`);
             console.log(`event1: ${Object.keys(currentCheckout.state)}`);
             console.log(`event2: ${currentCheckout.state}`);

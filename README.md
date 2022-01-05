@@ -36,7 +36,7 @@ Run development deployment:
 
 Under `./app/packages/web` run:
 
-`yarn start`
+`yarn dev` to increase verbosity or run `yarn start` to show default console outputs
 
 Or run testing deployment:
 

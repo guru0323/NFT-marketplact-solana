@@ -74,7 +74,7 @@ export function fetchPostJSON(url, data) {
                         })];
                 case 1:
                     response = _a.sent();
-                    return [4 /*yield*/, response.json()]; // parses JSON response into native JavaScript objects
+                    return [4 /*yield*/, response.json()];
                 case 2: return [2 /*return*/, _a.sent()]; // parses JSON response into native JavaScript objects
                 case 3:
                     err_2 = _a.sent();

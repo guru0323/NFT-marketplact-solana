@@ -9,7 +9,7 @@ type Props = {
 
 export const Layout = ({
   children,
-  title = 'TypeScript Next.js Stripe Example',
+  title = 'Page Title',
 }: Props) => (
   <>
     <Head>

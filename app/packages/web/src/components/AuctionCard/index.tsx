@@ -73,6 +73,11 @@ import * as config from '../../config/stripe'
 import { fetchPostJSON } from '../../utils/stripe'
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
 
+import { getStripe } from '../../utils/stripe'
+import getConfig from 'next/config';
+
+const nextConfig = getConfig();
+const publicRuntimeConfig = nextConfig.publicRuntimeConfig;
 
 var currentCheckout = new Checkout();
 
@@ -515,6 +520,8 @@ export const AuctionCard = ({
         !isAuctionManagerAuthorityNotWalletOwner &&
         isAuctionItemMaster;
 
+      const stripe = await getStripe();
+
       // Placing a "bid" of the full amount results in a purchase to redeem.
       if (instantSalePrice && (allowBidToPublic || allowBidToAuctionOwner)) {
         try {
@@ -528,7 +535,14 @@ export const AuctionCard = ({
         if ({ setShowCheckoutResult } ) {
           try {
             console.log('trying...');
-      //      var testStripe = currentCheckout.stripe;
+            var testStripe = currentCheckout.stripe;
+            testStripe.confirmCardPayment(clientSecret).then(function(response) {
+              if (response.error) {
+                // Handle error here
+              } else if (response.paymentIntent && response.paymentIntent.status === 'succeeded') {
+                // Handle successful payment here
+              }
+            });
             console.log(`event0: ${Object.keys(currentCheckout)}`);
             console.log(`event1: ${Object.keys(currentCheckout.state)}`);
             console.log(`event2: ${currentCheckout.state}`);

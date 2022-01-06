@@ -49,6 +49,9 @@ Or run production deployment:
 You may have to rebuild your package more than one time to secure a
 running environment.
 
+## Utilize
+
+Create a Solana Phantom wallet and fund it by [airdroping](https://solfaucet.com/) 1 SOL to your devnet address. Make sure to click `DEVNET` on the faucet, or the network you're using.
 
 ## Reset
 

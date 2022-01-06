@@ -319,11 +319,9 @@ export class Checkout extends React.Component<
     this.getStripe();
     return (
       <Space className="metaplex-fullwidth" direction="vertical" align="center">
-        <Space className="metaplex-space-align-stretch" direction="vertical">
+        <Space className="metaplex-space-align-stretch modal_container" direction="vertical">
           <Layout title="Page Title">
-            <div className="page-container">
-              <h1>Page Container</h1>
-              <p>Page Text</p>
+            <div className="modal_content">
               <Elements stripe = { this.stripe! } >
                 <ElementsForm />
               </Elements>

@@ -137,3 +137,6 @@ Ref:
 
 Any content produced by Solana, or developer resources that Solana provides, are for educational and inspiration purposes only. Solana does not encourage, induce or sanction the deployment of any such applications in violation of applicable laws or regulations.
 
+## Acknowledgements
+
+This codebase is derived from [akkoro-client](https://github.com/AKKOROWEB/akkoro-client). Thank you [Warren Gates](https://github.com/Moikapy) for publishing it under Apache 2.0!.

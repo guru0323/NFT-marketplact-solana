@@ -1,12 +1,32 @@
 {
   "private": true,
+  "name": "nft-marketplace",
+  "description": "A web3 enabled NFT marketplace",
+  "version": "0.0.1",
+  "author": "Queendom PBC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/QueendomDAO/nft-marketplace"
+  },
+  "contributors": [
+    {
+      "name": "Warren Gates",
+      "email": "warrencgates@devmoi.com",
+      "url": "https://github.com/Moikapy"
+    },
+    {
+      "name": "Phillip Strefling",
+      "email": "phillip@queendom.io",
+      "url": "https://github.com/circlenaut/"
+    }
+  ],
+  "license": "Apache-2.0",
+  "keywords": [],
   "workspaces": {
     "packages": [
       "packages/*"
     ]
   },
-  "keywords": [],
-  "license": "Apache-2.0",
   "scripts": {
     "bootstrap": "lerna link && lerna bootstrap",
     "build": "lerna run build --scope web --scope '{@oyster/common,@stripe/checkout}'",

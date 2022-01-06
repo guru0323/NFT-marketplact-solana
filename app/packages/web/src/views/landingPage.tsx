@@ -105,40 +105,6 @@ export const LandingPageView = () => {
               <h1 className={`p-3`}>{storefront.meta.title}</h1>
               <p className={`p-2`}>{storefront.meta.description}</p>
               <div className={`mt-5 mx-auto`}>
-                <InstructionsModal
-                  buttonText='Get Started'
-                  modalTitle={`Buying NFTs on the Queendom`}
-                  cardProps={[
-                    {
-                      title: 'Create a SOL wallet',
-                      imgSrc: '/modals/how-to-buy-1.svg',
-                      description: `SOL is the cryptocurrency we use for purchases on the Queendom. To keep your SOL safe, you’ll need a crypto wallet—we recommend using one called Phantom. Just head to Phantom’s site, install the Chrome extension, and create an account.`,
-                    },
-                    {
-                      title: 'Add funds to your wallet',
-                      imgSrc: '/modals/how-to-buy-2.svg',
-                      description: `To fund your wallet, you’ll need to purchase SOL tokens. The easiest way is with a credit card on FTX Pay—a service that’s already part of your new Phantom wallet. Open your wallet, tap “Deposit SOL”, and select “Deposit from FTX”. A new window will open where you can create an FTX account and purchase SOL.`,
-                    },
-                    {
-                      title: `Connect your wallet to the Queendom.`,
-                      imgSrc: '/modals/how-to-buy-3.jpg',
-                      description: `To connect your wallet, tap “Connect Wallet” here on the site. Select the Phantom option, and your wallet will connect. After that, you can start bidding on NFTs.`,
-                      endElement: <ConnectButton />,
-                    },
-                  ]}
-                />
-                <Link to='/explore'>
-                  <button className='btn btn-outline-light landing-page-btn-explore text-uppercase m-2'>
-                    explore
-                  </button>
-                </Link>
-                <Link to='/artworks/new'>
-                  <button
-                    title={'Coming Soon'}
-                    className='btn btn-outline-light landing-page-btn-create text-uppercase mx-0 mb-2 m-md-2'>
-                    create
-                  </button>
-                </Link>
               </div>
             </div>
             <div

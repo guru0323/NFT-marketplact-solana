@@ -97,7 +97,7 @@ export const AdminView = () => {
     (async () => {
       const [creatorsState, auctionManagerState] = await Promise.all([
         loadCreators(connection),
-        loadAuctionManagers(connection, '5c3giFv3iBYNfTSepJkZ25krZF1bQGdDLNmXF2RQ6Dhq' as string),
+        loadAuctionManagers(connection, storeAddress as string),
       ]);
       const auctionsState = await loadAuctionsForAuctionManagers(
         connection,
@@ -150,7 +150,7 @@ export const AdminView = () => {
                 <b>packages/web/.env</b> and restart yarn or redeploy
               </p>
               <SetupVariables
-                storeAddress={'5c3giFv3iBYNfTSepJkZ25krZF1bQGdDLNmXF2RQ6Dhq'}
+                storeAddress={publicRuntimeConfig.publicStoreAddress}
                 storeOwnerAddress={wallet.publicKey?.toBase58()}
               />
             </>
@@ -335,6 +335,7 @@ function InnerAdminView({
       ),
     },
   ];
+  
 
   return (
     <Content>

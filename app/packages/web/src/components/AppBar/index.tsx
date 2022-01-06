@@ -1,11 +1,13 @@
 import {ConnectButton, useStore} from '@oyster/common';
 import {useWallet} from '@solana/wallet-adapter-react';
 import {Col, Menu, Row, Space} from 'antd';
-import React, {ReactNode, useMemo} from 'react';
+import React, {ReactNode, useMemo, useState} from 'react';
 import {Link, matchPath, useLocation} from 'react-router-dom';
 import {Cog, CurrentUserBadge} from '../CurrentUserBadge';
 import {HowToBuyModal} from '../HowToBuyModal';
 import {Notifications} from '../Notifications';
+import { useMeta } from '../../contexts';
+
 type P = {
   logo: string;
 };
@@ -15,6 +17,17 @@ export const AppBar = (props: P) => {
   const location = useLocation();
   const locationPath = location.pathname.toLowerCase();
   const {ownerAddress} = useStore();
+  
+  const { store, whitelistedCreatorsByCreator, isLoading, patchState } =
+  useMeta();
+
+  const activatedCreators = Object.values(whitelistedCreatorsByCreator).filter(
+    (e) => {
+      if ( !e.info.activated ) { return };
+      return e.info.address;
+    },
+  );
+  
 
   // Array of menu item descriptions
   const menuInfo: {
@@ -67,7 +80,34 @@ export const AppBar = (props: P) => {
           {path: '/artworks', exact: false},
         ],
       },
+      {
+        key: 'learn',
+        title: 'Learn',
+        link: '/learn',
+        exact: true,
+        alt: [{path: '/auction', exact: false}],
+      },
     ];
+
+    const isActivatedCreator = Object.values(activatedCreators).some(
+      (e) => {
+        console.log(`${e.info.address} - ${publicKey?.toBase58()}`);
+        return e.info.address === publicKey?.toBase58();
+      },
+    );
+
+    if ( isActivatedCreator ) {
+      menu = [
+        {
+          key: 'create',
+          title: 'Create',
+          link: '/artworks/new',
+          exact: true,
+          alt: [],
+        },
+        ...menu,
+      ];
+    }
 
     if (connected) {
       menu = [
@@ -159,7 +199,9 @@ export const AppBar = (props: P) => {
             )}
           </Space>
         </Col>
+        { }
       </Row>
     </>
   );
 };
+

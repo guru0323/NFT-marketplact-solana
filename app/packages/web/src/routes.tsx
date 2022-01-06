@@ -14,6 +14,7 @@ import {
   CheckoutPageView,
   ResultPageView,
   CartPageView,
+  LearnPageView,
 } from './views';
 import { AdminView } from './views/admin';
 import { BillingView } from './views/auction/billing';
@@ -64,6 +65,7 @@ export function Routes({storefront}: RoutesProps) {
             <Route path='/result/:sessionId' component={() => <ResultPageView />} />
             <Route path='/about' component={() => <StaticPageView />} />
             <Route path='/explore' component={() => <HomeView />} />
+            <Route path='/learn' component={() => <LearnPageView />} />
             <Route path='/' component={() => <LandingPageView />} />
           </Switch>
         </Providers>

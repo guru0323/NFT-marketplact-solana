@@ -96,7 +96,7 @@ export const AppBar = (props: P) => {
       },
     );
 
-    if ( isActivatedCreator ) {
+    if ( isActivatedCreator || publicKey?.toBase58() === ownerAddress){
       menu = [
         {
           key: 'create',

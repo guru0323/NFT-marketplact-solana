@@ -67,6 +67,7 @@ export const SetupView = () => {
     history.push('/admin');
   };
 
+  // @TODO SetupVariables is not getting called on store init, redirecting directly to admin page
   return (
     <Row justify="center">
       <Col xs={24} md={18} lg={14}>

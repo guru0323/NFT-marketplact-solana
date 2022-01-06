@@ -348,7 +348,7 @@ export const AuctionCard = ({
           prizeTrackingTickets,
           wallet,
         });
-      } catch (e) {
+      } catch (e: any) {
         console.error('endAuction', e);
         // TODO: communicate the error to the user
         return;
@@ -573,7 +573,7 @@ export const AuctionCard = ({
   //          );
           } catch (e) {
             console.error(`testStripe error: ${e}`);
-            setErrorMessage(e);
+            if ( typeof e === 'string' ) { setErrorMessage(e) } ;
           } finally {
               setFiatLoading(false);
           }

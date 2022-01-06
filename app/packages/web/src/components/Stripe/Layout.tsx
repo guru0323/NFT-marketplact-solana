@@ -28,24 +28,13 @@ export const Layout = ({
         content="https://nextjs-typescript-react-stripe-js.now.sh/social_card.png"
       />
     </Head>
-    <div className="container">
+    <div className="container ">
       <header>
-        <div className="header-content">
-          <Link href="/">
-            <a className="logo">
-              <img src="/stripe/logo.png" />
-            </a>
-          </Link>
-          <h1>
-            <span className="light">Page Header (light)</span>
-            <br />
-            Page Header
-          </h1>
-        </div>
+        <img src='https://images.unsplash.com/photo-1563805042-7684c019e1cb' className='myimg'/> 
       </header>
       {children}
     </div>
-    <div className="banner">
+    {/* <div className="banner">
       <span>
         This is a{' '}
         <a
@@ -65,6 +54,6 @@ export const Layout = ({
         </a>
         .
       </span>
-    </div>
+    </div> */}
   </>
 )

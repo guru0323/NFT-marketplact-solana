@@ -1,4 +1,4 @@
-/* Variables */
+Variables
 :root {
   --body-color: #fcfdfe;
   --checkout-color: #8f6ed5;
@@ -170,6 +170,7 @@ button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
 
 .elements-style {
   color: var(--elements-color);

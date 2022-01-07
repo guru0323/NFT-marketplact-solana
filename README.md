@@ -59,7 +59,7 @@ Create a Solana Phantom wallet and fund it by [airdroping](https://solfaucet.com
 
 Use a reverse proxy to access outside localhost:
 
-`sudo caddy reverse-proxy --from 0.0.0.0 --to 127.0.0.1:3000`
+`sudo caddy reverse-proxy --from <Your IP> --to 127.0.0.1:3000`
 
 ## Reset
 

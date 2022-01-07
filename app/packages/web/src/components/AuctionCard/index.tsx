@@ -552,7 +552,6 @@ export const AuctionCard = ({
             console.log(`event4: ${currentCheckout.state.stripeState}`);
             console.log(`event5: ${currentCheckout.state.stripeState}`);
             console.log(`event5: ${currentCheckout.state.showStripeElements}`);
-            */
   
        //     console.log(`props: ${Object.keys(currentCheckout.props)}`);
        //     console.log(`props: ${currentCheckout.props}`);

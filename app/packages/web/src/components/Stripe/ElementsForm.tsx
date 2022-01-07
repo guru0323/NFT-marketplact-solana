@@ -10,6 +10,8 @@ import { PrintObject } from './PrintObject';
 import { fetchPostJSON } from '../../utils/stripe';
 import { formatAmountForDisplay } from '../../utils/stripe';
 import * as config from '../../config/stripe';
+import { Spin } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
 
 import {
   CardElement,
@@ -54,19 +56,27 @@ export const ElementsForm = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const stripe = useStripe();
   const elements = useElements();
-
+  const antIcon = (
+    <LoadingOutlined style={{ fontSize: 24, color: '#356d9bff' }} spin />
+  );
   const PaymentStatus = ({ status }: { status: string }) => {
     switch (status) {
       case 'processing':
       case 'requires_payment_method':
       case 'requires_confirmation':
-        return <h2>Processing...</h2>;
+        return (
+          <div className="payment_process">
+            <h2>Processing</h2>
+
+            <Spin indicator={antIcon} style={{ marginLeft: '10px' }} />
+          </div>
+        );
 
       case 'requires_action':
         return <h2>Authenticating...</h2>;
 
       case 'succeeded':
-        return <h2>Payment Succeeded 🥳</h2>;
+        return <h2>Done</h2>;
 
       case 'error':
         return (
@@ -144,7 +154,14 @@ export const ElementsForm = () => {
         /> */}
         {/* <StripeTestCards /> */}
         <fieldset className="elements-style">
-          <legend>Your payment details:</legend>
+          <div className='modal_header'>
+            <label>
+              Card &<br /> billing
+            </label>
+            <img src="/img/golden.png" style={{'width':'50px', 'height':'30px'}}/>
+          <img src='/img/solana-sol-logo.png' style={{'width':'40px', 'height':'40px'}}/>
+          
+          </div>
           <hr />
           <label htmlFor="cardholderName">First Name: </label>
           <input
@@ -155,7 +172,7 @@ export const ElementsForm = () => {
             onChange={handleInputChange}
             required
           />
-          <hr />
+          <hr className="transparent_line" />
           <label htmlFor="cardholderName">Last Name: </label>
           <input
             placeholder="Last Name"
@@ -165,7 +182,7 @@ export const ElementsForm = () => {
             onChange={handleInputChange}
             required
           />
-          <hr />
+          <hr className="transparent_line" />
           <label htmlFor="cardholderName">Email: </label>
           <input
             placeholder="Cardholder Email"
@@ -175,7 +192,7 @@ export const ElementsForm = () => {
             onChange={handleInputChange}
             required
           />
-          <hr />
+          <hr className="transparent_line" />
           <label htmlFor="cardholderName">Address: </label>
           <input
             placeholder="Cardholder Address"
@@ -189,11 +206,15 @@ export const ElementsForm = () => {
 
           <div className=" elements-style card_panel">
             <div
-              style={{ padding: '3px', border: '1px solid', display: 'flex' }}
+              style={{
+                padding: '3px',
+                border: '1px solid',
+                display: 'flex',
+                borderRadius: '5px 5px 0 0',
+              }}
             >
               <CardIcon />
-              <div className='card_element'>
-            
+              <div className="card_element">
                 <CardNumberElement
                   options={CARD_OPTIONS}
                   onChange={e => {
@@ -208,53 +229,57 @@ export const ElementsForm = () => {
               </div>
             </div>
             <div style={{ display: 'flex' }}>
-              <div className="card_items">
-                <CalendarIcon/>
-                <div className='card_element'>
-                <CardExpiryElement
-                  options={CARD_OPTIONS}
-                  onChange={e => {
-                    if (e.error) {
-                      setPayment({ status: 'error' });
-                      setErrorMessage(
-                        e.error.message ?? 'An unknown error occured',
-                      );
-                    }
-                  }}
-                />
+              <div className="card_items" style={{ borderRadius: '0 0 0 5px' }}>
+                <CalendarIcon />
+                <div className="card_element">
+                  <CardExpiryElement
+                    options={CARD_OPTIONS}
+                    onChange={e => {
+                      if (e.error) {
+                        setPayment({ status: 'error' });
+                        setErrorMessage(
+                          e.error.message ?? 'An unknown error occured',
+                        );
+                      }
+                    }}
+                  />
                 </div>
               </div>
-              <div className="card_items">
-                <LockIcon/>
-                <div className='card_element'>
-                <CardCvcElement
-                  options={CARD_OPTIONS}
-                  onChange={e => {
-                    if (e.error) {
-                      setPayment({ status: 'error' });
-                      setErrorMessage(
-                        e.error.message ?? 'An unknown error occured',
-                      );
-                    }
-                  }}
-                />
+              <div className="card_items" style={{ borderRadius: '0 0 5px 0' }}>
+                <LockIcon />
+                <div className="card_element">
+                  <CardCvcElement
+                    options={CARD_OPTIONS}
+                    onChange={e => {
+                      if (e.error) {
+                        setPayment({ status: 'error' });
+                        setErrorMessage(
+                          e.error.message ?? 'An unknown error occured',
+                        );
+                      }
+                    }}
+                  />
                 </div>
               </div>
             </div>
           </div>
         </fieldset>
-         <button
-          className="elements-style-background purhcase_button"
-          type="submit"
-          disabled={
-            !['initial', 'succeeded', 'error'].includes(payment.status) ||
-            !stripe
-          }
-        >
-          Purchase 
-        </button>
+        {payment.status === 'initial' ? (
+          <button
+            className="elements-style-background purhcase_button"
+            type="submit"
+            disabled={
+              !['initial', 'succeeded', 'error'].includes(payment.status) ||
+              !stripe
+            }
+          >
+            Purchase
+          </button>
+        ) : (
+          <PaymentStatus status={payment.status} />
+        )}
       </form>
-      <PaymentStatus status={payment.status} />
+
       {/* <PrintObject content={payment} /> */}
     </>
   );

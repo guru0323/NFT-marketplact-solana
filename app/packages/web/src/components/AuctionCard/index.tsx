@@ -41,7 +41,13 @@ import {
 } from 'antd';
 import BN from 'bn.js';
 import moment from 'moment';
-import React, { useCallback, useEffect, useMemo, useState, createContext} from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  createContext,
+} from 'react';
 import { Link } from 'react-router-dom';
 import { sendCancelBid } from '../../actions/cancelBid';
 import { findEligibleParticipationBidsForRedemption } from '../../actions/claimUnusedPrizes';
@@ -66,14 +72,14 @@ import { Confetti } from '../Confetti';
 import { HowAuctionsWorkModal } from '../HowAuctionsWorkModal';
 import { endSale } from './utils/endSale';
 
-import { Checkout } from '../Checkout'
-import { webhookHandler } from '../../pages/api/webhooks'
-import * as config from '../../config/stripe'
+import { Checkout } from '../Checkout';
+import { webhookHandler } from '../../pages/api/webhooks';
+import * as config from '../../config/stripe';
 
-import { fetchPostJSON } from '../../utils/stripe'
-import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
+import { fetchPostJSON } from '../../utils/stripe';
+import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
-import { getStripe } from '../../utils/stripe'
+import { getStripe } from '../../utils/stripe';
 import getConfig from 'next/config';
 
 const nextConfig = getConfig();
@@ -302,7 +308,7 @@ export const AuctionCard = ({
     auctionView.auctionManager.participationConfig?.fixedPrice || 0;
   const participationOnly =
     auctionView.auctionManager.numWinners.toNumber() === 0;
-  
+
   const hasBids = bids.length > 0;
   const minBid =
     (isUpcoming || bids.length === 0
@@ -310,10 +316,17 @@ export const AuctionCard = ({
           participationOnly ? participationFixedPrice : priceFloor,
           mintInfo,
         )
-      : isStarted && bids.length > 0 ? parseFloat(formatTokenAmount(bids[0].info.lastBid.toNumber(), mintInfo)) : 9999999) + (tickSize && hasBids ? (tickSize.toNumber() / LAMPORTS_PER_SOL) : 0);
-  const biddingPower = balance.balance + (auctionView.myBidderMetadata ? (auctionView.myBidderMetadata.info.lastBid.toNumber() / LAMPORTS_PER_SOL) : 0);
-  
-  const notEnoughFundsToBid = value && (value > biddingPower);
+      : isStarted && bids.length > 0
+      ? parseFloat(formatTokenAmount(bids[0].info.lastBid.toNumber(), mintInfo))
+      : 9999999) +
+    (tickSize && hasBids ? tickSize.toNumber() / LAMPORTS_PER_SOL : 0);
+  const biddingPower =
+    balance.balance +
+    (auctionView.myBidderMetadata
+      ? auctionView.myBidderMetadata.info.lastBid.toNumber() / LAMPORTS_PER_SOL
+      : 0);
+
+  const notEnoughFundsToBid = value && value > biddingPower;
   const invalidBid =
     tickSizeInvalid ||
     notEnoughFundsToBid ||
@@ -490,13 +503,13 @@ export const AuctionCard = ({
   const [showStripeInput, setStripeInput] = useState({
     customDonation: Math.round(config.MAX_AMOUNT / config.AMOUNT_STEP),
     cardholderName: '',
-   });
-   
-   const [payment, setPayment] = useState({ status: 'initial' });
-   const [errorMessage, setErrorMessage] = useState('');
+  });
 
-//   const stripe = useStripe()
-//   const elements = useElements()
+  const [payment, setPayment] = useState({ status: 'initial' });
+  const [errorMessage, setErrorMessage] = useState('');
+
+  //   const stripe = useStripe()
+  //   const elements = useElements()
 
   const instantFiatSale = async () => {
     setFiatLoading(true);
@@ -532,13 +545,13 @@ export const AuctionCard = ({
           return;
         }
         console.log(`setShowCheckoutResult: ${setShowCheckoutResult.toString}`);
-        if ({ setShowCheckoutResult } ) {
+        if ({ setShowCheckoutResult }) {
           try {
             console.log('trying...');
 
             var testStripe = currentCheckout.stripe;
-            /*
-            testStripe.confirmCardPayment(clientSecret).then(function(response) {
+            /*            testStripe.confirmCardPayment(clientSecret).then(function(response) {
+
               if (response.error) {
                 // Handle error here
               } else if (response.paymentIntent && response.paymentIntent.status === 'succeeded') {
@@ -548,51 +561,50 @@ export const AuctionCard = ({
           console.log(`event0: ${Object.keys(currentCheckout)}`);
             console.log(`event1: ${Object.keys(currentCheckout.state)}`);
             console.log(`event2: ${currentCheckout.state}`);
-            console.log(`event3: ${Object.keys(currentCheckout.state.stripeState)}`);
+            console.log(
+              `event3: ${Object.keys(currentCheckout.state.stripeState)}`,
+            );
             console.log(`event4: ${currentCheckout.state.stripeState}`);
             console.log(`event5: ${currentCheckout.state.stripeState}`);
             console.log(`event5: ${currentCheckout.state.showStripeElements}`);
-            */
-  
-       //     console.log(`props: ${Object.keys(currentCheckout.props)}`);
-       //     console.log(`props: ${currentCheckout.props}`);
-       //     console.log(`stripe: ${Object.keys(currentCheckout.props.stripe)}`);
-       //     console.log(`paymentStatus: ${Object.keys(currentCheckout.props.paymentStatus)}`);
-       //     console.log(`showErrorMessage: ${Object.keys(currentCheckout.props.showErrorMessage)}`);
-       //     console.log(`showStripeInput: ${Object.keys(currentCheckout.props.showStripeInput)}`);
-      //      console.log(`event2: ${Object.keys(currentCheckout.state)}`);
-       //     console.log(`event0: ${Object.keys(currentCheckout.stripePromise())}`);
-       //     console.log(`event1: ${testStripe}`);
-       //     console.log(`event1: ${Object.keys(currentCheckout.getStripe())}`);
-       //     console.log(`event2: ${Object.keys(currentCheckout.stripe)}`);
-       //     console.log(`event2: ${Object.keys(testStripe)}`);
-       //     const e = await testStripe.then;
-        //    console.log(`event3: ${e}`);
-        //    const paid = session.payment_status as any;
-        //    console.log(`paid: ${paid}`);
-        //    const response = await testStripe.then(
-         //     () => setStripeInput(true),
-//
-  //          );
+            //     console.log(`props: ${Object.keys(currentCheckout.props)}`);
+            //     console.log(`props: ${currentCheckout.props}`);
+            //     console.log(`stripe: ${Object.keys(currentCheckout.props.stripe)}`);
+            //     console.log(`paymentStatus: ${Object.keys(currentCheckout.props.paymentStatus)}`);
+            //     console.log(`showErrorMessage: ${Object.keys(currentCheckout.props.showErrorMessage)}`);
+            //     console.log(`showStripeInput: ${Object.keys(currentCheckout.props.showStripeInput)}`);
+            //      console.log(`event2: ${Object.keys(currentCheckout.state)}`);
+            //     console.log(`event0: ${Object.keys(currentCheckout.stripePromise())}`);
+            //     console.log(`event1: ${testStripe}`);
+            //     console.log(`event1: ${Object.keys(currentCheckout.getStripe())}`);
+            //     console.log(`event2: ${Object.keys(currentCheckout.stripe)}`);
+            //     console.log(`event2: ${Object.keys(testStripe)}`);
+            //     const e = await testStripe.then;
+            //    console.log(`event3: ${e}`);
+            //    const paid = session.payment_status as any;
+            //    console.log(`paid: ${paid}`);
+            //    const response = await testStripe.then(
+            //     () => setStripeInput(true),
+            //
+            //          );
           } catch (e) {
             console.error(`testStripe error: ${e}`);
             if ( typeof e === 'string' ) { setErrorMessage(e) } ;
           } finally {
-              setFiatLoading(false);
+            setFiatLoading(false);
           }
-          console.log('testStripe - done')
+          console.log('testStripe - done');
           setShowCheckoutResult(false);
         }
       }
       // Verify fiat transaction
-//      const fiatTransaction = webhookHandler()
+      //      const fiatTransaction = webhookHandler()
 
-  //    try {
-  //      await testStripe.then(() => set)
-  //    }
+      //    try {
+      //      await testStripe.then(() => set)
+      //    }
 
-     //fetchPostJSON(url: string, data?: {})
-
+      //fetchPostJSON(url: string, data?: {})
 
       // Claim the purchase
       try {
@@ -611,13 +623,12 @@ export const AuctionCard = ({
         setShowRedemptionIssue(true);
         return;
       }
-      if (!{ setShowCheckoutModal } ) {
+      if (!{ setShowCheckoutModal }) {
         setShowRedeemedBidModal(true);
       }
     } finally {
       setFiatLoading(false);
     }
-
   };
 
   const isOpenEditionSale =
@@ -814,8 +825,7 @@ export const AuctionCard = ({
       type="primary"
       size="large"
       block
-      loading={fiatLoading}      
-      
+      loading={fiatLoading}
       onClick={canEndInstantSale ? endInstantSale : instantFiatSale}
     >
       {!isAuctionManagerAuthorityNotWalletOwner
@@ -850,7 +860,10 @@ export const AuctionCard = ({
           />
         </Col>
         <Col flex="0 0 auto">
-          <Button disabled={solLoading} onClick={() => setShowPlaceBidUI(false)}>
+          <Button
+            disabled={solLoading}
+            onClick={() => setShowPlaceBidUI(false)}
+          >
             Cancel
           </Button>
         </Col>
@@ -948,9 +961,9 @@ export const AuctionCard = ({
             showPlaceBidUI &&
             !auctionView.isInstantSale &&
             placeBidUI}
-          {(showStartAuctionBtn
-              ? startAuctionBtn
-              : auctionView.isInstantSale && instantFiatSaleBtn)}
+          {showStartAuctionBtn
+            ? startAuctionBtn
+            : auctionView.isInstantSale && instantFiatSaleBtn}
           {showDefaultNonEndedAction &&
             (showStartAuctionBtn
               ? startAuctionBtn
@@ -963,8 +976,7 @@ export const AuctionCard = ({
               onClick={connect}
             >
               Connect wallet to{' '}
-              {auctionView.isInstantSale ? 'purchase' : 'place bid'}
-              {' '}with Sol
+              {auctionView.isInstantSale ? 'purchase' : 'place bid'} with Sol
             </Button>
           )}
 
@@ -980,7 +992,8 @@ export const AuctionCard = ({
           )}
           {notEnoughFundsToBid && (
             <Text type="danger">
-              You do not have enough funds to fulfill the bid. Your current bidding power is {biddingPower} SOL.
+              You do not have enough funds to fulfill the bid. Your current
+              bidding power is {biddingPower} SOL.
             </Text>
           )}
           {tickSizeInvalid && tickSize && (
@@ -994,9 +1007,10 @@ export const AuctionCard = ({
               bid during gap periods to be eligible.
             </Text>
           )}
-          {!solLoading && value !== undefined && showPlaceBidUI && invalidBid && (
-            <Text type="danger">Invalid amount.</Text>
-          )}
+          {!solLoading &&
+            value !== undefined &&
+            showPlaceBidUI &&
+            invalidBid && <Text type="danger">Invalid amount.</Text>}
         </Space>
       </Card>
 
@@ -1075,25 +1089,30 @@ export const AuctionCard = ({
         </h3>
       </MetaplexModal>
 
-      <MetaplexOverlay 
+  
+      <MetaplexOverlay
+        
         visible={showCheckoutModal}
-        onCancel={() => setShowCheckoutResult(true)}
+        onCancel={() => setShowCheckoutResult(false)}
+        
       >
-        <Space
-          className="metaplex-fullwidth"
-          direction="vertical"
-          align="center"
-        >
-          <currentCheckout.processPayment/>
-          <Button type="primary" onClick={() => {
+        
+          <Space
+            className="metaplex-fullwidth"
+            direction="vertical"
+            align="center"
+          >
+            <currentCheckout.processPayment />
+            {/* <Button type="primary" onClick={() => {
             setShowCheckoutModal(false),
             setShowCheckoutResult(true) 
             }
           }>
           Close
-          </Button>
-        </Space>
+          </Button> */}
+          </Space>
       </MetaplexOverlay>
-    </div>
+      </div>
+   
   );
 };

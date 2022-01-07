@@ -1087,7 +1087,7 @@ export const AuctionCard = ({
             setShowCheckoutResult(true) 
             }
           }>
-          Got it
+          Close
           </Button>
         </Space>
       </MetaplexOverlay>

@@ -243,16 +243,16 @@ export const ElementsForm = () => {
             </div>
           </div>
         </fieldset>
-        {/* <button
-          className="elements-style-background"
+         <button
+          className="elements-style-background purhcase_button"
           type="submit"
           disabled={
             !['initial', 'succeeded', 'error'].includes(payment.status) ||
             !stripe
           }
         >
-          Donate {formatAmountForDisplay(input.customDonation, config.CURRENCY)}
-        </button> */}
+          Purchase 
+        </button>
       </form>
       <PaymentStatus status={payment.status} />
       {/* <PrintObject content={payment} /> */}

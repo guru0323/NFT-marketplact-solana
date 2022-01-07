@@ -431,7 +431,7 @@ export const AuctionCard = ({
 
               const patch = await loadMultipleAccounts(
                 connection,
-                keys.map(k => k.toBase58()),
+                keys.map((k: { toBase58: () => any; }) => k.toBase58()),
                 'confirmed',
               );
 
@@ -456,7 +456,7 @@ export const AuctionCard = ({
             throw new Error("Couldn't get PlaceBid transaction");
           };
 
-          await tryPatchMeta(bidTxid);
+          await tryPatchMeta(bidTxid!);
         } catch (e) {
           console.error('update (post-sendPlaceBid)', e);
           return;
@@ -535,22 +535,25 @@ export const AuctionCard = ({
         if ({ setShowCheckoutResult } ) {
           try {
             console.log('trying...');
+
             var testStripe = currentCheckout.stripe;
-/*            testStripe.confirmCardPayment(clientSecret).then(function(response) {
+            /*
+            testStripe.confirmCardPayment(clientSecret).then(function(response) {
               if (response.error) {
                 // Handle error here
               } else if (response.paymentIntent && response.paymentIntent.status === 'succeeded') {
                 // Handle successful payment here
               }
             });
-*/
-            console.log(`event0: ${Object.keys(currentCheckout)}`);
+          console.log(`event0: ${Object.keys(currentCheckout)}`);
             console.log(`event1: ${Object.keys(currentCheckout.state)}`);
             console.log(`event2: ${currentCheckout.state}`);
             console.log(`event3: ${Object.keys(currentCheckout.state.stripeState)}`);
             console.log(`event4: ${currentCheckout.state.stripeState}`);
             console.log(`event5: ${currentCheckout.state.stripeState}`);
             console.log(`event5: ${currentCheckout.state.showStripeElements}`);
+            */
+  
        //     console.log(`props: ${Object.keys(currentCheckout.props)}`);
        //     console.log(`props: ${currentCheckout.props}`);
        //     console.log(`stripe: ${Object.keys(currentCheckout.props.stripe)}`);

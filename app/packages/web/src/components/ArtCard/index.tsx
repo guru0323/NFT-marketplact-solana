@@ -21,7 +21,7 @@ export interface ArtCardProps extends CardProps {
   description?: string;
   creators?: Artist[];
   preview?: boolean;
-  small?: boolean;
+  small?: string;
   hoverable?: boolean;
   close?: () => void;
 }

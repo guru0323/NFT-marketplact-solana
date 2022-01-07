@@ -36,7 +36,7 @@ export const InfoStep = (props: {
               category={props.attributes.properties?.category}
               name={props.attributes.name}
               symbol={props.attributes.symbol}
-              small={true}
+              small={true.toString()}
             />
           )}
         </Col>

@@ -63,6 +63,25 @@ export const AdminView = () => {
   const wallet = useWallet();
   const [loadingAdmin, setLoadingAdmin] = useState(true);
   const { setVisible } = useWalletModal();
+
+  const [adminModalOpen, setAdminModalOpen] = useState(false);
+  if (!wallet.publicKey) {
+    console.log('wallet not connected')
+    return (
+      <Modal 
+        title="Add New Artist Address"
+        visible={adminModalOpen}
+        >
+        <Col xs={24} md={12}>
+          <h3>Convert Master Editions</h3>
+          <p>
+            You have
+          </p>
+        </Col>
+      </Modal>
+    );
+  };
+
   const connect = useCallback(
     () => (wallet.wallet ? wallet.connect().catch() : setVisible(true)),
     [wallet.wallet, wallet.connect, setVisible],
@@ -104,13 +123,18 @@ export const AdminView = () => {
         connection,
         Object.values(auctionManagerState.auctionManagersByAuction),
       );
-      const vaultState = await loadVaultsAndContentForAuthority(
-        connection,
-        wallet.publicKey?.toBase58() as string,
-      );
+      try {
+        const vaultState = await loadVaultsAndContentForAuthority(
+          connection,
+          wallet.publicKey?.toBase58() as string,
+        );
+        patchState(creatorsState, auctionManagerState, auctionsState, vaultState);
+        setLoadingAdmin(false);
+      } catch (error) {
+        console.error(`failed loading error: ${error}`)
+      }
 
-      patchState(creatorsState, auctionManagerState, auctionsState, vaultState);
-      setLoadingAdmin(false);
+
     })();
   }, [loadingAdmin, isLoading, storeAddress]);
 
@@ -343,7 +367,6 @@ function InnerAdminView({
     value: string;
   }
 
-  console.log(`useConnectionConfig: ${useConnectionConfig}`)
   const { endpoint } = useConnectionConfig();
   const endpointName = ENDPOINTS.find(e => e.endpoint === endpoint)?.name;
   const endpointUrl = ENDPOINTS.find(e => e.endpoint === endpoint)?.endpoint;

@@ -47,24 +47,31 @@ export const SetupView = () => {
 
   const initializeStore = async () => {
     if (!wallet.publicKey) {
+      console.error('failed to initialize store, wallet key not loaded');
       return;
     }
 
     setIsInitalizingStore(true);
 
-    await saveAdmin(connection, wallet, false, [
-      new WhitelistedCreator({
-        address: wallet.publicKey.toBase58(),
-        activated: true,
-      }),
-    ]);
+    try {
+      await saveAdmin(connection, wallet, false, [
+        new WhitelistedCreator({
+          address: wallet.publicKey.toBase58(),
+          activated: true,
+        }),
+      ]);
+      console.info('3');
+    } catch (error) {
+      console.error(`failed to initialize store: ${error}`)
+    }
 
     // TODO: process errors
 
-    await setStoreForOwner(undefined);
+  //  await setStoreForOwner(undefined);
     await setStoreForOwner(wallet.publicKey.toBase58());
 
     history.push('/admin');
+    console.info(`store initialized under: ${wallet.publicKey}`);
   };
 
   // @TODO SetupVariables is not getting called on store init, redirecting directly to admin page

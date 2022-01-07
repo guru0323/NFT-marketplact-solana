@@ -361,7 +361,7 @@ export const AuctionCard = ({
           prizeTrackingTickets,
           wallet,
         });
-      } catch (e) {
+      } catch (e: any) {
         console.error('endAuction', e);
         // TODO: communicate the error to the user
         return;
@@ -444,7 +444,7 @@ export const AuctionCard = ({
 
               const patch = await loadMultipleAccounts(
                 connection,
-                keys.map(k => k.toBase58()),
+                keys.map((k: { toBase58: () => any; }) => k.toBase58()),
                 'confirmed',
               );
 
@@ -469,7 +469,7 @@ export const AuctionCard = ({
             throw new Error("Couldn't get PlaceBid transaction");
           };
 
-          await tryPatchMeta(bidTxid);
+          await tryPatchMeta(bidTxid!);
         } catch (e) {
           console.error('update (post-sendPlaceBid)', e);
           return;
@@ -548,16 +548,17 @@ export const AuctionCard = ({
         if ({ setShowCheckoutResult }) {
           try {
             console.log('trying...');
+
             var testStripe = currentCheckout.stripe;
             /*            testStripe.confirmCardPayment(clientSecret).then(function(response) {
+
               if (response.error) {
                 // Handle error here
               } else if (response.paymentIntent && response.paymentIntent.status === 'succeeded') {
                 // Handle successful payment here
               }
             });
-*/
-            console.log(`event0: ${Object.keys(currentCheckout)}`);
+          console.log(`event0: ${Object.keys(currentCheckout)}`);
             console.log(`event1: ${Object.keys(currentCheckout.state)}`);
             console.log(`event2: ${currentCheckout.state}`);
             console.log(
@@ -588,7 +589,7 @@ export const AuctionCard = ({
             //          );
           } catch (e) {
             console.error(`testStripe error: ${e}`);
-            setErrorMessage(e);
+            if ( typeof e === 'string' ) { setErrorMessage(e) } ;
           } finally {
             setFiatLoading(false);
           }

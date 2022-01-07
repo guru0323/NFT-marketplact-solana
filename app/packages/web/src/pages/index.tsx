@@ -46,7 +46,7 @@ export async function getServerSideProps(context: NextPageContext) {
   }
   const storefront = {
     subdomain: 'market',
-    pubkey: 'CBr3mDvvj5xEF2bAKhRo3GoBdHAzwc6ojQogTXmDrpMS',
+    pubkey: publicRuntimeConfig.publicStoreOwnerAddress,
     theme: {
       logo:
         'https://github.com/QueendomDAO/media/raw/main/logo_square.png',

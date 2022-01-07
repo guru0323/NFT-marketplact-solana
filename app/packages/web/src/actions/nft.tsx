@@ -23,7 +23,7 @@ import getConfig from 'next/config';
 
 
 let nextConfig = getConfig();
-const serverRuntimeConfig = nextConfig.serverRuntimeConfig;
+const publicRuntimeConfig = nextConfig.publicRuntimeConfig;
 
 const RESERVED_METADATA = 'metadata.json';
 
@@ -37,7 +37,8 @@ const RESERVED_METADATA = 'metadata.json';
 //   }>;
 // }
 
-const NFT_STORAGE_UPLOAD_ENDPOINT = serverRuntimeConfig.nftStorageUploadEndpoint;
+const NFT_STORAGE_UPLOAD_ENDPOINT = publicRuntimeConfig.nftStorageUploadEndpoint;
+
 export type PinFileResponse = {
   uri?: string;
   name?: string;
@@ -128,6 +129,7 @@ export const mintNFT = async (
       type: file.type,
     });
   });
+
 
   if (coverFile) {
     const coverFileUpload = uploadedFilePins.files.find(

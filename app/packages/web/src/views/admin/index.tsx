@@ -50,9 +50,10 @@ import { useAuctionManagersToCache, useNotifications } from '../../hooks';
 import Bugsnag from '@bugsnag/browser';
 import getConfig from 'next/config';
 
+import { ENDPOINTS, useConnectionConfig } from '@oyster/common';
 
-let nextConfig = getConfig();
-const publicRuntimeConfig = nextConfig.publicRuntimeConfig;
+
+const { publicRuntimeConfig } = getConfig();
 
 const { Content } = Layout;
 export const AdminView = () => {
@@ -62,6 +63,25 @@ export const AdminView = () => {
   const wallet = useWallet();
   const [loadingAdmin, setLoadingAdmin] = useState(true);
   const { setVisible } = useWalletModal();
+
+  const [adminModalOpen, setAdminModalOpen] = useState(false);
+  if (!wallet.publicKey) {
+    console.log('wallet not connected')
+    return (
+      <Modal 
+        title="Add New Artist Address"
+        visible={adminModalOpen}
+        >
+        <Col xs={24} md={12}>
+          <h3>Convert Master Editions</h3>
+          <p>
+            You have
+          </p>
+        </Col>
+      </Modal>
+    );
+  };
+
   const connect = useCallback(
     () => (wallet.wallet ? wallet.connect().catch() : setVisible(true)),
     [wallet.wallet, wallet.connect, setVisible],
@@ -97,19 +117,24 @@ export const AdminView = () => {
     (async () => {
       const [creatorsState, auctionManagerState] = await Promise.all([
         loadCreators(connection),
-        loadAuctionManagers(connection, '5c3giFv3iBYNfTSepJkZ25krZF1bQGdDLNmXF2RQ6Dhq' as string),
+        loadAuctionManagers(connection, storeAddress as string),
       ]);
       const auctionsState = await loadAuctionsForAuctionManagers(
         connection,
         Object.values(auctionManagerState.auctionManagersByAuction),
       );
-      const vaultState = await loadVaultsAndContentForAuthority(
-        connection,
-        wallet.publicKey?.toBase58() as string,
-      );
+      try {
+        const vaultState = await loadVaultsAndContentForAuthority(
+          connection,
+          wallet.publicKey?.toBase58() as string,
+        );
+        patchState(creatorsState, auctionManagerState, auctionsState, vaultState);
+        setLoadingAdmin(false);
+      } catch (error) {
+        console.error(`failed loading error: ${error}`)
+      }
 
-      patchState(creatorsState, auctionManagerState, auctionsState, vaultState);
-      setLoadingAdmin(false);
+
     })();
   }, [loadingAdmin, isLoading, storeAddress]);
 
@@ -150,7 +175,7 @@ export const AdminView = () => {
                 <b>packages/web/.env</b> and restart yarn or redeploy
               </p>
               <SetupVariables
-                storeAddress={'5c3giFv3iBYNfTSepJkZ25krZF1bQGdDLNmXF2RQ6Dhq'}
+                storeAddress={storeAddress}
                 storeOwnerAddress={wallet.publicKey?.toBase58()}
               />
             </>
@@ -159,7 +184,7 @@ export const AdminView = () => {
       ) : (
         <>
           <p>Store is not initialized</p>
-          <Link to="/">Go to initialize</Link>
+          <Link to="/explore">Go to initialize</Link>
         </>
       )}
     </>
@@ -335,10 +360,109 @@ function InnerAdminView({
       ),
     },
   ];
+  
+  interface DataType {
+    key: React.Key;
+    attribute: string;
+    value: string;
+  }
 
+  const { endpoint } = useConnectionConfig();
+  const endpointName = ENDPOINTS.find(e => e.endpoint === endpoint)?.name;
+  const endpointUrl = ENDPOINTS.find(e => e.endpoint === endpoint)?.endpoint;
+  const endpointId = ENDPOINTS.find(e => e.endpoint === endpoint)?.ChainId;
+
+  const { storefront, storeAddress } = useStore();
+  const storeConfigData: DataType[] = [
+    {
+      key: '1',
+      attribute: 'Store Title',
+      value: storefront.meta.title!,
+    },
+    {
+      key: '2',
+      attribute: 'Store Description',
+      value: storefront.meta.description!,
+    },
+    {
+      key: '3',
+      attribute: 'Store Subdomain',
+      value: storefront.subdomain!,
+    },
+    {
+      key: '4',
+      attribute: 'Store Address',
+      value: storeAddress!,
+    },
+    {
+      key: '5',
+      attribute: 'Store Public Key',
+      value: storefront.pubkey!,
+    },
+    {
+      key: '6',
+      attribute: 'Store Endpoint Name',
+      value: endpointName!,
+    },
+    {
+      key: '7',
+      attribute: 'Store Endpoint URL',
+      value: endpointUrl!,
+    },
+    {
+      key: '8',
+      attribute: 'Store Endpoint Chains',
+      value: endpointId?.toString()!,
+    },
+  ];
+
+  const configColumns = [
+    {
+      title: 'Attribute',
+      dataIndex: 'attribute',
+      render: (text: string) => <a>{text}</a>,
+    },
+    {
+      title: 'Value',
+      dataIndex: 'value',
+    },
+  ];
+
+
+  function unCamel( text: string ) {
+    const result = text.replace(/([A-Z])/g, " $1");
+    const finalResult = result.charAt(0).toUpperCase() + result.slice(1);
+    return finalResult;
+  }
+  
   return (
     <Content>
       <Col>
+      <h2>Metaplex</h2>
+      <Row>
+        {!store.info.public && (
+          <Col xs={24} md={24}>
+            <p>
+              Storefront Values
+            </p>
+            <Table
+            columns={configColumns}
+            dataSource={storeConfigData}
+          />
+            <p>
+              Public Environment Variables
+            </p>
+            <Table
+            columns={configColumns}
+            dataSource={Object.keys(publicRuntimeConfig).map(key => ({
+              key,
+              attribute: unCamel(key),
+              value: publicRuntimeConfig[key],
+            }))}
+          />
+          </Col>
+        )}
+      </Row>
         <Row>
           <h2>Whitelisted Creators</h2>
           <Col span={22}>

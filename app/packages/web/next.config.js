@@ -114,7 +114,6 @@ module.exports = withPlugins(plugins, {
     stripeSecretKey: sysVars['stripeSecretKey'],
     stripeWebhookSecret: sysVars['stripeWebhookSecret'],
     magiclinkKey: nextVars['magiclinkKey'],
-    nftStorageUploadEndpoint: nextVars['nftStorageUploadEndpoint'],
     bugsSnagApiKey: nextVars['bugsSnagApiKey'],
     enableNftPacks: nextVars['enableNftPacks'],
     splTokenMints: nextVars['splTokenMints'],
@@ -131,9 +130,10 @@ module.exports = withPlugins(plugins, {
     publicGoogleAnalyticsId: nextVars['publicGoogleAnalyticsId'],
     publicBigStore: nextVars['publicBigStore'],
     publicClientId: nextVars['publicClientId'],
-    publicStoreAddress: nextVars['storeAddress'],
+    publicStoreAddress: nextVars['publicStoreAddress'],
     publicStoreOwnerAddress: nextVars['publicStoreOwnerAddress'],
     publicStripePublishableKey: nextVars['publicStripePublishableKey'],
+    nftStorageUploadEndpoint: nextVars['nftStorageUploadEndpoint'],
   },
   async rewrites() {
     return [

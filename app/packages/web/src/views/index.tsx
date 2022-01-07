@@ -7,6 +7,7 @@ export { AuctionCreateView } from './auctionCreate';
 export { ArtworksView } from './artworks';
 export { AnalyticsView } from './analytics';
 export { StaticPageView } from './staticPage';
+export { LearnPageView } from './learnPage';
 export { LandingPageView } from './landingPage';
 export { CheckoutPageView } from './checkout';
 export { ResultPageView } from './checkout';

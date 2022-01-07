@@ -1,6 +1,14 @@
 import { StringPublicKey } from '@oyster/common';
-import { Space } from 'antd';
+import { Button, Space } from 'antd';
 import React, { useState } from 'react'
+import {
+  ReactNode,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react';
+import { useHistory } from 'react-router-dom';
 
 import { Stripe, loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js'
@@ -38,7 +46,9 @@ import { VOTE_PROGRAM_ID } from '@solana/web3.js';
 import nextSession from "next-session";
 
 
-const {serverRuntimeConfig, publicRuntimeConfig } = getConfig();
+const { publicRuntimeConfig } = getConfig();
+
+
 
 /*
 const production = serverRuntimeConfig.nodeEnv === 'production';
@@ -61,46 +71,6 @@ type CheckoutState = {
   stripeState: any;
   showStripeElements: any;
 };
-
-const stripe = new _Stripe(serverRuntimeConfig.stripeSecretKey!, {
-  // https://github.com/stripe/stripe-node#configuration
-  apiVersion: '2020-03-02',
-});
-
-const webhookSecret: string = serverRuntimeConfig.stripeWebhookSecret!;
-
-const getSession = nextSession();
-
-// Stripe requires the raw body to construct the event.
-const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
-const CARD_OPTIONS = {
-  iconStyle: 'solid' as const,
-  style: {
-    base: {
-      iconColor: '#6772e5',
-      color: '#6772e5',
-      fontWeight: '500',
-      fontFamily: 'Roboto, Open Sans, Segoe UI, sans-serif',
-      fontSize: '16px',
-      fontSmoothing: 'antialiased',
-      ':-webkit-autofill': {
-        color: '#fce883',
-      },
-      '::placeholder': {
-        color: '#6772e5',
-      },
-    },
-    invalid: {
-      iconColor: '#ef2961',
-      color: '#ef2961',
-    },
-  },
-}
 
 interface StripeInterface {
   stripe?: Promise<Stripe | null>;
@@ -240,7 +210,8 @@ export class Checkout extends React.Component<
       const stripeId = '12345'
       console.info(`------------>  loading stripe api: ${stripeId}`)
     }
-    this.setState(state =>({stripeState:  this.stripe}));
+//    this.setState(state =>({stripeState:  this.stripe}));
+    this.state.stripeState = this.stripe
     return this.stripe
     
 
@@ -340,6 +311,7 @@ export class Checkout extends React.Component<
   }) => {
     if (props.alert) {
       // TODO  - properly reset this components state on error
+      console.error('payment failed')
       return (
         <Space className="metaplex-fullwidth" direction="vertical" align="center">
           <div>

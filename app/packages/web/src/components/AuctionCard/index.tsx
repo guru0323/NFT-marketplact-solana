@@ -558,6 +558,7 @@ export const AuctionCard = ({
                 // Handle successful payment here
               }
             });
+            */
           console.log(`event0: ${Object.keys(currentCheckout)}`);
             console.log(`event1: ${Object.keys(currentCheckout.state)}`);
             console.log(`event2: ${currentCheckout.state}`);

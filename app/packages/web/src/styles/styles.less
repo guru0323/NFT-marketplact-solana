@@ -64,10 +64,23 @@
  
 }
 
+.modal_form{
+  display: flex;
+  flex-direction: column;
+}
+
 .input_form {
   float: right;
   transform: translateY(-3px);
   border-radius: 5px;
+  background: #323232ff;
+  color: white;
+  padding-left: 8px;
+  border: 1px solid white;
+}
+
+.input_form::placeholder{
+ color: white; ;
 }
 
 .card_element {
@@ -85,22 +98,28 @@
 }
 
 .card_panel {
-  width: 90%;
+  width: 100%;
   margin: auto;
-  padding: 5px 0 20px 0;
+  padding: 0 0 20px 0;
 }
 
 .modal_header {
-  font-family: Menlo, Consolas, monospace;
   display: flex;
   align-items: center;
-  justify-content: space-evenly;
+  justify-content: left;
 }
 
 .purhcase_button {
   display: flex;
   color: #323232ff;
   margin: auto;
+}
+
+.close_button{
+ position: absolute;
+ right: 55px;
+ top: 4px;
+ border-radius: 100%;
 }
 .card_items {
   display: flex;

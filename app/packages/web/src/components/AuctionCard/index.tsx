@@ -1099,18 +1099,18 @@ export const AuctionCard = ({
       >
         
           <Space
-            className="metaplex-fullwidth"
+            className="metaplex-fullwidth "
             direction="vertical"
             align="center"
           >
             <currentCheckout.processPayment />
-            {/* <Button type="primary" onClick={() => {
+            <Button className='close_button' type="primary" onClick={() => {
             setShowCheckoutModal(false),
             setShowCheckoutResult(true) 
             }
           }>
-          Close
-          </Button> */}
+          X
+          </Button>
           </Space>
       </MetaplexOverlay>
       </div>

@@ -151,19 +151,26 @@ export const ElementsForm = () => {
           step={config.AMOUNT_STEP}
           currency={config.CURRENCY}
           onChange={handleInputChange}
-        /> */}
-        {/* <StripeTestCards /> */}
-        <fieldset className="elements-style">
-          <div className='modal_header'>
-            <label>
+        /> 
+         <StripeTestCards />  */}
+        <fieldset className="elements-style  modal_form">
+          <div className="modal_header">
+            <div style={{'display':'flex','alignItems':'center'}}>
+            <h5 style={{'marginRight':'7px','fontFamily':'monospace','paddingTop':'5px'}}>
               Card &<br /> billing
-            </label>
-            <img src="/img/golden.png" style={{'width':'50px', 'height':'30px'}}/>
-          <img src='/img/solana-sol-logo.png' style={{'width':'40px', 'height':'40px'}}/>
-          
+            </h5>
+            <img
+              src="/img/golden.png"
+              style={{ width: '62px', height: '40px' }}
+            />
+            </div>
+            <img
+              src="/img/solana-sol-logo.png"
+              style={{ width: '40px', height: '40px','marginLeft':'20px' }}
+            />
           </div>
-          <hr />
-          <label htmlFor="cardholderName">First Name: </label>
+          <hr className="transparent_line" />
+          {/* <label htmlFor="cardholderName">First Name: </label> */}
           <input
             placeholder="First Name"
             className="elements-style input_form"
@@ -173,36 +180,46 @@ export const ElementsForm = () => {
             required
           />
           <hr className="transparent_line" />
-          <label htmlFor="cardholderName">Last Name: </label>
+          {/* <label htmlFor="cardholderLastName">Last Name: </label> */}
           <input
             placeholder="Last Name"
             className="elements-style input_form"
             type="Text"
-            name="cardholderName"
+            name="cardholderLastName"
             onChange={handleInputChange}
             required
           />
           <hr className="transparent_line" />
-          <label htmlFor="cardholderName">Email: </label>
+          {/* <label htmlFor="cardholderEmail">Email: </label> */}
           <input
             placeholder="Cardholder Email"
             className="elements-style input_form"
             type="email"
-            name="cardholderName"
+            name="cardholderEmail"
             onChange={handleInputChange}
             required
           />
           <hr className="transparent_line" />
-          <label htmlFor="cardholderName">Address: </label>
+          {/* <label htmlFor="cardholderAddress">Address: </label> */}
           <input
             placeholder="Cardholder Address"
             className="elements-style input_form"
             type="text"
-            name="cardholderName"
+            name="cardholderAddress"
             onChange={handleInputChange}
             required
           />
-          <hr />
+          <hr className="transparent_line" />
+          {/* <label htmlFor="cardholderAddress">Address: </label> */}
+          <input
+            placeholder="Cardholder Zipcode"
+            className="elements-style input_form"
+            type="number"
+            name="cardholderZipcode"
+            onChange={handleInputChange}
+            required
+          />
+          <hr className="transparent_line" />
 
           <div className=" elements-style card_panel">
             <div

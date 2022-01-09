@@ -67,7 +67,6 @@ export const ElementsForm = () => {
         return (
           <div className="payment_process">
             <h2>Processing</h2>
-
             <Spin indicator={antIcon} style={{ marginLeft: '10px' }} />
           </div>
         );

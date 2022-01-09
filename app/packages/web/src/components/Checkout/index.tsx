@@ -121,17 +121,25 @@ export class Checkout extends React.Component<
   }
   
   getPaymentStatus = ({ status }: { status: string }) => {
+    const antIcon = (
+      <LoadingOutlined style={{ fontSize: 24, color: '#356d9bff' }} spin />
+    );
     switch (status) {
       case 'processing':
       case 'requires_payment_method':
       case 'requires_confirmation':
-        return <h2>Processing...</h2>
+        return (
+          <div className="payment_process">
+            <h2>Processing</h2>
+            <Spin indicator={antIcon} style={{ marginLeft: '10px' }} />
+          </div>
+        );
 
       case 'requires_action':
-        return <h2>Authenticating...</h2>
+        return <h2>Authenticating...</h2>;
 
       case 'succeeded':
-        return <h2>Payment Succeeded 🥳</h2>
+        return <h2>Payment Succeeded 🥳</h2>;
 
       case 'error':
         return (
@@ -139,12 +147,12 @@ export class Checkout extends React.Component<
             <h2>Error 😭</h2>
             <p className="error-message">{this.state.errorMessage}</p>
           </>
-        )
+        );
 
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   doPayment = () => {
     const [input, setInput] = useState({
@@ -222,7 +230,7 @@ export class Checkout extends React.Component<
           /> 
            <StripeTestCards />  */}
           <fieldset className="elements-style  modal_form">
-          <hr className="solid_line" />
+            <hr className="solid_line" />
             <div className="modal_header">
               <div style={{'display':'flex','alignItems':'center'}}>
               <h5 style={{'marginRight':'7px','fontFamily':'monospace','paddingTop':'5px'}}>
@@ -239,8 +247,9 @@ export class Checkout extends React.Component<
               />
             </div>
             <hr className="solid_line" />
-            <hr className="transparent_line" />
+            {/*<hr className="transparent_line" />*/}
             {/* <label htmlFor="cardholderName">First Name: </label> */}
+            {/*
             <input
               placeholder="First Name"
               className="elements-style input_form"
@@ -249,8 +258,10 @@ export class Checkout extends React.Component<
               onChange={handleInputChange}
               required
             />
-            <hr className="transparent_line" />
+            */}
+            {/*<hr className="transparent_line" />*/}
             {/* <label htmlFor="cardholderLastName">Last Name: </label> */}
+            {/*
             <input
               placeholder="Last Name"
               className="elements-style input_form"
@@ -260,6 +271,16 @@ export class Checkout extends React.Component<
               required
             />
             <hr className="transparent_line" />
+            */}
+            <input
+              placeholder="Cardholder Name"
+              className="elements-style input_form"
+              type="Text"
+              name="cardholderLastName"
+              onChange={handleInputChange}
+              required
+            />
+            {/*<hr className="transparent_line" />*/}
             {/* <label htmlFor="cardholderEmail">Email: </label> */}
             <input
               placeholder="Cardholder Email"
@@ -269,8 +290,9 @@ export class Checkout extends React.Component<
               onChange={handleInputChange}
               required
             />
-            <hr className="transparent_line" />
+            {/*<hr className="transparent_line" />*/}
             {/* <label htmlFor="cardholderAddress">Address: </label> */}
+            {/*
             <input
               placeholder="Cardholder Address"
               className="elements-style input_form"
@@ -280,7 +302,9 @@ export class Checkout extends React.Component<
               required
             />
             <hr className="transparent_line" />
+            */}
             {/* <label htmlFor="cardholderAddress">Address: </label> */}
+            {/*
             <input
               placeholder="Cardholder Zipcode"
               className="elements-style input_form"
@@ -289,8 +313,8 @@ export class Checkout extends React.Component<
               onChange={handleInputChange}
               required
             />
+            */}
             <hr className="transparent_line" />
-            {/*
             <div className=" elements-style card_panel">
               <div
                 style={{
@@ -348,9 +372,24 @@ export class Checkout extends React.Component<
                     />
                   </div>
                 </div>
+                <div className="card_items" style={{ borderRadius: '0 0 5px 0' }}>
+                  {/*<LockIcon />*/}
+                  <div className="card_element"></div>
+                  <input
+                    placeholder="Zipcode"
+                    className="elements-style input_form"
+                  //  className ="card_element"
+                    type="number"
+                    name="cardholderZipcode"
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
               </div>
-              */}
               <div className="FormRow elements-style">
+              </div>
+            </div>
+            {/*
             <CardElement
               options={CARD_OPTIONS}
               onChange={(e) => {
@@ -361,6 +400,7 @@ export class Checkout extends React.Component<
               }}
             />
             </div>
+            */}
           </fieldset>
           {this.state.payment.status === 'initial' ? (
             <button
@@ -377,8 +417,7 @@ export class Checkout extends React.Component<
             <this.getPaymentStatus status={this.state.payment.status} />
           )}
         </form>
-  
-        <PrintObject content={this.state.payment} />
+        {/*<PrintObject content={this.state.payment} />*/}
       </>
     );
   };

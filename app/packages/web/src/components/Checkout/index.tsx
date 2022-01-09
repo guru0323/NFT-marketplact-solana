@@ -1,26 +1,25 @@
 import { StringPublicKey } from '@oyster/common';
 import { Button, Space } from 'antd';
-import React, { useState } from 'react'
-import {
-  ReactNode,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-} from 'react';
+import React, { useState } from 'react';
+import { ReactNode, useContext, useEffect, useMemo, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { Stripe, loadStripe } from '@stripe/stripe-js';
-import { getStripe } from '../../utils/stripe'
-import { Layout } from '../Stripe'
+import { getStripe } from '../../utils/stripe';
+import { Layout } from '../Stripe';
 import { string } from '@hapi/joi';
 
-import { fetchGetJSON, fetchPostJSON } from '../../utils/stripe'
+import { fetchGetJSON, fetchPostJSON } from '../../utils/stripe';
 
 import { Component } from 'react';
 
 import { NextApiRequest, NextApiResponse } from 'next';
-import { CURRENCY, MIN_AMOUNT, MAX_AMOUNT, AMOUNT_STEP } from '../../config/stripe';
+import {
+  CURRENCY,
+  MIN_AMOUNT,
+  MAX_AMOUNT,
+  AMOUNT_STEP,
+} from '../../config/stripe';
 import { formatAmountForStripe } from '../../utils/stripe';
 
 import { Stripe as _Stripe } from 'stripe';
@@ -77,7 +76,6 @@ const CARD_OPTIONS = {
   },
 };
 
-
 const { publicRuntimeConfig } = getConfig();
 
 type CheckoutState = {
@@ -97,20 +95,20 @@ interface StripeInterface {
 }
 
 export class Checkout extends React.Component<
-  CheckoutProps, CheckoutState, StripeInterface
+  CheckoutProps,
+  CheckoutState,
+  StripeInterface
 > {
   state: CheckoutState = {
     input: '',
     payment: { status: 'initial' },
     errorMessage: '',
-  }
+  };
   result: any;
   elements: any;
   stripe: Promise<Stripe | null>;
-  
-  constructor (
-    props?: any,
-  ) {
+
+  constructor(props?: any) {
     super(props);
     this.result = null;
     this.elements = null;
@@ -119,7 +117,7 @@ export class Checkout extends React.Component<
     this.state.payment;
     this.state.errorMessage;
   }
-  
+
   getPaymentStatus = ({ status }: { status: string }) => {
     const antIcon = (
       <LoadingOutlined style={{ fontSize: 24, color: '#356d9bff' }} spin />
@@ -158,6 +156,8 @@ export class Checkout extends React.Component<
     const [input, setInput] = useState({
       customDonation: Math.round(config.MAX_AMOUNT / config.AMOUNT_STEP),
       cardholderName: '',
+      cardholderZipcode: '',
+      cardholderEmail: '',
     });
     // const [payment, setPayment] = useState({ status: 'initial' });
     const [errorMessage, setErrorMessage] = useState('');
@@ -166,47 +166,51 @@ export class Checkout extends React.Component<
     const antIcon = (
       <LoadingOutlined style={{ fontSize: 24, color: '#356d9bff' }} spin />
     );
-  
+
     const handleInputChange: React.ChangeEventHandler<HTMLInputElement> = e =>
       setInput({
         ...input,
         [e.currentTarget.name]: e.currentTarget.value,
       });
-  
+
     const handleSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
       e.preventDefault();
       // Abort if form isn't valid
       if (!e.currentTarget.reportValidity()) return;
       this.state.payment = { status: 'processing' };
-  
+
       // Create a PaymentIntent with the specified amount.
       const response = await fetchPostJSON('/api/payment_intents', {
         amount: input.customDonation,
       });
       this.state.payment = response;
-  
+
       if (response.statusCode === 500) {
         this.state.payment = { status: 'error' };
         setErrorMessage(response.message);
         return;
       }
-  
+
       // Get a reference to a mounted CardElement. Elements knows how
       // to find your CardElement because there can only ever be one of
       // each type of element.
-      const cardElement = elements!.getElement(CardElement);
-  
+      const cardElement = elements!.getElement(CardNumberElement);
+
       // Use your card Element with other Stripe.js APIs
       const { error, paymentIntent } = await stripe!.confirmCardPayment(
         response.client_secret,
         {
           payment_method: {
             card: cardElement!,
-            billing_details: { name: input.cardholderName },
+            billing_details: {
+              name: input.cardholderName,
+              address: { postal_code: input.cardholderZipcode },
+              email: input.cardholderEmail,
+            },
           },
         },
       );
-  
+
       if (error) {
         this.state.payment = { status: 'error' };
         setErrorMessage(error.message ?? 'An unknown error occured');
@@ -214,7 +218,7 @@ export class Checkout extends React.Component<
         this.state.payment = paymentIntent;
       }
     };
-  
+
     return (
       <>
         <form onSubmit={handleSubmit}>
@@ -232,18 +236,24 @@ export class Checkout extends React.Component<
           <fieldset className="elements-style  modal_form">
             <hr className="solid_line" />
             <div className="modal_header">
-              <div style={{'display':'flex','alignItems':'center'}}>
-              <h5 style={{'marginRight':'7px','fontFamily':'monospace','paddingTop':'5px'}}>
-                Card &<br /> billing
-              </h5>
-              <img
-                src="/img/golden.png"
-                style={{ width: '62px', height: '40px' }}
-              />
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <h5
+                  style={{
+                    marginRight: '7px',
+                    fontFamily: 'monospace',
+                    paddingTop: '5px',
+                  }}
+                >
+                  Card &<br /> billing
+                </h5>
+                <img
+                  src="/img/golden.png"
+                  style={{ width: '62px', height: '40px' }}
+                />
               </div>
               <img
                 src="/img/solana-sol-logo.png"
-                style={{ width: '40px', height: '40px','marginLeft':'20px' }}
+                style={{ width: '40px', height: '40px', marginLeft: '20px' }}
               />
             </div>
             <hr className="solid_line" />
@@ -276,7 +286,7 @@ export class Checkout extends React.Component<
               placeholder="Cardholder Name"
               className="elements-style input_form"
               type="Text"
-              name="cardholderLastName"
+              name="cardholderName"
               onChange={handleInputChange}
               required
             />
@@ -340,7 +350,10 @@ export class Checkout extends React.Component<
                 </div>
               </div>
               <div style={{ display: 'flex' }}>
-                <div className="card_items" style={{ borderRadius: '0 0 0 5px' }}>
+                <div
+                  className="card_items"
+                  style={{ borderRadius: '0 0 0 5px' }}
+                >
                   <CalendarIcon />
                   <div className="card_element">
                     <CardExpiryElement
@@ -356,7 +369,7 @@ export class Checkout extends React.Component<
                     />
                   </div>
                 </div>
-                <div className="card_items" style={{ borderRadius: '0 0 5px 0' }}>
+                <div className="card_items" style={{ borderRadius: '0 0 0 0' }}>
                   <LockIcon />
                   <div className="card_element">
                     <CardCvcElement
@@ -372,22 +385,25 @@ export class Checkout extends React.Component<
                     />
                   </div>
                 </div>
-                <div className="card_items" style={{ borderRadius: '0 0 5px 0' }}>
+                <div
+                  className="card_items"
+                  style={{ borderRadius: '0 0 5px 0' }}
+                >
                   {/*<LockIcon />*/}
-                  <div className="card_element"></div>
-                  <input
-                    placeholder="Zipcode"
-                    className="elements-style input_form"
-                  //  className ="card_element"
-                    type="number"
-                    name="cardholderZipcode"
-                    onChange={handleInputChange}
-                    required
-                  />
+                  <div className="card_element">
+                    <input
+                      placeholder="Zipcode"
+                      className="elements-style input_zipcode"
+                      //  className ="card_element"
+                      type="number"
+                      name="cardholderZipcode"
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
                 </div>
               </div>
-              <div className="FormRow elements-style">
-              </div>
+              <div className="FormRow elements-style"></div>
             </div>
             {/*
             <CardElement
@@ -407,8 +423,9 @@ export class Checkout extends React.Component<
               className="elements-style-background purhcase_button"
               type="submit"
               disabled={
-                !['initial', 'succeeded', 'error'].includes(this.state.payment.status) ||
-                !stripe
+                !['initial', 'succeeded', 'error'].includes(
+                  this.state.payment.status,
+                ) || !stripe
               }
             >
               Purchase
@@ -425,10 +442,13 @@ export class Checkout extends React.Component<
   displayPaymentForm = () => {
     return (
       <Space className="metaplex-fullwidth" direction="vertical" align="center">
-        <Space className="metaplex-space-align-stretch modal_container" direction="vertical">
+        <Space
+          className="metaplex-space-align-stretch modal_container"
+          direction="vertical"
+        >
           <Layout title="Page Title">
             <div className="modal_content">
-              <Elements stripe = { this.stripe! } >
+              <Elements stripe={this.stripe!}>
                 <this.doPayment />
               </Elements>
             </div>
@@ -446,9 +466,13 @@ export class Checkout extends React.Component<
   }) => {
     if (props.alert) {
       // TODO  - properly reset this components state on error
-      console.error('payment failed')
+      console.error('payment failed');
       return (
-        <Space className="metaplex-fullwidth" direction="vertical" align="center">
+        <Space
+          className="metaplex-fullwidth"
+          direction="vertical"
+          align="center"
+        >
           <div>
             <h2>Sorry, there was an error!</h2>
             <p>{props.alert}</p>
@@ -457,8 +481,6 @@ export class Checkout extends React.Component<
       );
     }
 
-    return (
-      <this.displayPaymentForm/>
-    );
+    return <this.displayPaymentForm />;
   };
 }

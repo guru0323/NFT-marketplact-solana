@@ -99,30 +99,7 @@ export const LandingPageView = () => {
         <div
           className={`landing-page-header mt-5 mt-md-0 d-flex flex-column justify-content-between h-100`}>
           <div
-            className={`d-flex flex-column flex-md-row justify-content-between`}>
-            <div
-              className={`d-flex flex-column justify-content-center col col-md-6`}>
-              <h1 className={`p-3`}>{storefront.meta.title}</h1>
-              <p className={`p-2`}>{storefront.meta.description}</p>
-              <div className={`mt-5 mx-auto`}>
-              </div>
-            </div>
-            <div
-              className={`d-flex flex-row justify-content-center col col-md-6`}>
-              {console.log(auctions)}
-              {
-               auctions.length > 0? <Link
-                  to={`/auction/${
-                    auctions.length > 0 && auctions[0].auction.pubkey
-                  }`}
-                  key={0}>
-                  <AuctionRenderCard
-                    key={auctions.length > 0 ? auctions[0].auction.pubkey : 0}
-                    auctionView={auctions.length !== 0 ? auctions[0]:null}
-                  />
-                </Link>:<div/>
-              }
-            </div>
+            className ={`d-flex flex-column flex-md-row justify-content-between`}>
           </div>
           <div
             className={`d-flex flex-row justify-content-center my-3 flex-wrap text-center`}>

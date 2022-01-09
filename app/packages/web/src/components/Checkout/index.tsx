@@ -11,16 +11,12 @@ import {
 import { useHistory } from 'react-router-dom';
 
 import { Stripe, loadStripe } from '@stripe/stripe-js';
-import { Elements } from '@stripe/react-stripe-js'
-import { PaymentElement } from '@stripe/react-stripe-js';
 import { getStripe } from '../../utils/stripe'
 import { Layout } from '../Stripe'
-import { ElementsForm } from  '../Stripe'
 import { string } from '@hapi/joi';
 
 import { fetchGetJSON, fetchPostJSON } from '../../utils/stripe'
 
-import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { Component } from 'react';
 
 import { NextApiRequest, NextApiResponse } from 'next';
@@ -36,40 +32,64 @@ import express, { Request, Response, NextFunction } from 'express';
 
 import getConfig from 'next/config';
 
-import { buffer } from 'micro';
-import Cors from 'micro-cors';
-import next from 'next';
-import { createServer } from 'http';
-import { parse } from 'url';
-import { VOTE_PROGRAM_ID } from '@solana/web3.js';
+import * as config from '../../config/stripe';
+import { Spin } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
 
-import nextSession from "next-session";
+import CardIcon from '../svgs/Card';
+import CalendarIcon from '../svgs/calendar';
+import LockIcon from '../svgs/lock';
+
+import {
+  Elements,
+  CardElement,
+  useStripe,
+  useElements,
+  CardNumberElement,
+  CardExpiryElement,
+  CardCvcElement,
+  PaymentElement,
+} from '@stripe/react-stripe-js';
+
+import { PrintObject } from '../Stripe/PrintObject';
+
+const CARD_OPTIONS = {
+  iconStyle: 'solid' as const,
+  style: {
+    base: {
+      iconColor: '#fcfdfe',
+      color: '#fcfdfe',
+      fontWeight: '500',
+      fontFamily: 'Roboto, Open Sans, Segoe UI, sans-serif',
+      fontSize: '16px',
+      fontSmoothing: 'antialiased',
+      ':-webkit-autofill': {
+        color: '#fce883',
+      },
+      '::placeholder': {
+        color: '#fcfdfe',
+      },
+    },
+    invalid: {
+      iconColor: '#ef2961',
+      color: '#ef2961',
+    },
+  },
+};
 
 
 const { publicRuntimeConfig } = getConfig();
 
-
-
-/*
-const production = serverRuntimeConfig.nodeEnv === 'production';
-const dev = !production;
-const app = next({ dev });
-const handle = app.getRequestHandler();
-*/
+type CheckoutState = {
+  input: any;
+  payment: { status: string };
+  errorMessage: string;
+};
 
 type CheckoutProps = {
-  payment: string;
-  setErrorMessage: string;
   setInput: string;
-  stripeData: Promise<Stripe | null>;
-  stripeElements: typeof Elements;
-};
-type CheckoutState = {
-  paymentStatus: string;
-  showErrorMessage: string;
-  input: any;
-  stripeState: any;
-  showStripeElements: any;
+  setPayment: string;
+  setErrorMessage: string;
 };
 
 interface StripeInterface {
@@ -80,11 +100,9 @@ export class Checkout extends React.Component<
   CheckoutProps, CheckoutState, StripeInterface
 > {
   state: CheckoutState = {
-    paymentStatus: 'initial',
-    showErrorMessage: '',
     input: '',
-    stripeState: '',
-    showStripeElements: '',
+    payment: { status: 'initial' },
+    errorMessage: '',
   }
   result: any;
   elements: any;
@@ -96,13 +114,13 @@ export class Checkout extends React.Component<
     super(props);
     this.result = null;
     this.elements = null;
-    this.stripe = this.getStripe();
-    this.state.paymentStatus;
-    this.state.showErrorMessage;
-    this.state.input;
+    this.stripe = getStripe();
+    // this.state.input;
+    this.state.payment;
+    this.state.errorMessage;
   }
   
-  paymentStatus = ({ status }: { status: string }) => {
+  getPaymentStatus = ({ status }: { status: string }) => {
     switch (status) {
       case 'processing':
       case 'requires_payment_method':
@@ -119,7 +137,7 @@ export class Checkout extends React.Component<
         return (
           <>
             <h2>Error 😭</h2>
-            <p className="error-message">{this.state.showErrorMessage}</p>
+            <p className="error-message">{this.state.errorMessage}</p>
           </>
         )
 
@@ -128,173 +146,251 @@ export class Checkout extends React.Component<
     }
   }
 
-  handleInputChange: React.ChangeEventHandler<HTMLInputElement> = (e) =>
-  //  setInput({
-  //    ...input,
-  //    [e.currentTarget.name]: e.currentTarget.value,
-  //  })    
-    this.setState((state, props) => {
-      return {input: [e.currentTarget.name] + e.currentTarget.value};
+  doPayment = () => {
+    const [input, setInput] = useState({
+      customDonation: Math.round(config.MAX_AMOUNT / config.AMOUNT_STEP),
+      cardholderName: '',
     });
-
-  handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
-
-    // handleInputChange
-    
-    e.preventDefault();
-    // Abort if form isn't valid
-    if (!e.currentTarget.reportValidity()) return;
-    // this.paymentStatus({ status: 'processing' })
-    this.setState(state =>({paymentStatus: 'processing' }));
+    // const [payment, setPayment] = useState({ status: 'initial' });
+    const [errorMessage, setErrorMessage] = useState('');
+    const stripe = useStripe();
+    const elements = useElements();
+    const antIcon = (
+      <LoadingOutlined style={{ fontSize: 24, color: '#356d9bff' }} spin />
+    );
   
-    // Create a PaymentIntent with the specified amount.
-    const response = await fetchPostJSON('/api/payment_intents', {
-      // amount: self.input.customDonation,
-//      amount: this.props.setInput.customDonation,
-    });
-    console.log(`response: ${response}`);
-    // setPayment(response)
-    this.setState(state =>({paymentStatus: response }));
+    const handleInputChange: React.ChangeEventHandler<HTMLInputElement> = e =>
+      setInput({
+        ...input,
+        [e.currentTarget.name]: e.currentTarget.value,
+      });
   
-    // if (response.statusCode === 500) {
-    if (Number(this.state.paymentStatus) === 500 ) {
-      // setPayment({ status: 'error' })
-      this.setState(state =>({paymentStatus:  'error'}))
-      // setErrorMessage(response.message)
-      return
+    const handleSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
+      e.preventDefault();
+      // Abort if form isn't valid
+      if (!e.currentTarget.reportValidity()) return;
+      this.state.payment = { status: 'processing' };
+  
+      // Create a PaymentIntent with the specified amount.
+      const response = await fetchPostJSON('/api/payment_intents', {
+        amount: input.customDonation,
+      });
+      this.state.payment = response;
+  
+      if (response.statusCode === 500) {
+        this.state.payment = { status: 'error' };
+        setErrorMessage(response.message);
+        return;
+      }
+  
+      // Get a reference to a mounted CardElement. Elements knows how
+      // to find your CardElement because there can only ever be one of
+      // each type of element.
+      const cardElement = elements!.getElement(CardElement);
+  
+      // Use your card Element with other Stripe.js APIs
+      const { error, paymentIntent } = await stripe!.confirmCardPayment(
+        response.client_secret,
+        {
+          payment_method: {
+            card: cardElement!,
+            billing_details: { name: input.cardholderName },
+          },
+        },
+      );
+  
+      if (error) {
+        this.state.payment = { status: 'error' };
+        setErrorMessage(error.message ?? 'An unknown error occured');
+      } else if (paymentIntent) {
+        this.state.payment = paymentIntent;
+      }
     };
   
-    // Get a reference to a mounted CardElement. Elements knows how
-    // to find your CardElement because there can only ever be one of
-    // each type of element.
+    return (
+      <>
+        <form onSubmit={handleSubmit}>
+          {/* <CustomDonationInput
+            className="elements-style"
+            name="customDonation"
+            value={input.customDonation}
+            min={config.MIN_AMOUNT}
+            max={config.MAX_AMOUNT}
+            step={config.AMOUNT_STEP}
+            currency={config.CURRENCY}
+            onChange={handleInputChange}
+          /> 
+           <StripeTestCards />  */}
+          <fieldset className="elements-style  modal_form">
+          <hr className="solid_line" />
+            <div className="modal_header">
+              <div style={{'display':'flex','alignItems':'center'}}>
+              <h5 style={{'marginRight':'7px','fontFamily':'monospace','paddingTop':'5px'}}>
+                Card &<br /> billing
+              </h5>
+              <img
+                src="/img/golden.png"
+                style={{ width: '62px', height: '40px' }}
+              />
+              </div>
+              <img
+                src="/img/solana-sol-logo.png"
+                style={{ width: '40px', height: '40px','marginLeft':'20px' }}
+              />
+            </div>
+            <hr className="solid_line" />
+            <hr className="transparent_line" />
+            {/* <label htmlFor="cardholderName">First Name: </label> */}
+            <input
+              placeholder="First Name"
+              className="elements-style input_form"
+              type="Text"
+              name="cardholderName"
+              onChange={handleInputChange}
+              required
+            />
+            <hr className="transparent_line" />
+            {/* <label htmlFor="cardholderLastName">Last Name: </label> */}
+            <input
+              placeholder="Last Name"
+              className="elements-style input_form"
+              type="Text"
+              name="cardholderLastName"
+              onChange={handleInputChange}
+              required
+            />
+            <hr className="transparent_line" />
+            {/* <label htmlFor="cardholderEmail">Email: </label> */}
+            <input
+              placeholder="Cardholder Email"
+              className="elements-style input_form"
+              type="email"
+              name="cardholderEmail"
+              onChange={handleInputChange}
+              required
+            />
+            <hr className="transparent_line" />
+            {/* <label htmlFor="cardholderAddress">Address: </label> */}
+            <input
+              placeholder="Cardholder Address"
+              className="elements-style input_form"
+              type="text"
+              name="cardholderAddress"
+              onChange={handleInputChange}
+              required
+            />
+            <hr className="transparent_line" />
+            {/* <label htmlFor="cardholderAddress">Address: </label> */}
+            <input
+              placeholder="Cardholder Zipcode"
+              className="elements-style input_form"
+              type="number"
+              name="cardholderZipcode"
+              onChange={handleInputChange}
+              required
+            />
+            <hr className="transparent_line" />
+            {/*
+            <div className=" elements-style card_panel">
+              <div
+                style={{
+                  padding: '3px',
+                  border: '1px solid',
+                  display: 'flex',
+                  borderRadius: '5px 5px 0 0',
+                }}
+              >
+                <CardIcon />
+                <div className="card_element">
+                  <CardNumberElement
+                    options={CARD_OPTIONS}
+                    onChange={e => {
+                      if (e.error) {
+                        this.state.payment = { status: 'error' };
+                        setErrorMessage(
+                          e.error.message ?? 'An unknown error occured',
+                        );
+                      }
+                    }}
+                  />
+                </div>
+              </div>
+              <div style={{ display: 'flex' }}>
+                <div className="card_items" style={{ borderRadius: '0 0 0 5px' }}>
+                  <CalendarIcon />
+                  <div className="card_element">
+                    <CardExpiryElement
+                      options={CARD_OPTIONS}
+                      onChange={e => {
+                        if (e.error) {
+                          this.state.payment = { status: 'error' };
+                          setErrorMessage(
+                            e.error.message ?? 'An unknown error occured',
+                          );
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+                <div className="card_items" style={{ borderRadius: '0 0 5px 0' }}>
+                  <LockIcon />
+                  <div className="card_element">
+                    <CardCvcElement
+                      options={CARD_OPTIONS}
+                      onChange={e => {
+                        if (e.error) {
+                          this.state.payment = { status: 'error' };
+                          setErrorMessage(
+                            e.error.message ?? 'An unknown error occured',
+                          );
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+              */}
+              <div className="FormRow elements-style">
+            <CardElement
+              options={CARD_OPTIONS}
+              onChange={(e) => {
+                if (e.error) {
+                  this.state.payment = { status: 'error' };
+                  setErrorMessage(e.error.message ?? 'An unknown error occured')
+                }
+              }}
+            />
+            </div>
+          </fieldset>
+          {this.state.payment.status === 'initial' ? (
+            <button
+              className="elements-style-background purhcase_button"
+              type="submit"
+              disabled={
+                !['initial', 'succeeded', 'error'].includes(this.state.payment.status) ||
+                !stripe
+              }
+            >
+              Purchase
+            </button>
+          ) : (
+            <this.getPaymentStatus status={this.state.payment.status} />
+          )}
+        </form>
   
-  
-//    const cardElement = elements!.getElement(CardElement)
-  
-    // Use your card Element with other Stripe.js APIs
-
-/*
-    const { error, paymentIntent } = await stripe!.confirmCardPayment(
-      response.client_secret,
-      {
-        payment_method: {
-//          card: cardElement!,
-          billing_details: { name: input.cardholderName },
-        },
-      }
-    )
-  
-    if (error) {
-      setPayment({ status: 'error' })
-      setErrorMessage(error.message ?? 'An unknown error occured')
-    } else if (paymentIntent) {
-      setPayment(paymentIntent)
-    }
-*/
-  }
-
-  getStripe = () => {
-
-  //  const [this.input, this.setInput] = useState({
-  //    customDonation: Math.round(config.MAX_AMOUNT / config.AMOUNT_STEP),
-  //    cardholderName: '',
-  //   });
-  //   this.setState(state =>({input:  Math.round(config.MAX_AMOUNT / config.AMOUNT_STEP)}));
-     
-
-  //  const [payment, setPayment] = useState({ status: 'initial' });
-  //  const [errorMessage, setErrorMessage] = useState('');
-
-    if (!this.stripe) {
-      this.stripe = loadStripe(publicRuntimeConfig.publicStripePublishableKey!);
-      const stripeId = '12345'
-      console.info(`------------>  loading stripe api: ${stripeId}`)
-    }
-//    this.setState(state =>({stripeState:  this.stripe}));
-    this.state.stripeState = this.stripe
-    return this.stripe
-    
-
-   // var elements = this.stripe.elements({
-   //   clientSecret: publicRuntimeConfig.publicStripePublishableKey,
-   // });
-
-/*  
-   CardElement.on('change', function(event) {
-    if (event.complete) {
-      console.log(`completed event: ${event}`);
-    }
-  });
-*/
-
-  //  const sessions = this.stripe.checkout.sessions
-    const sessions = 'test_session'
-    console.info(`------------>  sessions: ${sessions}`)
-
-//    const res = fetchPostJSON('/api/payment_intents', {});
-/* 
-    stripe.confirmPayment({
-      elements,
-      confirmParams: {
-        // Return URL where the customer should be redirected after the PaymentIntent is confirmed.
-        return_url: 'https://example.com',
-      },
-    })
-    .then(function(result) {
-      if (result.error)
-      // Inform the customer that there was an error.
-    });
-*/
-
-/*
-//    const id: string = req.query.id as string;
-    try {
-      if (!id.startsWith('cs_')) {
-        throw Error('Incorrect CheckoutSession ID.');
-      }
-      const checkout_session: _Stripe.Checkout.Session =
-      this.stripe.checkout.sessions.retrieve(sessionId, {
-          expand: ['payment_intent'],
-        });
-      console.log(`response: ${res}`);
-      console.log(`keys: ${Object.keys(res)}`);
-
-    //  res.status(200).json(checkout_session);
-    } catch (err: any) {
-      res.status(500).json({ statusCode: 500, message: err.message });
-    }
-*/
+        <PrintObject content={this.state.payment} />
+      </>
+    );
   };
-/*
-  ElementsForm = () => {
-    /*
-    const [input, setInput] = useState({
-      customDonation: Math.round(MAX_AMOUNT / AMOUNT_STEP),
-      cardholderName: '',
-    })
-
-    this.setState((state, props) => {
-      return {
-        customDonation: Math.round(MAX_AMOUNT / AMOUNT_STEP),
-        cardholderName: '',
-      };
-    });
-    const [payment, setPayment] = useState({ status: 'initial' })
-    const [errorMessage, setErrorMessage] = useState('')
-    const stripe = useStripe()
-    const elements = useElements()
-  }
-*/
 
   displayPaymentForm = () => {
-    this.getStripe();
     return (
       <Space className="metaplex-fullwidth" direction="vertical" align="center">
         <Space className="metaplex-space-align-stretch modal_container" direction="vertical">
           <Layout title="Page Title">
             <div className="modal_content">
               <Elements stripe = { this.stripe! } >
-                <ElementsForm />
+                <this.doPayment />
               </Elements>
             </div>
           </Layout>

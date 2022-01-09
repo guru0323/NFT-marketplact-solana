@@ -226,6 +226,7 @@ export const AuctionCard = ({
 }) => {
   const connection = useConnection();
   const { patchState } = useMeta();
+  const [errorMessage, setErrorMessage] = useState('');
 
   const wallet = useWallet();
   const { setVisible } = useWalletModal();
@@ -505,12 +506,6 @@ export const AuctionCard = ({
     cardholderName: '',
   });
 
-  const [payment, setPayment] = useState({ status: 'initial' });
-  const [errorMessage, setErrorMessage] = useState('');
-
-  //   const stripe = useStripe()
-  //   const elements = useElements()
-
   const instantFiatSale = async () => {
     setFiatLoading(true);
 
@@ -549,7 +544,6 @@ export const AuctionCard = ({
           try {
             console.log('trying...');
 
-            var testStripe = currentCheckout.stripe;
             /*            testStripe.confirmCardPayment(clientSecret).then(function(response) {
 
               if (response.error) {
@@ -559,41 +553,12 @@ export const AuctionCard = ({
               }
             });
             */
-          console.log(`event0: ${Object.keys(currentCheckout)}`);
-            console.log(`event1: ${Object.keys(currentCheckout.state)}`);
-            console.log(`event2: ${currentCheckout.state}`);
-            console.log(
-              `event3: ${Object.keys(currentCheckout.state.stripeState)}`,
-            );
-            console.log(`event4: ${currentCheckout.state.stripeState}`);
-            console.log(`event5: ${currentCheckout.state.stripeState}`);
-            console.log(`event5: ${currentCheckout.state.showStripeElements}`);
-  
-       //     console.log(`props: ${Object.keys(currentCheckout.props)}`);
-       //     console.log(`props: ${currentCheckout.props}`);
-       //     console.log(`stripe: ${Object.keys(currentCheckout.props.stripe)}`);
-       //     console.log(`paymentStatus: ${Object.keys(currentCheckout.props.paymentStatus)}`);
-       //     console.log(`showErrorMessage: ${Object.keys(currentCheckout.props.showErrorMessage)}`);
-       //     console.log(`showStripeInput: ${Object.keys(currentCheckout.props.showStripeInput)}`);
-      //      console.log(`event2: ${Object.keys(currentCheckout.state)}`);
-       //     console.log(`event0: ${Object.keys(currentCheckout.stripePromise())}`);
-       //     console.log(`event1: ${testStripe}`);
-       //     console.log(`event1: ${Object.keys(currentCheckout.getStripe())}`);
-       //     console.log(`event2: ${Object.keys(currentCheckout.stripe)}`);
-       //     console.log(`event2: ${Object.keys(testStripe)}`);
-       //     const e = await testStripe.then;
-        //    console.log(`event3: ${e}`);
-        //    const paid = session.payment_status as any;
-        //    console.log(`paid: ${paid}`);
-        //    const response = await testStripe.then(
-         //     () => setStripeInput(true),
-//
-  //          );
+            console.log(`Payment Status: ${currentCheckout.state.payment.status}`);
           } catch (e) {
-            console.error(`testStripe error: ${e}`);
-            if ( typeof e === 'string' ) { setErrorMessage(e) } ;
+              console.error(`testStripe error: ${e}`);
+              if ( typeof e === 'string' ) { setErrorMessage(e) } ;
           } finally {
-            setFiatLoading(false);
+              setFiatLoading(false);
           }
           console.log('testStripe - done');
           setShowCheckoutResult(false);

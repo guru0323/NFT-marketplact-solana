@@ -257,6 +257,7 @@ export class Checkout extends React.Component<
               />
             </div>
             <hr className="solid_line" />
+            <hr className="transparent_line" />
             {/*<hr className="transparent_line" />*/}
             {/* <label htmlFor="cardholderName">First Name: </label> */}
             {/*
@@ -369,7 +370,7 @@ export class Checkout extends React.Component<
                     />
                   </div>
                 </div>
-                <div className="card_items" style={{ borderRadius: '0 0 0 0' }}>
+                <div className="card_items" style={{ borderRadius: '0 0 5px 0' }}>
                   <LockIcon />
                   <div className="card_element">
                     <CardCvcElement

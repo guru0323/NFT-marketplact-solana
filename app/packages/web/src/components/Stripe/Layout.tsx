@@ -1,17 +1,14 @@
-import React, { ReactNode } from 'react'
-import Head from 'next/head'
-import Link from 'next/link'
-import Image from 'next/image'
+import React, { ReactNode } from 'react';
+import Head from 'next/head';
+import Link from 'next/link';
+import Image from 'next/image';
 
 type Props = {
-  children: ReactNode
-  title?: string
-}
+  children: ReactNode;
+  title?: string;
+};
 
-export const Layout = ({
-  children,
-  title = 'Page Title',
-}: Props) => (
+export const Layout = ({ children, title = 'Page Title' }: Props) => (
   <>
     <Head>
       <title>{title}</title>
@@ -31,7 +28,13 @@ export const Layout = ({
     </Head>
     <div className="container ">
       <header>
-        <img src='https://images.unsplash.com/photo-1563805042-7684c019e1cb' className='myimg'/> 
+  
+         
+          <img
+            src="https://images.unsplash.com/photo-1563805042-7684c019e1cb"
+            className="myimg ant-card"
+          />
+        
       </header>
       {children}
     </div>
@@ -57,4 +60,4 @@ export const Layout = ({
       </span>
     </div> */}
   </>
-)
+);

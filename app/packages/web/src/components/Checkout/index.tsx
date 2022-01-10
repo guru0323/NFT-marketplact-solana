@@ -285,7 +285,7 @@ export class Checkout extends React.Component<
             */}
             <input
               placeholder="Cardholder Name"
-              className="elements-style input_form"
+              className="elements-style input_form stripe-element"
               type="Text"
               name="cardholderName"
               onChange={handleInputChange}
@@ -448,7 +448,7 @@ export class Checkout extends React.Component<
     return (
       <Space className="metaplex-fullwidth" direction="vertical" align="center">
         <Space
-          className="metaplex-space-align-stretch modal_container"
+          className="metaplex-space-align-stretch modal_container ant-card"
           direction="vertical"
         >
           <Layout title="Page Title">

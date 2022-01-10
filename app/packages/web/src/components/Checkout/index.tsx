@@ -385,11 +385,14 @@ export class Checkout extends React.Component<
                     />
                   </div>
                 </div>
+                {/*
                 <div
                   className="card_items"
                   style={{ borderRadius: '0 0 5px 0' }}
                 >
+                /*}
                   {/*<LockIcon />*/}
+                  {/*
                   <div className="card_element">
                     <input
                       placeholder="Zipcode"
@@ -402,6 +405,7 @@ export class Checkout extends React.Component<
                     />
                   </div>
                 </div>
+                */}
               </div>
               <div className="FormRow elements-style"></div>
             </div>

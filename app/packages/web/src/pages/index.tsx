@@ -8,7 +8,11 @@ import BugsnagPluginReact from '@bugsnag/plugin-react';
 import { applyTheme } from '../actions/applyTheme';
 //import '../styles/theme.less';
 import getConfig from 'next/config';
+import lightTheme from '../themes/light.json';
+import darkTheme from '../themes/dark.json';
 
+const lightColor = lightTheme.color;
+const darkColor = darkTheme.color;
 
 const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
 
@@ -21,7 +25,7 @@ interface AppProps {
   storefront: Storefront;
 }
 
-  if (serverRuntimeConfig.bugsSnagApiKey) {
+if (serverRuntimeConfig.bugsSnagApiKey) {
   Bugsnag.start({
     apiKey: serverRuntimeConfig.bugsSnagApiKey,
     plugins: [new BugsnagPluginReact()],
@@ -48,31 +52,25 @@ export async function getServerSideProps(context: NextPageContext) {
     subdomain: 'market',
     pubkey: publicRuntimeConfig.publicStoreOwnerAddress,
     theme: {
-      logo:
-        'https://github.com/QueendomDAO/media/raw/main/logo_square.png',
-      banner:
-        '',
-      stylesheet:
-        '../styles/theme.less',
-      color: {
-        background: '#121111',
-        primary: '#e4d000',
-      },
+      logo: 'https://github.com/QueendomDAO/media/raw/main/logo_square.png',
+      banner: '',
+      stylesheet: '../styles/theme.less',
+      color: lightColor,
       font: {
         title: 'Montserrat',
         text: 'Montserrat',
       },
     },
     meta: {
-      favicon:
-        'https://github.com/QueendomDAO/media/raw/main/logo_square.png',
+      favicon: 'https://github.com/QueendomDAO/media/raw/main/logo_square.png',
       title: 'Queendom',
-      description: 'An NFT Market and Community Built on Solana and Powered by Metaplex.',
+      description:
+        'An NFT Market and Community Built on Solana and Powered by Metaplex.',
     },
   };
 
   if (storefront) {
-    return {props: {storefront}};
+    return { props: { storefront } };
   }
 
   return {

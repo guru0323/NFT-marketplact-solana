@@ -285,7 +285,7 @@ export class Checkout extends React.Component<
             */}
             <input
               placeholder="Cardholder Name"
-              className="elements-style input_form stripe-element"
+              className="elements-style input_form "
               type="Text"
               name="cardholderName"
               onChange={handleInputChange}

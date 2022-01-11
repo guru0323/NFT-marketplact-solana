@@ -10,7 +10,7 @@ import { applyTheme } from '../actions/applyTheme';
 import getConfig from 'next/config';
 import lightTheme from '../themes/light.json';
 import darkTheme from '../themes/dark.json';
-
+import {useTheme,Theme} from '../contexts/themecontext'
 const lightColor = lightTheme.color;
 const darkColor = darkTheme.color;
 
@@ -32,7 +32,10 @@ if (serverRuntimeConfig.bugsSnagApiKey) {
   });
 }
 
+
 export async function getServerSideProps(context: NextPageContext) {
+  
+
   const headers = context?.req?.headers || {};
   const forwarded = headers.forwarded
     ?.split(';')
@@ -55,7 +58,7 @@ export async function getServerSideProps(context: NextPageContext) {
       logo: 'https://github.com/QueendomDAO/media/raw/main/logo_square.png',
       banner: '',
       stylesheet: '../styles/theme.less',
-      color: lightColor,
+      color: null,
       font: {
         title: 'Montserrat',
         text: 'Montserrat',
@@ -82,6 +85,9 @@ function AppWrapper({ storefront }: AppProps) {
   const [isMounted, setIsMounted] = useState(false);
   const [hasLogo, setHasLogo] = useState(false);
   const [hasStylesheet, setHasStylesheet] = useState(false);
+  const [currentTheme,setCurrentTheme] = useState({}) 
+  const {theme,setTheme} = useTheme()
+
 
   useEffect(() => {
     if (hasLogo && hasStylesheet) {
@@ -90,13 +96,23 @@ function AppWrapper({ storefront }: AppProps) {
   }, [hasLogo, hasStylesheet]);
 
   useEffect(() => {
+    console.log()
+    if(theme===Theme.Light){
+
+      storefront.theme.color=lightColor
+        
+      } else{
+        
+       storefront.theme.color=darkColor
+      }
+      console.log(storefront.theme.color)
     const doc = document.documentElement;
 
     const cleanup = applyTheme(storefront.theme, doc.style, document.head);
     setHasStylesheet(true);
 
     return cleanup;
-  }, [storefront.theme]);
+  }, [storefront.theme,theme]);
 
   useEffect(() => {
     const onHasLogo = () => {

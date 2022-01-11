@@ -1,33 +1,36 @@
-import {ConnectButton, useStore} from '@oyster/common';
-import {useWallet} from '@solana/wallet-adapter-react';
-import {Col, Menu, Row, Space} from 'antd';
-import React, {ReactNode, useMemo, useState} from 'react';
-import {Link, matchPath, useLocation} from 'react-router-dom';
-import {Cog, CurrentUserBadge} from '../CurrentUserBadge';
-import {HowToBuyModal} from '../HowToBuyModal';
-import {Notifications} from '../Notifications';
+import { ConnectButton, useStore } from '@oyster/common';
+import { useWallet } from '@solana/wallet-adapter-react';
+import { Col, Menu, Row, Space } from 'antd';
+import React, { ReactNode, useMemo, useState } from 'react';
+import { Link, matchPath, useLocation } from 'react-router-dom';
+import { Cog, CurrentUserBadge } from '../CurrentUserBadge';
+import { HowToBuyModal } from '../HowToBuyModal';
+import { Notifications } from '../Notifications';
 import { useMeta } from '../../contexts';
+import { useTheme, Theme } from '../../contexts/themecontext';
+import { Switch } from 'antd';
 
 type P = {
   logo: string;
 };
 
 export const AppBar = (props: P) => {
-  const {connected, publicKey} = useWallet();
+  const { connected, publicKey } = useWallet();
   const location = useLocation();
   const locationPath = location.pathname.toLowerCase();
-  const {ownerAddress} = useStore();
-  
+  const { ownerAddress } = useStore();
+
   const { store, whitelistedCreatorsByCreator, isLoading, patchState } =
-  useMeta();
+    useMeta();
 
   const activatedCreators = Object.values(whitelistedCreatorsByCreator).filter(
-    (e) => {
-      if ( !e.info.activated ) { return };
+    e => {
+      if (!e.info.activated) {
+        return;
+      }
       return e.info.address;
     },
   );
-  
 
   // Array of menu item descriptions
   const menuInfo: {
@@ -68,7 +71,7 @@ export const AppBar = (props: P) => {
         title: 'Explore',
         link: '/explore',
         exact: true,
-        alt: [{path: '/auction', exact: false}],
+        alt: [{ path: '/auction', exact: false }],
       },
       {
         key: 'artists',
@@ -76,8 +79,8 @@ export const AppBar = (props: P) => {
         link: `/artists/${ownerAddress}`,
         exact: true,
         alt: [
-          {path: '/artists', exact: false},
-          {path: '/artworks', exact: false},
+          { path: '/artists', exact: false },
+          { path: '/artworks', exact: false },
         ],
       },
       {
@@ -85,18 +88,16 @@ export const AppBar = (props: P) => {
         title: 'Learn',
         link: '/learn',
         exact: true,
-        alt: [{path: '/auction', exact: false}],
+        alt: [{ path: '/auction', exact: false }],
       },
     ];
 
-    const isActivatedCreator = Object.values(activatedCreators).some(
-      (e) => {
-        console.log(`${e.info.address} - ${publicKey?.toBase58()}`);
-        return e.info.address === publicKey?.toBase58();
-      },
-    );
+    const isActivatedCreator = Object.values(activatedCreators).some(e => {
+      console.log(`${e.info.address} - ${publicKey?.toBase58()}`);
+      return e.info.address === publicKey?.toBase58();
+    });
 
-    if ( isActivatedCreator || publicKey?.toBase58() === ownerAddress){
+    if (isActivatedCreator || publicKey?.toBase58() === ownerAddress) {
       menu = [
         {
           key: 'create',
@@ -140,26 +141,40 @@ export const AppBar = (props: P) => {
 
   const menuItems = useMemo(
     () =>
-      menuInfo.map(({key, link, title}) => (
+      menuInfo.map(({ key, link, title }) => (
         <Menu.Item key={key}>
           <Link to={link}>{title}</Link>
         </Menu.Item>
       )),
-    [menuInfo]
+    [menuInfo],
   );
 
   const activeItems = useMemo(
     () =>
       menuInfo
-        .filter(({link, alt, exact}) =>
-          [{path: link, exact}, ...alt].find(({path, exact}) =>
-            matchPath(locationPath, {path, exact})
-          )
+        .filter(({ link, alt, exact }) =>
+          [{ path: link, exact }, ...alt].find(({ path, exact }) =>
+            matchPath(locationPath, { path, exact }),
+          ),
         )
-        .map(({key}) => key),
-    [locationPath, menuInfo]
+        .map(({ key }) => key),
+    [locationPath, menuInfo],
   );
+  const { theme, setTheme } = useTheme();
+  const [currentTheme, setCurrentTheme] = useState('');
+  function switchTheme() {
+    if (theme === "Dark") {
+      setCurrentTheme(Theme.Light);
+      setTheme(Theme.Light);
 
+      
+    } else {
+      setCurrentTheme(Theme.Dark);
+      setTheme(Theme.Dark);
+
+     
+    }
+  }
   return (
     <>
       <style global jsx>
@@ -172,36 +187,41 @@ export const AppBar = (props: P) => {
           }
         `}
       </style>
-      <Row wrap={false} align='middle'>
-        <Col flex='0 0 auto'>
-          <Link to='/' id='metaplex-header-logo'>
+      <Row wrap={false} align="middle">
+        <Col flex="0 0 auto">
+          <Link to="/" id="metaplex-header-logo">
             Queendom
           </Link>
         </Col>
-        <Col flex='1 0 0' style={{overflow: 'hidden'}}>
-          <Menu theme='dark' mode='horizontal' selectedKeys={activeItems}>
+        <Col flex="1 0 0" style={{ overflow: 'hidden' }}>
+          <Menu theme="dark" mode="horizontal" selectedKeys={activeItems}>
             {menuItems}
           </Menu>
         </Col>
-        <Col flex='0 1 auto'>
-          <Space className='metaplex-display-flex' align='center'>
+        <Col flex="0 1 auto">
+          <Space className="metaplex-display-flex" align="center">
             {connected ? (
               <>
-                <CurrentUserBadge showAddress={true} buttonType='text' />
-                <Notifications buttonType='text' />
-                <Cog buttonType='text' />
+                <CurrentUserBadge showAddress={true} buttonType="text" />
+                <Notifications buttonType="text" />
+                <Switch
+                  checkedChildren="Dark"
+                  unCheckedChildren="Light"
+                  onChange={switchTheme}
+                />
+                <Cog buttonType="text" />
               </>
             ) : (
               <>
-                <HowToBuyModal buttonType='text' />
-                <ConnectButton type='text' allowWalletChange={false} />
+                <HowToBuyModal buttonType="text" />
+                <Switch checkedChildren="1" unCheckedChildren="0" />
+                <ConnectButton type="text" allowWalletChange={false} />
               </>
             )}
           </Space>
         </Col>
-        { }
+        {}
       </Row>
     </>
   );
 };
-

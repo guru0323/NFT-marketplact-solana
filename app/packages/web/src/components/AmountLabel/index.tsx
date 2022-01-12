@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { useSolPrice } from '../../contexts';
 import { SolCircle } from '../Custom';
 
-
 interface IAmountLabel {
   amount: number | string;
   displayUSD?: boolean;

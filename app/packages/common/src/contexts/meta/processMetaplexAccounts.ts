@@ -192,7 +192,7 @@ export const processMetaplexAccounts: ProcessAccountsFunc = async (
       }
     }
   } catch {
-    // ignore errors (why!?)
+    // ignore errors
     // add type as first byte for easier deserialization
   }
 };

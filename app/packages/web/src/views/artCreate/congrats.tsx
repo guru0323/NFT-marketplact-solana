@@ -18,8 +18,8 @@ export const Congrats = (props: {
       url: `${
         window.location.origin
       }/#/artworks/${props.nft?.metadataAccount.toString()}`,
-      hashtags: 'NFT,Crypto,Metaplex,Queendom',
-      related: 'Metaplex,Solana,Queendom',
+      hashtags: 'NFT,Crypto,Metaplex,Holaplex',
+      related: 'Metaplex,Solana,Holaplex',
     };
     const queryParams = new URLSearchParams(params).toString();
     return `https://twitter.com/intent/tweet?${queryParams}`;

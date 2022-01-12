@@ -118,7 +118,7 @@ export function useCollapseWrappedSol({
   const [showNotification, setShowNotification] = useState(false);
   const fn = async () => {
     const ata = await getPersonalEscrowAta(wallet);
-    if (ata) {  
+    if (ata) {
       try {
         const balance = await connection.getTokenAccountBalance(
           toPublicKey(ata),
@@ -171,6 +171,7 @@ export function Notifications({
   const connection = useConnection();
   const wallet = useWallet();
   const notifications: NotificationCard[] = [];
+
   const walletPubkey = wallet.publicKey?.toBase58() || '';
 
   useCollapseWrappedSol({ connection, wallet, notifications });

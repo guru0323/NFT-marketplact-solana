@@ -15,7 +15,7 @@ export const Congrats = (props: {
 
   const newTweetURL = () => {
     const params = {
-      text: "I've listed an NFT on #Queendom, check it out!",
+      text: "I've listed an NFT on #AKKOROS, check it out!",
       url: `${
         window.location.origin
       }/#/auction/${props.auction?.auction.toString()}`,

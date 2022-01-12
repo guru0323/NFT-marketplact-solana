@@ -121,7 +121,7 @@ const processMetaplexAccounts = async ({ account, pubkey }, setter) => {
         }
     }
     catch {
-        // ignore errors (why!?)
+        // ignore errors
         // add type as first byte for easier deserialization
     }
 };

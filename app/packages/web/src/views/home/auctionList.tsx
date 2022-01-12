@@ -2,7 +2,7 @@ import {LoadingOutlined} from '@ant-design/icons';
 import {useStore} from '@oyster/common';
 import {useWallet} from '@solana/wallet-adapter-react';
 import {Alert, Button, Spin} from 'antd';
-import React,{useState} from 'react';
+import React from 'react';
 import useInfiniteScroll from 'react-infinite-scroll-hook';
 import {Link} from 'react-router-dom';
 import {AuctionRenderCard} from '../../components/AuctionRenderCard';
@@ -12,7 +12,6 @@ import {
   useInfiniteScrollAuctions,
 } from '../../hooks';
 import {Banner} from '../../components/Banner';
-import CheckOutModal from '../modals/CheckOutModal';
 
 export enum LiveAuctionViewState {
   All = '0',
@@ -29,8 +28,6 @@ export const AuctionListView = () => {
     hasNextPage,
     loadMore,
   } = useInfiniteScrollAuctions();
-  const [showModal, setShowModal] = useState<boolean>(false);
-  const [itemId, setItemId] = useState<string>("");
 
   const [sentryRef] = useInfiniteScroll({
     loading,
@@ -45,12 +42,6 @@ export const AuctionListView = () => {
   const isStoreOwner = ownerAddress === wallet.publicKey?.toBase58();
   const notAllAuctionsCached = auctionManagerTotal !== auctionCacheTotal;
   const showCacheAuctionsAlert = isStoreOwner && notAllAuctionsCached;
-  const renderModal = (id:string) =>{
-    console.log(id, "id")
-    setItemId(id);
-    setShowModal(true);
-
-  }
 
   return initLoading ? (
     <div className='app-section--loading'>
@@ -99,11 +90,9 @@ export const AuctionListView = () => {
           const id = m.auction.pubkey;
           if (m.auction.info.state !== 2)
             return (
-              // <Link to={`/auction/${id}`} key={idx}>
-              <div onClick={()=> {renderModal(id)}} key={idx}>
+              <Link to={`/auction/${id}`} key={idx}>
                 <AuctionRenderCard key={id} auctionView={m} />
-                </div>
-              // </Link>
+              </Link>
             );
         })}
       </MetaplexMasonry>
@@ -111,9 +100,6 @@ export const AuctionListView = () => {
         <div className='app-section--loading' ref={sentryRef}>
           <Spin indicator={<LoadingOutlined />} />
         </div>
-      )}
-      {showModal && (
-        <CheckOutModal show={showModal} id={itemId} hide={()=>setShowModal(false)} />
       )}
     </>
   );

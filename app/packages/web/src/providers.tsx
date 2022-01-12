@@ -23,7 +23,6 @@ interface ProvidersProps {
   children: React.ReactNode;
 }
 
-console.log(`publicRuntimeConfig.publicStoreAddress: ${publicRuntimeConfig.publicStoreAddress}`)
 export const Providers: FC<ProvidersProps> = ({ children, storefront }) => {
   return (
     <ConnectionProvider>

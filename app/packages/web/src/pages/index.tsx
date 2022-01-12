@@ -3,18 +3,15 @@ import dynamic from 'next/dynamic';
 import { NextPageContext } from 'next';
 import Head from 'next/head';
 import { Storefront } from '@oyster/common';
+import { getStorefront } from './../actions/getStorefront';
 import Bugsnag from '@bugsnag/js';
 import BugsnagPluginReact from '@bugsnag/plugin-react';
 import { applyTheme } from '../actions/applyTheme';
-//import '../styles/theme.less';
 import getConfig from 'next/config';
-import lightTheme from '../themes/light.json';
-import darkTheme from '../themes/dark.json';
-import {useTheme,Theme} from '../contexts/themecontext'
-const lightColor = lightTheme.color;
-const darkColor = darkTheme.color;
 
-const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
+
+let nextConfig = getConfig();
+const publicRuntimeConfig = nextConfig.publicRuntimeConfig;
 
 // import 'bootstrap/dist/css/bootstrap.min.css';
 const CreateReactAppEntryPoint = dynamic(() => import('../App'), {
@@ -25,17 +22,14 @@ interface AppProps {
   storefront: Storefront;
 }
 
-if (serverRuntimeConfig.bugsSnagApiKey) {
+  if (publicRuntimeConfig.publicBugsSnagApiKey) {
   Bugsnag.start({
-    apiKey: serverRuntimeConfig.bugsSnagApiKey,
+    apiKey: publicRuntimeConfig.publicBugsSnagApiKey,
     plugins: [new BugsnagPluginReact()],
   });
 }
 
-
 export async function getServerSideProps(context: NextPageContext) {
-  
-
   const headers = context?.req?.headers || {};
   const forwarded = headers.forwarded
     ?.split(';')
@@ -48,32 +42,39 @@ export async function getServerSideProps(context: NextPageContext) {
   const host = (forwarded?.host || headers.host) ?? '';
   let subdomain = host.split(':')[0].split('.')[0];
 
-  if (publicRuntimeConfig.subdomain && !serverRuntimeConfig.strictSubdomain) {
+  if (publicRuntimeConfig.subdomain && !publicRuntimeConfig.strictSubdomain) {
     subdomain = publicRuntimeConfig.subdomain;
   }
+  // console.log('subdomain', await getStorefront('somniumspace'));
   const storefront = {
-    subdomain: 'market',
-    pubkey: publicRuntimeConfig.publicStoreOwnerAddress,
+    subdomain: 'akkoros',
+    pubkey: '98jiC2PfMNqLwUrabW3LxE15dfHCyaNX5V6nxHaP96NQ',
     theme: {
-      logo: 'https://github.com/QueendomDAO/media/raw/main/logo_square.png',
-      banner: '',
-      stylesheet: '../styles/theme.less',
-      color: null,
+      logo:
+        'https://ipfs.io/ipfs/QmWQdbBQWujc2qsB59oqt3snQhKeNzGTPBvbcG7cX3egrD?filename=replicate-prediction-7alwxcfzjnaghmy2yjlknacsvy.png',
+      banner:
+        '',
+      stylesheet:
+        'https://arweave.cache.holaplex.dev/GfF6WrFBhEXbBZDecdbmUPYhuke7nz5UHR_7p4Y-bVQ',
+      color: {
+        background: '#121111',
+        primary: '#e4d000',
+      },
       font: {
         title: 'Montserrat',
         text: 'Montserrat',
       },
     },
     meta: {
-      favicon: 'https://github.com/QueendomDAO/media/raw/main/logo_square.png',
-      title: 'Queendom',
-      description:
-        'An NFT Market and Community Built on Solana and Powered by Metaplex.',
+      favicon:
+        'https://ipfs.io/ipfs/QmWQdbBQWujc2qsB59oqt3snQhKeNzGTPBvbcG7cX3egrD?filename=replicate-prediction-7alwxcfzjnaghmy2yjlknacsvy.png',
+      title: 'AKKOROS',
+      description: 'An Open-Source NFT Market and Community Built on Solana and Powered by Metaplex.',
     },
   };
 
   if (storefront) {
-    return { props: { storefront } };
+    return {props: {storefront}};
   }
 
   return {
@@ -85,9 +86,6 @@ function AppWrapper({ storefront }: AppProps) {
   const [isMounted, setIsMounted] = useState(false);
   const [hasLogo, setHasLogo] = useState(false);
   const [hasStylesheet, setHasStylesheet] = useState(false);
-  const [currentTheme,setCurrentTheme] = useState({}) 
-  const {theme,setTheme} = useTheme()
-
 
   useEffect(() => {
     if (hasLogo && hasStylesheet) {
@@ -96,23 +94,13 @@ function AppWrapper({ storefront }: AppProps) {
   }, [hasLogo, hasStylesheet]);
 
   useEffect(() => {
-    console.log()
-    if(theme===Theme.Light){
-
-      storefront.theme.color=lightColor
-        
-      } else{
-        
-       storefront.theme.color=darkColor
-      }
-      console.log(storefront.theme.color)
     const doc = document.documentElement;
 
     const cleanup = applyTheme(storefront.theme, doc.style, document.head);
     setHasStylesheet(true);
 
     return cleanup;
-  }, [storefront.theme,theme]);
+  }, [storefront.theme]);
 
   useEffect(() => {
     const onHasLogo = () => {
@@ -165,7 +153,7 @@ function AppWrapper({ storefront }: AppProps) {
     </>
   );
 
-  if (serverRuntimeConfig.bugsSnagApiKey) {
+  if (publicRuntimeConfig.publicBugsSnagApiKey) {
     //@ts-ignore
     const ErrorBoundary = Bugsnag.getPlugin('react').createErrorBoundary(React);
     return <ErrorBoundary>{appBody}</ErrorBoundary>;

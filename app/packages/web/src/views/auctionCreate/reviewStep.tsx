@@ -34,7 +34,7 @@ export const ReviewStep = (props: {
           {item?.metadata.info && (
             <ArtCard
               pubkey={item.metadata.pubkey}
-              small={true.toString()}
+              small={true}
               hoverable={false}
             />
           )}

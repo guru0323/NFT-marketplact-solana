@@ -66,7 +66,7 @@ export const LaunchStep = (props: {
               category={props.attributes.properties?.category}
               name={props.attributes.name}
               symbol={props.attributes.symbol}
-              small={true.toString()}
+              small={true}
             />
           )}
         </Col>
@@ -94,7 +94,7 @@ export const LaunchStep = (props: {
         Pay with SOL
       </Button>
       <Button
-//        disabled={true}
+        disabled={true}
         className="metaplex-fullwidth"
         size="large"
         onClick={props.confirm}

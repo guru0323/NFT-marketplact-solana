@@ -8,7 +8,7 @@ import getConfig from 'next/config';
 
 
 let nextConfig = getConfig();
-const serverRuntimeConfig = nextConfig.serverRuntimeConfig;
+const publicRuntimeConfig = nextConfig.publicRuntimeConfig;
 
 const tokenSema = new Sema(1);
 const loggedInSema = new Sema(1);
@@ -67,7 +67,7 @@ function setToken(token, lifespan = ONE_MINUTE * 15) {
 }
 
 export default function useMagicLink() {
-  const magicLinkKey = serverRuntimeConfig.magiclinkKey;
+  const magicLinkKey = publicRuntimeConfig.publicMagiclinkKey;
   if (!magicLinkKey) {
     throw new Error('Magic Link publishableKey required');
   }

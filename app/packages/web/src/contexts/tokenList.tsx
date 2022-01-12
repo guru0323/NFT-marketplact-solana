@@ -9,7 +9,7 @@ import getConfig from 'next/config';
 
 
 let nextConfig = getConfig();
-const serverRuntimeConfig = nextConfig.serverRuntimeConfig;
+const publicRuntimeConfig = nextConfig.publicRuntimeConfig;
 
 // Tag in the spl-token-registry for sollet wrapped tokens.
 export const SPL_REGISTRY_SOLLET_TAG = "wrapped-sollet";
@@ -33,11 +33,11 @@ const TokenListContext =
 export function SPLTokenListProvider({ children = null as any }) {  
     const [tokenList, setTokenList] = useState<TokenListContainer | null>(null);
     
-    const subscribedTokenMints = serverRuntimeConfig.splTokenMints? 
+    const subscribedTokenMints = publicRuntimeConfig.splTokenMints? 
       [
 
         WRAPPED_SOL_MINT,
-        ...serverRuntimeConfig.splTokenMints.split(",")
+        ...publicRuntimeConfig.splTokenMints.split(",")
       ]: [WRAPPED_SOL_MINT]
 
     useEffect(() => {

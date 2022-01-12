@@ -9,6 +9,7 @@ export const HomeView = () => {
   const { isConfigured } = useStore();
 
   const showAuctions = (store && isConfigured) || isLoading;
+  console.log(`showAuctions: ${showAuctions}`);
 
   return showAuctions ? <AuctionListView /> : <SetupView />;
 };

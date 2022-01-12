@@ -10,7 +10,7 @@ const NotFound = () => (
   >
     <h1>Storefront Not Found</h1>
     <p>
-      Claim this storefront on <a href="https://holaplex.com">Holaplex</a>
+      Return to the <a href="https://market.queendom.io">market</a>
     </p>
   </Space>
 );

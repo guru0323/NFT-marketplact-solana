@@ -17,7 +17,11 @@
     "downlevelIteration": true,
     "noEmit": true,
     "jsx": "preserve",
-    "typeRoots": ["../../types"]
+    "typeRoots": [
+      "./node_modules/@types/",
+      "./types/*",
+      "./src/api/types"
+    ]
   },
   "include": ["src"],
   "exclude": ["node_modules"]

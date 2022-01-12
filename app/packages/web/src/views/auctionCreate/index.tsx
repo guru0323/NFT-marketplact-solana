@@ -626,6 +626,7 @@ export const AuctionCreateView = () => {
     />
   );
 
+  console.error('congratsStep');
   const congratsStep = (
     <MetaplexOverlay visible={true}>
       <Congrats auction={auctionObj} />

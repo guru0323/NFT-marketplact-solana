@@ -10,6 +10,7 @@
 
 # temp files
 **/out
+**/temp
 /tmp
 
 # next.js
@@ -39,16 +40,23 @@
 app/.eslintcache
 app/yarn.lock
 
+# log files
+app/lerna-debug.log
+
+
 # map files
-app/packages/common/dist/lib/models/metaplex/setStoreIndex.d.ts.map
-app/packages/common/dist/lib/models/metaplex/setStoreIndex.js.map
 app/packages/common/dist/tsconfig.tsbuildinfo
+app/packages/common/dist/lib/components/ConnectButton/index.js.map
 app/packages/common/dist/lib/contexts/meta/meta.d.ts.map
 app/packages/common/dist/lib/contexts/meta/meta.js.map
-app/packages/common/dist/lib/components/ConnectButton/index.js.map
 app/packages/common/dist/lib/contexts/meta/processMetaData.d.ts.map
 app/packages/common/dist/lib/contexts/meta/processMetaData.js.map
 app/packages/common/dist/lib/contexts/meta/processAuctions.d.ts.map
 app/packages/common/dist/lib/contexts/meta/processAuctions.js.map
 app/packages/common/dist/lib/contexts/store.js.map
+app/packages/common/dist/lib/models/metaplex/setStoreIndex.d.ts.map
+app/packages/common/dist/lib/models/metaplex/setStoreIndex.js.map
+
+app/packages/checkout/dist/tsconfig.tsbuildinfo
+app/packages/checkout/dist/lib/**/*.map
 

@@ -19,6 +19,11 @@ import { MintLayout, Token } from '@solana/spl-token';
 import { Connection, Keypair, TransactionInstruction } from '@solana/web3.js';
 import BN from 'bn.js';
 import React, { Dispatch, SetStateAction } from 'react';
+import getConfig from 'next/config';
+
+
+let nextConfig = getConfig();
+const publicRuntimeConfig = nextConfig.publicRuntimeConfig;
 
 const RESERVED_METADATA = 'metadata.json';
 
@@ -32,7 +37,8 @@ const RESERVED_METADATA = 'metadata.json';
 //   }>;
 // }
 
-const NFT_STORAGE_UPLOAD_ENDPOINT = 'https://www.holaplex.com/api/ipfs/upload';
+const NFT_STORAGE_UPLOAD_ENDPOINT = publicRuntimeConfig.nftStorageUploadEndpoint;
+
 export type PinFileResponse = {
   uri?: string;
   name?: string;
@@ -123,6 +129,7 @@ export const mintNFT = async (
       type: file.type,
     });
   });
+
 
   if (coverFile) {
     const coverFileUpload = uploadedFilePins.files.find(

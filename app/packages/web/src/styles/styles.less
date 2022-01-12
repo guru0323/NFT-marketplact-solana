@@ -51,6 +51,124 @@
   }
 }
 
+.modal_container {
+
+  border-radius: 15px;
+  border: 0.5px solid ;
+  border-color: #535353
+}
+
+.modal_content {
+  padding: 50px 20px 50px 20px;
+  width: 450px;
+}
+
+.modal_form{
+  display: flex;
+  flex-direction: column;
+}
+
+.input_form {
+  width: 100%;
+  float: right;
+  transform: translateY(-3px);
+  border-radius: 5px;
+  background: unset;
+  color: unset;
+  padding-left: 8px;
+  border: 1px solid;
+}
+
+.input_zipcode {
+  float: right;
+  border-radius: 5px;
+  background: #323232ff;
+  color: white;
+  padding-left: 8px;
+ border: none;
+ width: 150px;
+ 
+}
+
+.input_zipcode::placeholder{
+  color: white;
+}
+
+.input_zipcode:focus{
+  border: none;
+}
+
+.input_form::placeholder{
+ color: white; ;
+}
+
+.card_element {
+  width: 80%;
+
+}
+
+.transparent_line {
+  border-color: transparent;
+}
+
+.solid_line {
+  border: 1px ridge rgba(255, 255, 255, 0.172);
+  width: 100%;
+//  border-radius: 15px;
+//  border: 0.5px solid ;
+//  border-color: white;
+//  border-color: #535353
+}
+
+.payment_process {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card_panel {
+  width: 100%;
+  margin: auto;
+  padding: 0 0 20px 0;
+}
+
+.modal_header {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+}
+
+.purhcase_button {
+  display: flex;
+  color: #323232ff;
+  margin: auto;
+}
+
+.close_button{
+ position: absolute;
+ right: 35px;
+ top: 10px;
+ border-radius: 100%;
+}
+.card_items {
+  display: flex;
+  border: 1px solid;
+  width: 100%;
+  padding: 3px;
+  align-items: center;
+}
+.myimg {
+  border: 1px solid #535353;
+  padding: 5px;
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 50%;
+  position: absolute;
+  top: -50px;
+  left: 42%;
+}
+
 .metaplex-square-w,
 .metaplex-square-h {
   aspect-ratio: 1 / 1;
@@ -103,3 +221,5 @@ h5,
 h6 {
   font-family: @theme-family-title;
 }
+
+

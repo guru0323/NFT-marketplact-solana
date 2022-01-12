@@ -99,88 +99,31 @@ export const LandingPageView = () => {
         <div
           className={`landing-page-header mt-5 mt-md-0 d-flex flex-column justify-content-between h-100`}>
           <div
-            className={`d-flex flex-column flex-md-row justify-content-between`}>
-            <div
-              className={`d-flex flex-column justify-content-center col col-md-6`}>
-              <h1 className={`p-3`}>{storefront.meta.title}</h1>
-              <p className={`p-2`}>{storefront.meta.description}</p>
-              <div className={`mt-5 mx-auto`}>
-                <InstructionsModal
-                  buttonText='Get Started'
-                  modalTitle={`Buying NFTs on AKKOROS`}
-                  cardProps={[
-                    {
-                      title: 'Create a SOL wallet',
-                      imgSrc: '/modals/how-to-buy-1.svg',
-                      description: `SOL is the cryptocurrency we use for purchases on AKKOROS. To keep your SOL safe, you’ll need a crypto wallet—we recommend using one called Phantom. Just head to Phantom’s site, install the Chrome extension, and create an account.`,
-                    },
-                    {
-                      title: 'Add funds to your wallet',
-                      imgSrc: '/modals/how-to-buy-2.svg',
-                      description: `To fund your wallet, you’ll need to purchase SOL tokens. The easiest way is with a credit card on FTX Pay—a service that’s already part of your new Phantom wallet. Open your wallet, tap “Deposit SOL”, and select “Deposit from FTX”. A new window will open where you can create an FTX account and purchase SOL.`,
-                    },
-                    {
-                      title: `Connect your wallet to AKKOROS.`,
-                      imgSrc: '/modals/how-to-buy-3.jpg',
-                      description: `To connect your wallet, tap “Connect Wallet” here on the site. Select the Phantom option, and your wallet will connect. After that, you can start bidding on NFTs.`,
-                      endElement: <ConnectButton />,
-                    },
-                  ]}
-                />
-                <Link to='/explore'>
-                  <button className='btn btn-outline-light landing-page-btn-explore text-uppercase m-2'>
-                    explore
-                  </button>
-                </Link>
-                <Link to='/artworks/new'>
-                  <button
-                    title={'Coming Soon'}
-                    className='btn btn-outline-light landing-page-btn-create text-uppercase mx-0 mb-2 m-md-2'>
-                    create
-                  </button>
-                </Link>
-              </div>
-            </div>
-            <div
-              className={`d-flex flex-row justify-content-center col col-md-6`}>
-              {console.log(auctions)}
-              {
-               auctions.length > 0? <Link
-                  to={`/auction/${
-                    auctions.length > 0 && auctions[0].auction.pubkey
-                  }`}
-                  key={0}>
-                  <AuctionRenderCard
-                    key={auctions.length > 0 ? auctions[0].auction.pubkey : 0}
-                    auctionView={auctions.length !== 0 ? auctions[0]:null}
-                  />
-                </Link>:<div/>
-              }
-            </div>
+            className ={`d-flex flex-column flex-md-row justify-content-between`}>
           </div>
           <div
             className={`d-flex flex-row justify-content-center my-3 flex-wrap text-center`}>
             <button
-              onClick={() => router.push('https://discord.gg/DnbkrC8')}
+              onClick={() => router.push('https://discord.gg/vYBcfGSdYr')}
               className='btn btn-outline-light landing-page-btn text-uppercase m-3'>
               Discord
             </button>
 
             <button
-              onClick={() => router.push('https://twitter.com/akkoros')}
+              onClick={() => router.push('https://twitter.com/Queendomverse')}
               className='btn btn-outline-light landing-page-btn text-uppercase m-3'>
               Twitter
             </button>
 
             <button
               onClick={() =>
-                router.push('https://github.com/AKKOROWEB/akkoro-client')
+                router.push('https://github.com/QueendomDAO')
               }
               className='btn btn-outline-light landing-page-btn text-uppercase m-3'>
               Github
             </button>
             <button
-              onClick={() => router.push('https://www.reddit.com/r/AKKOROS/')}
+              onClick={() => router.push('https://www.reddit.com/r/queendomverse')}
               className='btn btn-outline-light landing-page-btn text-uppercase m-3'>
               Reddit
             </button>

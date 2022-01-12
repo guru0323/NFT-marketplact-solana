@@ -31,6 +31,11 @@ import { useQuerySearch } from '../hooks';
 import { notify } from '../utils/notifications';
 import { sleep, useLocalStorageState } from '../utils/utils';
 import { WalletSigner } from './wallet';
+import getConfig from 'next/config';
+
+
+let nextConfig = getConfig();
+const publicRuntimeConfig = nextConfig.publicRuntimeConfig;
 
 interface BlockhashAndFeeCalculator {
   blockhash: Blockhash;
@@ -49,13 +54,8 @@ export type ENV =
 
 export const ENDPOINTS: { name: ENV; endpoint: string; ChainId: ChainId }[] = [
   {
-    name: 'mainnet-beta (Triton)',
-    endpoint: 'https://holaplex.rpcpool.com',
-    ChainId: ChainId.MainnetBeta,
-  },
-  {
-    name: 'mainnet-beta (Triton Staging)',
-    endpoint: 'https://stage.mainnet.rpcpool.com/4715f6087c8269548f2edb003a5e',
+    name: publicRuntimeConfig.publicSolanaNetwork,
+    endpoint: publicRuntimeConfig.publicSolanaRpcHost, 
     ChainId: ChainId.MainnetBeta,
   },
   {
